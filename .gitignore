@@ -1,0 +1,63 @@
+# === Contenuti copyright: MAI nel repository ===
+# ISO / archivi del gioco
+*.iso
+*.ISO
+*.cso
+*.7z
+*.nfo
+Yu-Gi-Oh*/
+
+# File estratti dalla ISO / binari originali
+iso_extracted/
+extracted/
+PSP_GAME/
+UMD_DATA.BIN
+*.prx
+*.PRX
+EBOOT.BIN
+BOOT.BIN
+*.elf.orig
+
+# ELF decifrati / dump
+*.dec
+*_decrypted*
+dump/
+
+# Asset estratti (EHP, audio, video, texture)
+assets/
+*.ehp
+*.pmf
+*.at3
+*.gim
+*.gmo
+
+# === Tool di terze parti (rigenerati da scripts/setup_tools.sh) ===
+tools/
+
+# === Output di build e tool ===
+build/
+out/
+obj/
+*.o
+*.elf
+!*.ld.elf   # eventuali eccezioni esplicite
+
+# asm generato da splat (rigenerabile dai PRX estratti — non è codice nostro)
+asm/
+
+# Ghidra
+*.gpr
+*.rep/
+ghidra_projects/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
