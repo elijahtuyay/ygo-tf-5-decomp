@@ -1,101 +1,150 @@
-# ygo-tf-5-decomp
+<p align="center">
+  <img src="github_image.png" alt="Tag Force 5 Decompilation" width="440">
+</p>
 
-Progetto di **decompilazione (matching)** di *Yu-Gi-Oh! 5D's Tag Force 5* per PSP
-(disco **ULES-01474**, Konami 2010, CPU MIPS Allegrex).
+# Tag Force 5 Decompilation
 
-Obiettivo: ricostruire a mano il codice C dei moduli del gioco in modo che,
-ricompilati con il compilatore originale, producano binari **byte-per-byte identici**
-a quelli sul disco — e da lì poter capire, correggere ed estendere il gioco (a
-partire dalla logica dei duelli, che è hardcoded nel codice, non nei dati).
+A **matching decompilation** of *Yu-Gi-Oh! 5D's Tag Force 5* for the PSP
+(disc **ULES-01474**, Konami, 2010, MIPS Allegrex CPU).
 
-> ⚠️ **Nessun contenuto Konami/Sony va nel repository.** ISO, `.prx`, EBOOT e asset
-> estratti sono esclusi da `.gitignore`. Serve una propria copia legale del gioco per
-> estrarre i file. Le mod si distribuiscono come patch, mai come ISO complete.
+The goal is to reconstruct the game's C source by hand so that, recompiled with the
+original toolchain, it produces **byte-for-byte identical** binaries — and from there to
+understand, fix, and extend the game (starting with the duel logic, which is hardcoded
+in the code rather than in data).
 
-## Stato attuale
+> This is the **first known decompilation effort for any Tag Force game.** It is early
+> and there is a lot to do — contributions are very welcome (see
+> [Contributing](#contributing)).
 
-Fase di **setup completata**: analisi del disco fatta, toolchain installata e
-verificata, EBOOT decifrato, documentazione e skill pronte. È pronta anche la rampa di
-lancio per la decomp vera e propria: il tutorial del **primo match** con due funzioni
-già individuate in `rel_movie_viewer` (vedi `docs/09-primo-match.md`). Prossimo passo
-operativo: portare quelle funzioni al 100% su decomp.me.
+## ⚠️ Legal
 
-Cosa è già accertato e funzionante:
+- **No copyrighted content is stored in this repository.** ISOs, `.prx` files, the
+  EBOOT, and extracted assets are all excluded by `.gitignore`. You must provide your
+  own legally-obtained copy of the game to extract the files.
+- Only hand-written reconstructed source, tooling, and documentation live here.
+- Mods are distributed as patches (xdelta), never as complete ISOs.
 
-- **28 moduli `rel_*.prx` sono ELF Allegrex in chiaro** → analizzabili subito.
-- **EBOOT.BIN decifrato**: con pspdecrypt si ottiene `build/EBOOT.elf` (engine
-  `modehsys`, ELF32 Allegrex, 1,5 MB; sha1 `cc92ddd4…`). `BOOT.BIN` è un dummy azzerato.
-- **Compilatore originale: Metrowerks CodeWarrior** (`MW MIPS C Compiler (2.4.1.01)`,
-  confermato anche sull'EBOOT) → il match si fa con `mwccpsp`, non con psp-gcc.
-- Pipeline provata end-to-end su un modulo reale: estrazione ISO → decrypt EBOOT →
-  disassembly Allegrex (rabbitizer) → **splat produce asm etichettato con rilocazioni
-  risolte**.
-- `checksums.sha1` con gli hash di tutti i moduli + EBOOT.elf = target del match.
+## Status
 
-## Struttura del repository
+Setup is complete and the **decompilation has started**. The first function is
+**matched at 100%** (`func_00000184` in `rel_movie_viewer`, see
+[`src/rel_movie_viewer.c`](src/rel_movie_viewer.c)), which pinned down the compiler
+configuration.
+
+**Confirmed compiler configuration**
+
+| Setting | Value |
+|---|---|
+| Original compiler | Metrowerks CodeWarrior for PSP — `MW MIPS C Compiler (2.4.1.01)` |
+| decomp.me / build | **MWCC 1.3 SP7** (`mwccpsp_3.0.1_219`) — exact build still being narrowed (180–219 all match simple functions) |
+| Flags | **`-O4,p -sdatathreshold 0`** |
+| Key technique | game state globals are **`volatile`**, accessed via a local pointer (see [`docs/09-first-match.md`](docs/09-first-match.md)) |
+
+What is already established:
+
+- **28 `rel_*.prx` game modules are plain Allegrex ELF** → analyzable immediately.
+- **EBOOT.BIN decrypted** → `build/EBOOT.elf` (the shared `modehsys` engine).
+  `BOOT.BIN` is a zeroed dummy.
+- Full pipeline proven end-to-end: ISO extraction → EBOOT decryption → Allegrex
+  disassembly (rabbitizer) → **splat** producing labeled asm → **decomp.me / mwccpsp**
+  matching → 100%.
+
+## How it works
 
 ```
-README.md              questo file
-docs/                  documentazione (in italiano) — vedi indice sotto
-scripts/               setup_tools.sh, extract_iso.sh, decrypt_eboot.sh
-config/                config splat (rel_movie_viewer.example.yaml = esempio verificato)
-requirements.txt       toolchain Python (splat/spimdisasm/rabbitizer)
-checksums.sha1         hash sha1 dei moduli originali (target del match)
-.claude/skills/        skill per Claude Code (tf5-decomp, psp-allegrex-tools, tf5-formati)
-.gitignore             esclude ISO/asset/binari/build
+ISO ──extract_iso.sh──► iso_extracted/
+EBOOT.BIN (~PSP) ──decrypt_eboot.sh──► build/EBOOT.elf
+PRX / EBOOT.elf
+   ──Ghidra + ghidra-allegrex / prxtool──►  understand code, resolve NID imports
+   ──splat (config/*.yaml)──►  asm/  +  linker script
+   ──m2c──►  draft C in src/*.c
+   ──mwccpsp + asm-differ / decomp.me──►  byte-exact match
+   ──build + sha1sum vs checksums.sha1──►  verify
+```
 
-# generati/ignorati (non in git):
-iso_extracted/         output di extract_iso.sh
-tools/                 asm-differ, m2c, decomp-permuter, pspdecrypt (clonati)
-.venv/                 virtualenv Python
-build/                 EBOOT.elf decifrato, output di build
+Details for every stage live in [`docs/`](docs/) — see the index below.
+
+## Repository layout
+
+```
+README.md              this file
+CONTRIBUTING.md        how to help
+docs/                  full documentation (English)
+scripts/               setup_tools.sh, extract_iso.sh, decrypt_eboot.sh, run_ghidra.sh
+config/                splat configs (rel_movie_viewer.example.yaml = verified example)
+src/                   reconstructed C source (matched functions)
+requirements.txt       Python toolchain (splat / spimdisasm / rabbitizer)
+checksums.sha1         sha1 of the original modules (match targets)
+.claude/skills/        Claude Code skills for this project
+.gitignore             excludes ISO / assets / binaries / build output
+
+# generated / git-ignored (never committed):
+iso_extracted/  tools/  .venv/  build/  asm/
 ```
 
 ## Quick start
 
 ```bash
-# 1. dipendenze di sistema (una volta) — richiede sudo
+# 1. system dependencies (once)
 sudo apt install -y p7zip-full build-essential libssl-dev python3-venv cmake ninja-build
 
-# 2. toolchain del progetto (venv + tool git)
+# 2. project toolchain (venv + git tools)
 scripts/setup_tools.sh
 
-# 3. estrai il disco (usa la tua ISO)
-scripts/extract_iso.sh "Yu-Gi-Oh 5D's Tag Force 5 (E)(M5)(ZER0)/0-ygotf5.iso"
+# 3. extract the disc (use YOUR own ISO)
+scripts/extract_iso.sh "path/to/your.iso"
 
-# 4. (opzionale) decifra l'EBOOT — engine condiviso modehsys
-make -C tools/pspdecrypt        # dopo libssl-dev
+# 4. decrypt the EBOOT (shared modehsys engine)
+make -C tools/pspdecrypt            # after libssl-dev
 scripts/decrypt_eboot.sh
 
-# 5. prova lo split su un modulo piccolo
+# 5. try splitting a small module
 . .venv/bin/activate
 splat split config/rel_movie_viewer.example.yaml
 ```
 
-Ghidra + ghidra-allegrex e PPSSPP si installano a mano: vedi `docs/03-strumenti.md`.
+Ghidra + the ghidra-allegrex extension and PPSSPP are installed manually — see
+[`docs/03-tools.md`](docs/03-tools.md). Launch Ghidra with `scripts/run_ghidra.sh`.
 
-## Documentazione
+## Documentation
 
-Leggere in ordine per una comprensione completa:
+1. [`docs/01-overview.md`](docs/01-overview.md) — what a matching decompilation is, the workflow, legal notes, expectations
+2. [`docs/02-iso-analysis.md`](docs/02-iso-analysis.md) — disc structure, modules, identified compiler
+3. [`docs/03-tools.md`](docs/03-tools.md) — installing the toolchain on Linux
+4. [`docs/04-extraction-and-decryption.md`](docs/04-extraction-and-decryption.md) — extracting the ISO, decrypting the EBOOT
+5. [`docs/05-ghidra.md`](docs/05-ghidra.md) — analysis with Ghidra + ghidra-allegrex, NIDs
+6. [`docs/06-splitting-and-matching.md`](docs/06-splitting-and-matching.md) — splitting, m2c, asm-differ, decomp.me, mwccpsp
+7. [`docs/07-file-formats.md`](docs/07-file-formats.md) — asset formats (EHP / CIP / card DB / audio / models)
+8. [`docs/08-resources.md`](docs/08-resources.md) — links, community, reference project (sotn-decomp)
+9. [`docs/09-first-match.md`](docs/09-first-match.md) — **hands-on tutorial**: the first match on decomp.me
 
-1. [`docs/01-panoramica.md`](docs/01-panoramica.md) — cos'è una decomp matching, flusso, note legali, aspettative
-2. [`docs/02-analisi-iso.md`](docs/02-analisi-iso.md) — struttura del disco, moduli, compilatore identificato
-3. [`docs/03-strumenti.md`](docs/03-strumenti.md) — installazione della toolchain su Linux
-4. [`docs/04-estrazione-e-decrypt.md`](docs/04-estrazione-e-decrypt.md) — estrarre la ISO, decifrare l'EBOOT
-5. [`docs/05-ghidra.md`](docs/05-ghidra.md) — analisi con Ghidra + ghidra-allegrex, NID
-6. [`docs/06-splat-e-matching.md`](docs/06-splat-e-matching.md) — split, m2c, asm-differ, decomp.me, mwccpsp
-7. [`docs/07-formati-file.md`](docs/07-formati-file.md) — formati asset (EHP/CIP/carte/audio/modelli)
-8. [`docs/08-risorse.md`](docs/08-risorse.md) — link, community, progetto di riferimento (sotn-decomp)
-9. [`docs/09-primo-match.md`](docs/09-primo-match.md) — **tutorial pratico**: il primo match su decomp.me
+## Contributing
 
-## Rischio principale
+Help is very welcome — this is a big, long-term effort and every matched function
+counts. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full guide. In short:
 
-La `.comment` dei binari indica CodeWarrior `2.4.1.01`, mentre le build di `mwccpsp`
-disponibili pubblicamente (decomp.me) sono etichettate `3.0.1_NNN`. Trovare la build
-che produce un match è l'incognita più grossa del progetto — vedi `docs/06`.
+1. Read [`docs/01-overview.md`](docs/01-overview.md) and
+   [`docs/09-first-match.md`](docs/09-first-match.md).
+2. Get set up with `scripts/setup_tools.sh` and extract your own copy of the game.
+3. Pick a small, unclaimed function (the `rel_movie_viewer` module is a good starting
+   point) and match it on [decomp.me](https://decomp.me) with the confirmed config above.
+4. Open a PR adding the matched C to `src/`.
 
-## Riferimento di processo
+The single most useful reference project is
+[**sotn-decomp**](https://github.com/Xeeynamo/sotn-decomp) — the only mature PSP
+matching decompilation, and it uses the same toolchain.
 
-[**sotn-decomp**](https://github.com/Xeeynamo/sotn-decomp) è l'unica decomp matching
-con un target PSP funzionante e usa la nostra stessa impostazione (splat + mwccpsp via
-wibo + verifica sha1 + frogress). È il modello da seguire.
+## Acknowledgements
+
+Built on the work of the PSP reverse-engineering and decomp communities:
+[splat](https://github.com/ethteck/splat), [m2c](https://github.com/matt-kempster/m2c),
+[asm-differ](https://github.com/simonlindholm/asm-differ),
+[decomp.me](https://decomp.me), [ghidra-allegrex](https://github.com/kotcrab/ghidra-allegrex),
+[pspdecrypt](https://github.com/John-K/pspdecrypt),
+and the [Tag Force modding community](https://github.com/xan1242).
+
+## License
+
+The reconstructed source and tooling in this repository are released under the terms in
+[LICENSE](LICENSE). This project is not affiliated with or endorsed by Konami. All game
+content and trademarks belong to their respective owners.

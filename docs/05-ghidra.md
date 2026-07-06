@@ -1,95 +1,109 @@
-# 05 — Analisi statica con Ghidra + ghidra-allegrex
+# 05 — Static Analysis with Ghidra + ghidra-allegrex
 
-Ghidra (con l'estensione Allegrex) è lo strumento principale per capire il codice:
-disassembla, decompila in pseudo-C, permette di nominare funzioni/dati e navigare le
-chiamate. È complementare a splat: Ghidra per **capire**, splat per **produrre l'asm
-da matchare**.
+Ghidra (with the Allegrex extension) is the primary tool for understanding the code:
+it disassembles, decompiles to pseudo-C, lets you name functions/data, and lets you
+navigate calls. It's complementary to splat: Ghidra for **understanding**, splat for
+**producing the asm to match**.
 
-## Perché serve ghidra-allegrex
+Quick start (finds Ghidra, sets JDK 21, warns if the Allegrex extension is missing,
+launches in the background):
 
-Ghidra "vanilla" ha il processore MIPS ma non conosce le specificità PSP. L'estensione
-[**ghidra-allegrex**](https://github.com/kotcrab/ghidra-allegrex) (kotcrab) aggiunge:
+```bash
+scripts/run_ghidra.sh              # opens Ghidra
+scripts/run_ghidra.sh progetto.gpr # opens a specific project
+```
 
-- rilocazioni PSP: `PT_SCE_PSPREL` (`0x700000A0`) e `PT_SCE_PSPREL2` (compressa);
-- rebase dell'immagine dopo il load;
-- istruzioni **Allegrex** custom e **disassembly/decompilazione della VFPU** (COP2:
-  128 registri, 8 matrici 4×4, `vmmul`, `vdot`, `vsin`, prefissi/swizzle…);
-- riconoscimento automatico dell'ELF PSP e convenzione di chiamata PSP;
-- import/export dei simboli `.sym` di **PPSSPP** (ponte con il debugging dinamico).
+## Why ghidra-allegrex is needed
 
-> Limiti noti (da PSP RE HQ): il supporto VFPU non è completissimo e i valori di
-> ritorno/argomenti a 64 bit su più registri non sono sempre gestiti bene.
+"Vanilla" Ghidra has the MIPS processor but doesn't know about PSP specifics. The
+[**ghidra-allegrex**](https://github.com/kotcrab/ghidra-allegrex) extension (kotcrab)
+adds:
 
-Installazione: vedi `03-strumenti.md` §4.
+- PSP relocations: `PT_SCE_PSPREL` (`0x700000A0`) and `PT_SCE_PSPREL2` (compressed);
+- rebasing the image after load;
+- custom **Allegrex** instructions and **VFPU disassembly/decompilation** (COP2:
+  128 registers, 8 4x4 matrices, `vmmul`, `vdot`, `vsin`, prefixes/swizzle…);
+- automatic recognition of the PSP ELF and the PSP calling convention;
+- import/export of **PPSSPP** `.sym` symbols (a bridge with dynamic debugging).
 
-## Cosa caricare
+> Known limitations (from PSP RE HQ): VFPU support isn't fully complete, and
+> 64-bit return values/arguments spanning multiple registers aren't always
+> handled well.
 
-- **Moduli `rel_*.prx`**: caricabili direttamente (sono ELF Allegrex in chiaro).
-  L'header ha `e_type = 0xFFA0` (verificato: Ghidra/readelf lo mostrano come
+Installation: see `03-tools.md` §4.
+
+## What to load
+
+- **`rel_*.prx` modules**: can be loaded directly (they are plaintext Allegrex ELFs).
+  The header has `e_type = 0xFFA0` (verified: Ghidra/readelf show it as
   "Processor Specific: (ffa0)").
-- **`modehsys`** (l'engine): serve prima l'ELF decifrato `build/EBOOT.elf`
-  (vedi `04-estrazione-e-decrypt.md`), poi si carica come gli altri.
+- **`modehsys`** (the engine): first requires the decrypted ELF `build/EBOOT.elf`
+  (see `04-extraction-and-decryption.md`), then it loads like the others.
 
-Indirizzo di load: convenzionalmente `0x08804000` per il modulo utente principale; i
-moduli `rel_*` sono rilocabili (vram 0) e caricati dinamicamente dall'engine — Ghidra
-applica le rilocazioni della `.rel.text`.
+Load address: conventionally `0x08804000` for the main user module; the `rel_*`
+modules are relocatable (vram 0) and loaded dynamically by the engine — Ghidra
+applies the `.rel.text` relocations.
 
-## Risolvere gli import: i NID
+## Resolving imports: the NIDs
 
-La PSP non importa le funzioni SDK per nome ma per **NID** = primi 4 byte di
-`SHA-1(nome_funzione)`, in little-endian. Nel PRX:
+The PSP doesn't import SDK functions by name but by **NID** = the first 4 bytes of
+`SHA-1(function_name)`, in little-endian. In the PRX:
 
-- `.lib.stub` elenca i moduli importati (es. `sceGu`, `sceIo`, `sceCtrl`) e punta a…
-- `.rodata.sceNid`, la tabella dei NID richiesti;
-- `.sceStub.text` contiene gli stub (`jr $ra`/`nop`) patchati al load.
+- `.lib.stub` lists the imported modules (e.g. `sceGu`, `sceIo`, `sceCtrl`) and
+  points to…
+- `.rodata.sceNid`, the table of required NIDs;
+- `.sceStub.text` contains the stubs (`jr $ra`/`nop`) patched at load time.
 
-Senza tradurre i NID in nomi, il decompilato è illeggibile. Fonti/strumenti:
+Without translating the NIDs into names, the decompiled output is unreadable.
+Sources/tools:
 
-- **uofw/uofw** — https://github.com/uofw/uofw — reimplementazione clean-room del
-  firmware PSP: è la fonte pubblica standard di NID **con nome e firma tipizzata**.
-- **Script NID** (PSP RE HQ): un `SonyPSPResolveNIDs.py` mappa i NID e carica gli
-  archivi di tipi Ghidra `PSPSDK.gdt` (per i giochi) o `uOFW.gdt` (per i moduli
-  kernel). Quickstart: https://psp-re.github.io/quickstart/
-- **psp-ghidra-scripts** — https://github.com/pspdev/psp-ghidra-scripts — fix
-  import/export.
-- **prxtool** (pspdev) risolve anch'esso i NID da riga di comando.
+- **uofw/uofw** — https://github.com/uofw/uofw — a clean-room reimplementation of
+  the PSP firmware: it's the standard public source of NIDs **with names and typed
+  signatures**.
+- **NID script** (PSP RE HQ): a `SonyPSPResolveNIDs.py` maps the NIDs and loads the
+  Ghidra type archives `PSPSDK.gdt` (for games) or `uOFW.gdt` (for kernel modules).
+  Quickstart: https://psp-re.github.io/quickstart/
+- **psp-ghidra-scripts** — https://github.com/pspdev/psp-ghidra-scripts — import/export
+  fixes.
+- **prxtool** (pspdev) also resolves NIDs from the command line.
 
-Flusso tipico all'apertura di un modulo:
+Typical flow when opening a module:
 
-1. Auto-analisi Ghidra (con ghidra-allegrex attivo).
-2. Esegui lo script di risoluzione NID → gli stub prendono i nomi `sce*`.
-3. Applica gli archivi di tipi (`PSPSDK.gdt`) → firme corrette delle funzioni SDK.
-4. Da qui, naviga `module_start` e le funzioni esportate in `.lib.ent`.
+1. Ghidra auto-analysis (with ghidra-allegrex active).
+2. Run the NID resolution script → the stubs get their `sce*` names.
+3. Apply the type archives (`PSPSDK.gdt`) → correct SDK function signatures.
+4. From here, navigate `module_start` and the exported functions in `.lib.ent`.
 
-## Ponte con PPSSPP (analisi dinamica)
+## Bridge with PPSSPP (dynamic analysis)
 
-PPSSPP ha disassembler, debugger, memory viewer e GE debugger integrati. Utile per:
+PPSSPP has a built-in disassembler, debugger, memory viewer, and GE debugger. Useful for:
 
-- confermare a runtime cosa fa una funzione (breakpoint, watch di memoria);
-- ricavare indirizzi reali di strutture dati;
-- esportare i simboli `.sym` e importarli in Ghidra (e viceversa) con gli script di
-  ghidra-allegrex.
+- confirming at runtime what a function does (breakpoints, memory watches);
+- getting real addresses of data structures;
+- exporting `.sym` symbols and importing them into Ghidra (and vice versa) with
+  the ghidra-allegrex scripts.
 
-I CWCheat noti per TF5 (vedi `08-risorse.md`) danno già indirizzi "caldi" da cui
-partire: es. la coppia US `0x80338CD4/0x80338CD2` (All Cards / No Card Bans) indica
-una funzione di **controllo legalità delle carte**, punto di partenza concreto.
+The known CWCheats for TF5 (see `08-resources.md`) already give "hot" addresses to
+start from: e.g. the US pair `0x80338CD4/0x80338CD2` (All Cards / No Card Bans)
+points to a **card legality check** function, a concrete starting point.
 
-## Convenzione dei nomi (mantenere coerenza con splat)
+## Naming convention (stay consistent with splat)
 
-Quando nomini funzioni/dati in Ghidra, usa nomi che poi riporterai nei file di simboli
-di splat (`config/symbols.*.txt`), così l'asm generato e il decompilato parlano la
-stessa lingua. Esempi di schema da progetti maturi (sotn-decomp):
+When naming functions/data in Ghidra, use names that you'll later carry over into
+splat's symbol files (`config/symbols.*.txt`), so the generated asm and the
+decompiled code speak the same language. Example scheme from mature projects
+(sotn-decomp):
 
 ```
-config/symbols.<modulo>.txt     # indirizzo = nome
-config/symexport.<modulo>.txt   # simboli esportati
+config/symbols.<module>.txt     # address = name
+config/symexport.<module>.txt   # exported symbols
 ```
 
-## Riferimenti
+## References
 
 - ghidra-allegrex: https://github.com/kotcrab/ghidra-allegrex
 - PSP RE HQ quickstart: https://psp-re.github.io/quickstart/
-- uofw (NID/firme): https://github.com/uofw/uofw — tutorial:
+- uofw (NIDs/signatures): https://github.com/uofw/uofw — tutorial:
   https://github.com/uofw/uofw/wiki/Reverse-Engineering-Tutorial
-- Formato PRX: https://www.psdevwiki.com/psp/PRX_File_Format
+- PRX format: https://www.psdevwiki.com/psp/PRX_File_Format
 - VFPU: https://pspdev.github.io/vfpu-docs/

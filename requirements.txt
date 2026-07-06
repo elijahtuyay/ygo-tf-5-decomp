@@ -1,14 +1,14 @@
-# Toolchain Python per la decomp di Tag Force 5 (PSP / MIPS Allegrex)
-# Installare in un virtualenv:  python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
+# Python toolchain for the Tag Force 5 decompilation (PSP / MIPS Allegrex)
+# Install in a virtualenv:  python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
 
-# Split del binario in asm/ + assets/ (supporta la piattaforma "psp")
+# Splits the binary into asm/ + assets/ (supports the "psp" platform)
 splat64[mips]==0.41.0
 
-# Disassembler MIPS con supporto Allegrex (R4000ALLEGREX) — dipendenza di splat,
-# fissata qui per riproducibilità
+# MIPS disassembler with Allegrex support (R4000ALLEGREX) — a splat dependency,
+# pinned here for reproducibility
 spimdisasm==1.42.2
 rabbitizer==1.16.2
 
-# Utilità varie usate dagli script/tool
-pyelftools>=0.31   # lettura header ELF/PRX da Python
-colorama>=0.4      # output colorato (asm-differ / m2c)
+# Miscellaneous utilities used by the scripts/tools
+pyelftools>=0.31   # reads ELF/PRX headers from Python
+colorama>=0.4      # colored output (asm-differ / m2c)

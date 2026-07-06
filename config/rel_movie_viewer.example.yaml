@@ -1,36 +1,36 @@
-# Config splat DI ESEMPIO per il modulo più piccolo (rel_movie_viewer.prx, 26 KB).
-# VERIFICATO: con questo file `splat split` disassembla il .text producendo
-# asm/text.s con funzioni etichettate e rilocazioni %hi/%lo risolte.
+# EXAMPLE splat config for the smallest module (rel_movie_viewer.prx, 26 KB).
+# VERIFIED: with this file `splat split` disassembles the .text section, producing
+# asm/text.s with labeled functions and resolved %hi/%lo relocations.
 #
-# NB: è un punto di partenza, non una config completa di match. Restano da mappare
-# le sezioni PSP-specifiche (.sceStub.text, .rodata.sceNid, .lib.stub/.lib.ent,
-# .data, .bss) come subsegment dedicati perché venga generato anche il linker
-# script. Layout reale delle sezioni del PRX (da `readelf -S`):
+# NOTE: this is a starting point, not a complete matching config. The PSP-specific
+# sections (.sceStub.text, .rodata.sceNid, .lib.stub/.lib.ent, .data, .bss) still
+# need to be mapped as dedicated subsegments so that the linker script also gets
+# generated. Actual PRX section layout (from `readelf -S`):
 #
 #   .text            vram 0x0000   file 0x0054  size 0x8b4
-#   .sceStub.text    vram 0x08b4   file 0x0908           <- stub di import (jal SDK)
+#   .sceStub.text    vram 0x08b4   file 0x0908           <- import stub (jal SDK)
 #   .rodata.sceModuleInfo vram 0x3f04 file 0x3f58
-#   .rodata.sceNid   vram 0x3f68   file 0x3fbc size 0x1b04  <- tabella NID import
+#   .rodata.sceNid   vram 0x3f68   file 0x3fbc size 0x1b04  <- import NID table
 #   .data            vram 0x5a6c   file 0x5ac0 size 0x54
 #   .bss             vram 0x5ac0
-#   (mapping piatto: file_offset = 0x54 + vram, fino a .data)
+#   (flat mapping: file_offset = 0x54 + vram, up to .data)
 #
-# Sostituisci lo sha1 con quello del TUO file estratto se differisce.
+# Replace the sha1 with that of YOUR extracted file if it differs.
 
 name: rel_movie_viewer
 sha1: 12171f279306265587cd1254f68244c81f8b7528
 options:
   platform: psp
   basename: rel_movie_viewer
-  # splat risolve i percorsi rispetto a base_path, che è relativo alla cartella di
-  # QUESTO file (config/). base_path ".." = root del progetto.
-  # Lancia dalla root:  splat split config/rel_movie_viewer.example.yaml
+  # splat resolves paths relative to base_path, which is relative to the folder
+  # containing THIS file (config/). base_path ".." = project root.
+  # Run from the root:  splat split config/rel_movie_viewer.example.yaml
   base_path: ..
   target_path: iso_extracted/PSP_GAME/USRDIR/gmodule/rel_movie_viewer.prx
   asm_path: asm/rel_movie_viewer
   ld_script_path: build/rel_movie_viewer.ld
-  compiler: GCC          # placeholder: il gioco usa MWCC (vedi docs/06); GCC va bene
-                         # solo per far girare il disassemblatore, non per il match.
+  compiler: GCC          # placeholder: the game uses MWCC (see docs/06); GCC is fine
+                         # just to run the disassembler, not for matching.
   find_file_boundaries: True
   section_order: [".text"]
 

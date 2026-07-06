@@ -1,84 +1,95 @@
 ---
 name: tf5-decomp
 description: >
-  Orientamento e workflow per la decompilazione (matching) di Yu-Gi-Oh! 5D's Tag
-  Force 5 (PSP, ULES-01474). Attiva questa skill ogni volta che si lavora in questo
-  repository su decomp, reverse engineering, analisi dei moduli PRX/EBOOT, split del
-  binario, matching di funzioni, o formati dei file del gioco. Trigger: "decomp",
-  "decompilare", "matching", "PRX", "EBOOT", "Allegrex", "splat", "duel_eng",
-  "Tag Force", "modehsys", "reverse engineering PSP".
+  Orientation and workflow for the matching decompilation of Yu-Gi-Oh! 5D's Tag
+  Force 5 (PSP, ULES-01474). Activate this skill whenever working in this repository on
+  decompilation, reverse engineering, PRX/EBOOT module analysis, binary splitting,
+  function matching, or the game's file formats. Triggers: "decomp", "decompile",
+  "matching", "PRX", "EBOOT", "Allegrex", "splat", "duel_eng", "Tag Force", "modehsys",
+  "PSP reverse engineering".
 ---
 
-# Decomp di Tag Force 5 — guida operativa
+# Tag Force 5 decomp — operating guide
 
-Progetto: ricostruzione matching del codice di **Yu-Gi-Oh! 5D's Tag Force 5**
-(PSP, MIPS Allegrex, Konami 2010, disco **ULES-01474**).
+Project: matching reconstruction of the code of **Yu-Gi-Oh! 5D's Tag Force 5**
+(PSP, MIPS Allegrex, Konami 2010, disc **ULES-01474**).
 
-## Fatti di progetto da NON riscoprire ogni volta
+## Project facts NOT to rediscover every time
 
-- **Compilatore originale = Metrowerks CodeWarrior `MW MIPS C Compiler (2.4.1.01)`**
-  (dalla sezione `.comment` di tutti i PRX). Il match si fa con **`mwccpsp`**, non con
-  psp-gcc. Su decomp.me il preset è PSP/`mwccpsp`; in locale gira via **wibo**/WINE.
-- **I 28 moduli `USRDIR/gmodule/rel_*.prx` sono ELF Allegrex IN CHIARO**: analizzabili
-  subito, senza decifrare nulla. Convenzione: `rel_X.prx` = modulo `modX`, esporta
-  `libX_rel`, importa `libehsys_rel` dall'engine principale.
-- **`SYSDIR/EBOOT.BIN` è CIFRATO** (magic `~PSP`, modulo `modehsys`). `BOOT.BIN` è un
-  dummy azzerato (NON è l'ELF in chiaro). Va decifrato con pspdecrypt o PPSSPP.
-- **Nessuna decomp Tag Force è mai esistita**: siamo i primi. La logica delle carte è
-  **hardcoded** in `rel_duel_eng.prx`, non nei dati → decompilare il codice è l'unico
-  modo di capirla davvero.
-- **Toolchain locale già installata e verificata**: splat64 (piattaforma `psp`),
-  spimdisasm, rabbitizer (categoria `R4000ALLEGREX`, con VFPU), in `.venv`;
+- **Original compiler = Metrowerks CodeWarrior `MW MIPS C Compiler (2.4.1.01)`**
+  (from the `.comment` section of every PRX). Matching uses **`mwccpsp`**, not psp-gcc.
+  On decomp.me the PSP builds use the product names **MWCC 1.0 … 1.3 SP7** (internal
+  builds 3.0.1_121…219); `2.4.1.01` is a different numbering axis, do NOT look for it
+  in the list. Bisect from the high builds (219→210→205…) on a real function to find the
+  right one; locally it runs via **wibo**. Details in `docs/09-first-match.md`.
+- **CONFIRMED config (first function at 100%)**: compiler **MWCC 1.3 SP7
+  (mwccpsp_3.0.1_219)**, flags **`-O4,p -sdatathreshold 0`**. `-sdatathreshold 0` =
+  absolute addressing (not gp-relative). Exact build still to be narrowed (180–219 all
+  match simple functions).
+- **Technique**: game **state globals are `volatile`**; to match, access them via a
+  local pointer: `volatile int *p = &G; if (*p) { ... *p ...; *p = 0; }` — this
+  reproduces the value reload + use of saved registers (`$s0`). Full case in
+  `docs/09-first-match.md`.
+- **The 28 `USRDIR/gmodule/rel_*.prx` modules are PLAINTEXT Allegrex ELF**: analyzable
+  immediately, no decryption needed. Convention: `rel_X.prx` = module `modX`, exports
+  `libX_rel`, imports `libehsys_rel` from the main engine.
+- **`SYSDIR/EBOOT.BIN` is ENCRYPTED** (magic `~PSP`, module `modehsys`). `BOOT.BIN` is a
+  zeroed dummy (NOT the plaintext ELF). Decrypt it with pspdecrypt or PPSSPP.
+- **No Tag Force decomp has ever existed**: we're the first. Card logic is **hardcoded**
+  in `rel_duel_eng.prx`, not in data → decompiling the code is the only way to really
+  understand it.
+- **Local toolchain already installed and verified**: splat64 (platform `psp`),
+  spimdisasm, rabbitizer (category `R4000ALLEGREX`, with VFPU), in `.venv`;
   asm-differ, m2c, decomp-permuter, pspdecrypt in `tools/`.
 
-## Regole ferree del repository
+## Hard repository rules
 
-- **MAI committare** ISO, `.prx`, EBOOT, asset estratti, `iso_extracted/`, `build/`.
-  Il `.gitignore` li esclude già. Solo `src/`, `config/`, `scripts/`, `docs/`, `tools/`
-  (submodule/clonati) vanno in git.
-- Le mod si distribuiscono come **patch xdelta**, mai come ISO complete.
+- **NEVER commit** ISOs, `.prx`, EBOOT, extracted assets, `iso_extracted/`, `build/`,
+  `asm/`. The `.gitignore` already excludes them. Only `src/`, `config/`, `scripts/`,
+  `docs/` (and the git-ignored `tools/`) belong in git.
+- Mods are distributed as **xdelta patches**, never as complete ISOs.
 
-## La pipeline (dettagli in docs/)
+## The pipeline (details in docs/)
 
 ```
 ISO ──scripts/extract_iso.sh──► iso_extracted/
-EBOOT.BIN (~PSP) ──scripts/decrypt_eboot.sh──► build/EBOOT.elf   (serve libssl-dev)
-PRX in chiaro / EBOOT.elf
-   ──Ghidra+ghidra-allegrex / prxtool──►  analisi, NID, nomi funzioni
+EBOOT.BIN (~PSP) ──scripts/decrypt_eboot.sh──► build/EBOOT.elf   (needs libssl-dev)
+plaintext PRX / EBOOT.elf
+   ──Ghidra+ghidra-allegrex / prxtool──►  analysis, NIDs, function names
    ──splat (config/*.yaml)──►  asm/  +  linker script
-   ──m2c──►  bozza src/*.c
-   ──mwccpsp + asm-differ / decomp.me──►  match byte-per-byte
-   ──make + sha1sum vs checksums.sha1──►  verifica
+   ──m2c──►  draft src/*.c
+   ──mwccpsp + asm-differ / decomp.me──►  byte-for-byte match
+   ──make + sha1sum vs checksums.sha1──►  verify
 ```
 
-## Come attaccare un nuovo modulo (checklist)
+## How to attack a new module (checklist)
 
-1. `readelf -S modulo.prx` → annota layout sezioni (.text/.rodata.sceNid/.data/.bss).
-2. Scrivi/adatta una config splat (parti da `config/rel_movie_viewer.example.yaml`).
-3. `splat split config/modulo.yaml` → genera `asm/`.
-4. Risolvi gli import: la `.rodata.sceNid` elenca i NID delle funzioni SDK importate;
-   nominale con un database NID (vedi skill `psp-allegrex-tools`).
-5. Per ogni funzione: `m2c` → bozza C → mwccpsp/decomp.me → itera con asm-differ finché
-   il diff è vuoto → segna "matched".
-6. Ricostruisci e verifica lo sha1 contro `checksums.sha1`.
+1. `readelf -S module.prx` → note the section layout (.text/.rodata.sceNid/.data/.bss).
+2. Write/adapt a splat config (start from `config/rel_movie_viewer.example.yaml`).
+3. `splat split config/module.yaml` → generates `asm/`.
+4. Resolve imports: `.rodata.sceNid` lists the NIDs of imported SDK functions; name them
+   with a NID database (see the `psp-allegrex-tools` skill).
+5. For each function: `m2c` → draft C → mwccpsp/decomp.me → iterate with asm-differ until
+   the diff is empty → mark "matched".
+6. Rebuild and verify the sha1 against `checksums.sha1`.
 
-## Ordine consigliato dei moduli
+## Recommended module order
 
-`rel_movie_viewer` (26 KB, per rodare la pipeline) → altri moduli piccoli
-(`rel_html_view`, `rel_soundtest`) → **`modehsys`** (EBOOT: engine condiviso, sblocca
-`libehsys_rel`) → **`rel_duel_eng`** (4,3 MB: motore delle regole, il cuore del gioco).
+`rel_movie_viewer` (26 KB, to shake down the pipeline) → other small modules
+(`rel_html_view`, `rel_soundtest`) → **`modehsys`** (EBOOT: shared engine, unlocks
+`libehsys_rel`) → **`rel_duel_eng`** (4.3 MB: the rules engine, the heart of the game).
 
-## Documentazione completa
+## Full documentation
 
-- `docs/01-panoramica.md` — cos'è una decomp matching, aspettative, note legali
-- `docs/02-analisi-iso.md` — struttura ISO, moduli, compilatore
-- `docs/03-strumenti.md` — installazione toolchain
-- `docs/04-estrazione-e-decrypt.md` — estrarre ISO, decifrare EBOOT
-- `docs/05-ghidra.md` — Ghidra + ghidra-allegrex, prxtool, NID
-- `docs/06-splat-e-matching.md` — split, m2c, asm-differ, decomp.me, mwccpsp
-- `docs/07-formati-file.md` — EHP/CIP/card DB/audio/modelli + tool community
-- `docs/08-risorse.md` — link, community, repo di riferimento
-- `docs/09-primo-match.md` — tutorial: primo match su decomp.me (funzioni `func_000001C0`
-  vuota e `func_00000184` in rel_movie_viewer; bozza C da m2c inclusa)
+- `docs/01-overview.md` — what a matching decomp is, expectations, legal notes
+- `docs/02-iso-analysis.md` — ISO structure, modules, compiler
+- `docs/03-tools.md` — toolchain installation
+- `docs/04-extraction-and-decryption.md` — extracting the ISO, decrypting the EBOOT
+- `docs/05-ghidra.md` — Ghidra + ghidra-allegrex, prxtool, NIDs
+- `docs/06-splitting-and-matching.md` — splitting, m2c, asm-differ, decomp.me, mwccpsp
+- `docs/07-file-formats.md` — EHP/CIP/card DB/audio/models + community tools
+- `docs/08-resources.md` — links, community, reference project
+- `docs/09-first-match.md` — tutorial: first match on decomp.me (empty `func_000001C0`
+  and `func_00000184` in rel_movie_viewer; m2c C draft included)
 
-Skill correlate: **psp-allegrex-tools** (toolchain RE), **tf5-formati** (asset).
+Related skills: **psp-allegrex-tools** (RE toolchain), **tf5-formats** (assets).

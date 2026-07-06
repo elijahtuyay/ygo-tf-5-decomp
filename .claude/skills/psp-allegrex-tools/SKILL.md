@@ -1,78 +1,81 @@
 ---
 name: psp-allegrex-tools
 description: >
-  Riferimento operativo della toolchain di reverse engineering PSP/MIPS Allegrex per
-  questo progetto: splat, spimdisasm/rabbitizer, Ghidra + ghidra-allegrex, prxtool,
-  m2c, asm-differ/objdiff, decomp-permuter, mwccpsp+wibo, pspdecrypt, PPSSPP, NID.
-  Attiva quando si installa/usa uno di questi strumenti, si disassembla o decompila
-  codice Allegrex, si risolvono i NID/import SDK, o si imposta il build di matching.
-  Trigger: "splat", "ghidra", "allegrex", "VFPU", "NID", "prxtool", "m2c",
-  "asm-differ", "objdiff", "mwccpsp", "wibo", "pspdecrypt", "decompilare funzione".
+  Operational reference for this project's PSP/MIPS Allegrex reverse-engineering
+  toolchain: splat, spimdisasm/rabbitizer, Ghidra + ghidra-allegrex, prxtool, m2c,
+  asm-differ/objdiff, decomp-permuter, mwccpsp+wibo, pspdecrypt, PPSSPP, NIDs.
+  Activate when installing/using any of these tools, disassembling or decompiling
+  Allegrex code, resolving NIDs/SDK imports, or setting up the matching build.
+  Triggers: "splat", "ghidra", "allegrex", "VFPU", "NID", "prxtool", "m2c",
+  "asm-differ", "objdiff", "mwccpsp", "wibo", "pspdecrypt", "decompile function".
 ---
 
-# Toolchain RE per PSP Allegrex
+# PSP Allegrex RE toolchain
 
-Comandi e fatti verificati. Assumi il virtualenv attivo: `. .venv/bin/activate`.
+Verified commands and facts. Assume the virtualenv is active: `. .venv/bin/activate`.
 
-## Stato locale (verificato)
-- `.venv`: splat64[mips] 0.41.0, spimdisasm 1.42.2, rabbitizer 1.16.2 (categoria
-  `R4000ALLEGREX`, VFPU inclusa). `tools/`: asm-differ, m2c, decomp-permuter, pspdecrypt.
-- **pspdecrypt compilato**; EBOOT già decifrato → `build/EBOOT.elf` (engine `modehsys`,
+## Local state (verified)
+- `.venv`: splat64[mips] 0.41.0, spimdisasm 1.42.2, rabbitizer 1.16.2 (category
+  `R4000ALLEGREX`, VFPU included). `tools/`: asm-differ, m2c, decomp-permuter, pspdecrypt.
+- **pspdecrypt built**; EBOOT already decrypted → `build/EBOOT.elf` (engine `modehsys`,
   sha1 `cc92ddd45f550ac1b906842d587c883fba22be34`).
-- Da installare a mano: **Ghidra 12.0** (NON 12.1.x) + ghidra-allegrex **v21.3**
-  (zip `ghidra_12.0_..._ghidra-allegrex.zip`), poi wibo + mwccpsp; PPSSPP opzionale.
+- Install manually: **Ghidra 12.0** (NOT 12.1.x) + ghidra-allegrex **v21.3**
+  (zip `ghidra_12.0_..._ghidra-allegrex.zip`), then wibo + mwccpsp; PPSSPP optional.
 
-## Disassembly rapido (senza config) — utile per orientarsi
-rabbitizer decodifica Allegrex direttamente. Estrarre `.text` da un PRX e disassemblare:
+## Quick disassembly (no config) — useful for orientation
+rabbitizer decodes Allegrex directly. Extract `.text` from a PRX and disassemble:
 ```python
 import struct, rabbitizer
-data=open('modulo.prx','rb').read()
-# ... trova offset/size di .text via header ELF (readelf -S) ...
+data=open('module.prx','rb').read()
+# ... find .text offset/size via the ELF header (readelf -S) ...
 ins=rabbitizer.Instruction(word, vram=addr, category=rabbitizer.InstrCategory.R4000ALLEGREX)
 print(ins.disassemble())
 ```
-Verificato: produce codice corretto sui PRX di TF5 (es. `module_start` di rel_movie_viewer).
+Verified: produces correct code on the TF5 PRXs (e.g. `module_start` of rel_movie_viewer).
 
-## splat (produzione asm/ + linker script)
+## splat (produces asm/ + linker script)
 ```bash
-readelf -S modulo.prx          # 1) leggi layout sezioni
-# 2) adatta config/<modulo>.yaml (parti da config/rel_movie_viewer.example.yaml)
-splat split config/<modulo>.yaml
+readelf -S module.prx          # 1) read the section layout
+# 2) adapt config/<module>.yaml (start from config/rel_movie_viewer.example.yaml)
+splat split config/<module>.yaml
 ```
-Note PRX: sono ELF rilocabili con `vram=0`; le sezioni PSP-specifiche
-(`.sceStub.text`, `.rodata.sceNid`, `.lib.stub/.lib.ent`, `.data`, `.bss`) vanno messe
-come subsegment perché venga generato il linker script. `platform: psp`.
+PRX notes: they are relocatable ELFs with `vram=0`; the PSP-specific sections
+(`.sceStub.text`, `.rodata.sceNid`, `.lib.stub/.lib.ent`, `.data`, `.bss`) must be added
+as subsegments for the linker script to be generated. `platform: psp`.
 
 ## Ghidra + ghidra-allegrex
-Estensione kotcrab: rilocazioni PSP (`PT_SCE_PSPREL`/`PSPREL2`), VFPU, PPSSPP `.sym`.
-Install: Ghidra ▸ File ▸ Install Extensions ▸ (+) ▸ zip ▸ riavvia. Carica i PRX in
-chiaro direttamente; per `modehsys` serve prima `build/EBOOT.elf` decifrato.
+kotcrab extension: PSP relocations (`PT_SCE_PSPREL`/`PSPREL2`), VFPU, PPSSPP `.sym`.
+Install: Ghidra ▸ File ▸ Install Extensions ▸ (+) ▸ zip ▸ restart. Load the plaintext
+PRXs directly; for `modehsys` you first need the decrypted `build/EBOOT.elf`. Launch
+with `scripts/run_ghidra.sh`.
 
-## NID (import SDK) — obbligatorio per leggibilità
-I NID = primi 4 byte di SHA-1(nome), little-endian; tabella in `.rodata.sceNid`.
-Database nomi/firme: **uofw** (https://github.com/uofw/uofw). Flusso PSP RE HQ:
-script risoluzione NID + archivi tipi `PSPSDK.gdt`/`uOFW.gdt`
-(https://psp-re.github.io/quickstart/). Oppure `prxtool` da CLI.
+## NIDs (SDK imports) — required for readability
+NIDs = first 4 bytes of SHA-1(name), little-endian; table in `.rodata.sceNid`.
+Name/signature database: **uofw** (https://github.com/uofw/uofw). PSP RE HQ flow:
+NID resolution script + type archives `PSPSDK.gdt`/`uOFW.gdt`
+(https://psp-re.github.io/quickstart/). Or `prxtool` from the CLI.
 
-## m2c → bozza C
+## m2c → C draft
 ```bash
 python tools/m2c/m2c.py --target mips-mwcc-c asm/func.s > src/func.c
 ```
 
 ## Matching loop
-- Online: decomp.me, preset **PSP / mwccpsp** (vedi caveat build nel README/doc 06).
-- Locale: `tools/asm-differ/diff.py -mwo <func>` oppure **objdiff** (supporta MIPS PSP
-  + demangle CodeWarrior). Ostinato → `tools/decomp-permuter/permuter.py`.
-- Compilatore: **mwccpsp** via **wibo** (`wibo mwccpsp.exe ...`), NON psp-gcc.
+- Online: decomp.me, **PSP / mwccpsp** preset. **CONFIRMED config: MWCC 1.3 SP7
+  (mwccpsp_3.0.1_219), flags `-O4,p -sdatathreshold 0`.** State globals are `volatile`
+  (access via a local pointer). See `docs/09-first-match.md`.
+- Local: `tools/asm-differ/diff.py -mwo <func>` or **objdiff** (supports MIPS PSP +
+  CodeWarrior demangling). Stubborn → `tools/decomp-permuter/permuter.py`.
+- Compiler: **mwccpsp** via **wibo** (`wibo mwccpsp.exe ...`), NOT psp-gcc.
 
 ## Decrypt EBOOT
 ```bash
-make -C tools/pspdecrypt              # dopo: sudo apt install libssl-dev
+make -C tools/pspdecrypt              # after: sudo apt install libssl-dev
 scripts/decrypt_eboot.sh              # -> build/EBOOT.elf + sha1
 ```
-Alternativa: PPSSPP ▸ Developer Tools ▸ "Dump decrypted EBOOT on game boot".
+Alternative: PPSSPP ▸ Developer Tools ▸ "Dump decrypted EBOOT on game boot".
 
-## Verifica match
-`sha1sum` dell'output ricostruito vs `checksums.sha1` (già generato in fase estrazione).
+## Match verification
+`sha1sum` of the rebuilt output vs `checksums.sha1` (generated during extraction).
 
-Dettagli estesi: `docs/03-strumenti.md`, `docs/05-ghidra.md`, `docs/06-splat-e-matching.md`.
+Extended details: `docs/03-tools.md`, `docs/05-ghidra.md`, `docs/06-splitting-and-matching.md`.
