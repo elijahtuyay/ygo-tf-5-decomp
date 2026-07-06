@@ -1,0 +1,24 @@
+name: Claim a function
+description: Claim a function to decompile so others don't duplicate the work.
+title: "[claim] func_XXXXXXXX in <module>"
+labels: ["help wanted"]
+body:
+  - type: input
+    id: module
+    attributes:
+      label: Module
+      placeholder: rel_movie_viewer
+    validations:
+      required: true
+  - type: input
+    id: function
+    attributes:
+      label: Function (address or name)
+      placeholder: func_00000034
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything you already know about this function (optional).

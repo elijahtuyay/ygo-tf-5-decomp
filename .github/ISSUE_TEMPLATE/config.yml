@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/angelof-exe/ygo-tf-5-decomp/tree/main/docs
+    about: Read the docs before opening an issue.
+  - name: First-match tutorial
+    url: https://github.com/angelof-exe/ygo-tf-5-decomp/blob/main/docs/09-first-match.md
+    about: Step-by-step guide to matching your first function.

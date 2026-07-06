@@ -1,0 +1,30 @@
+name: No copyrighted content
+
+# Fails a pull request if it adds files that look like copyrighted game content
+# (ISOs, PRX/EBOOT binaries, extracted assets). This is a safety net on top of
+# .gitignore so contributors can't accidentally commit game data.
+
+on:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check changed files for forbidden content
+        run: |
+          base='${{ github.event.pull_request.base.sha }}'
+          head='${{ github.event.pull_request.head.sha }}'
+          files="$(git diff --name-only "$base" "$head")"
+          echo "Changed files:"; echo "$files"
+          bad="$(printf '%s\n' "$files" | grep -iE '\.(iso|cso|7z|prx|ehp|cip|gim|gmo|pmf|at3|bin)$|(^|/)(EBOOT\.BIN|BOOT\.BIN|UMD_DATA\.BIN)$|(^|/)PSP_GAME/' || true)"
+          if [ -n "$bad" ]; then
+            echo '::error::Forbidden (copyrighted / game-binary) files detected in this PR:'
+            printf '%s\n' "$bad"
+            echo 'Remove them and rely on .gitignore. Never commit game content.'
+            exit 1
+          fi
+          echo 'OK: no forbidden files.'

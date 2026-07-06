@@ -1,0 +1,10 @@
+name: Question / help
+description: Ask a question about the project or the decompilation process.
+labels: ["question"]
+body:
+  - type: textarea
+    id: q
+    attributes:
+      label: Your question
+    validations:
+      required: true
