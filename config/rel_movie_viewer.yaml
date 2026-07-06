@@ -1,0 +1,82 @@
+# splat config for rel_movie_viewer.prx (26 KB) — full file coverage.
+#
+# Real section layout (`readelf -SW`, file offsets = section "Off" column;
+# vram is irrelevant here: splat slices the flat file by byte offset, it does
+# not re-parse the PRX's own ELF section headers):
+#
+#   0x0000-0x0054  ELF header + program headers        (not a section)
+#   0x0054-0x0908  .text                                <- code to decompile
+#   0x0908-0x3F10  .sceStub.text                        import-stub trampolines (jr $ra/nop, compiler/linker-generated)
+#   0x3F10-0x3F58  .lib.ent.top/.lib.ent/.lib.ent.btm/.lib.stub.top/.lib.stub/.lib.stub.btm  export+import tables
+#   0x3F58-0x3FBC  .rodata.sceModuleInfo + .rodata.sceResident   module metadata
+#   0x3FBC-0x5AC0  .rodata.sceNid                        NID table for imported SDK functions
+#   0x5AC0-0x5B14  .data
+#   0x5B14-0x6478  section header table + all .rel.* (PT_SCE_PSPREL) + .shstrtab + .comment
+#                  (ELF/relocation metadata, not part of the loaded image)
+#   (.bss is NOBITS, zero size here, occupies no file space)
+#
+# Only .text is meaningful to hand-decompile: everything else is import/export
+# plumbing, NID tables, or ELF metadata that the compiler/linker generate
+# mechanically and that we reproduce byte-for-byte via raw `bin` blobs.
+#
+# Verified: sum of the bin/asm ranges above == 0x6478 == the file's exact size
+# (`ls -la` / `sha1sum` match `checksums.sha1`).
+
+name: rel_movie_viewer
+sha1: 12171f279306265587cd1254f68244c81f8b7528
+options:
+  platform: psp
+  basename: rel_movie_viewer
+  base_path: ..
+  target_path: iso_extracted/PSP_GAME/USRDIR/gmodule/rel_movie_viewer.prx
+  asm_path: asm/rel_movie_viewer
+  ld_script_path: build/rel_movie_viewer.ld
+  compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (see docs/06)
+  find_file_boundaries: True
+  # all `bin` subsegments default to the ".data" linker section (splat's
+  # generic fallback); ".text" is the decompiled code. splat's linker-script
+  # generator additionally wants .rodata/.bss declared even though this
+  # config doesn't use those segtypes.
+  section_order: [".text", ".data", ".rodata", ".bss"]
+
+# NOTE on the auto-generated linker script (build/rel_movie_viewer.ld):
+# splat's stock "code" segment linker-script generator groups contributions
+# by OUTPUT SECTION (TEXT block, then DATA block, then RODATA, then BSS), not
+# by their raw position in the subsegments list. `header` therefore has to be
+# its OWN top-level segment placed before `rel_movie_viewer` (as below) so it
+# lands first in ROM; a bin subsegment declared *inside* the code segment
+# would incorrectly be grouped into the DATA block, i.e. emitted after .text.
+# With `header` split out, the generated .ld reproduces the real physical
+# byte order (header -> text+stub -> tables/rodata/data, all tagged .data but
+# listed in file order) end to end. Still unverified end-to-end (no local
+# mwccpsp/wibo yet to actually compile+link+sha1sum), but the ordering
+# problem that motivated this note is resolved — kept as a warning in case
+# more subsegments are added later: any bin placed before an asm one within
+# the SAME code segment will silently break physical ordering again.
+
+# IMPORTANT on numbering: `func_XXXXXXXX` / `D_XXXXXXXX` names are derived
+# from VRAM, and VRAM here is defined as "byte offset from the start of the
+# code segment" (segment vram: 0x0, segment start/rom: 0x54, i.e. right after
+# the ELF header). This is the SAME baseline already used by the one matched
+# function in src/rel_movie_viewer.c (`func_00000184`) and by its extern
+# reference `func_00000CEC` (a .sceStub.text import trampoline, vram 0xCEC =
+# file offset 0xD40) — so .text and .sceStub.text MUST stay in one contiguous
+# "code" segment starting at rom 0x54/vram 0x0, or every existing name shifts
+# and stops matching the already-matched source. Do not change segment start
+# away from 0x54 for this reason.
+segments:
+  - [0x0, bin, header]   # ELF header + program headers, file 0x0-0x54 (not loaded code)
+  - name: rel_movie_viewer
+    type: code
+    start: 0x54
+    vram: 0x0
+    subsegments:
+      - [0x54,   asm, text]          # vram 0x000-0x8B4: real .text, this is what we decompile/match
+      - [0x908,  asm, sceStub_text]  # vram 0x8B4-0x3EBC: import-stub trampolines (jal-only bodies,
+                                      # compiler/linker-generated; disassembled for labels/xrefs, not hand-matched)
+      - [0x3F10, bin, lib_tables]    # .lib.ent*/.lib.stub* export+import tables
+      - [0x3F58, bin, module_info]   # .rodata.sceModuleInfo + .rodata.sceResident
+      - [0x3FBC, bin, sceNid]        # .rodata.sceNid: NID table for imported SDK functions
+      - [0x5AC0, bin, data]          # .data
+      - [0x5B14, bin, elf_meta]      # section header table + all .rel.* + .shstrtab + .comment
+  - [0x6478]   # sentinel: total file size

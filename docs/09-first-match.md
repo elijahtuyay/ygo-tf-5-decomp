@@ -297,15 +297,23 @@ needs to be found empirically by matching a real function.
 
 Note the outcome here as soon as you find out:
 
-> ⏳ *mwccpsp build bisection outcome: (to be filled in — which build/flags matches
-> TF5's real functions?)*
+> ✅ **Update**: build **219** (MWCC 1.3 SP7) with `-O4,p -sdatathreshold 0` has now
+> been confirmed on 9 real functions of `rel_movie_viewer` (not just the trivial
+> empty one), verified locally with `wibo` + the real `mwccpsp_3.0.1_219` binary
+> (see `docs/06-splitting-and-matching.md` "Local matching") — no adjacent build
+> has been tried against these same functions yet, so 219 isn't proven UNIQUE, but
+> it's solidly confirmed SUFFICIENT. If a future function fails to match on 219
+> with otherwise-correct-looking C, that's the point to bisect adjacent builds
+> (210, 205, ...) as originally planned above.
 
 ## When a function is "done"
 
-1. 100% on decomp.me.
+1. 100% on decomp.me, **or** `MATCH (N words)` from `scripts/mwcc_diff.py` (see
+   `06-splitting-and-matching.md` "Local matching" — no decomp.me account needed).
 2. Save the scratch (decomp.me gives you a URL) and/or bring the C back into the
    project's `src/`.
-3. Mark the function as completed (in the future: tracking with frogress/objdiff).
+3. Tag the function's comment `MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0)`
+   in `src/*.c` (in the future: tracking with frogress/objdiff).
 
 ## Generating the asm of any function
 
@@ -314,7 +322,7 @@ The target asm is produced by **splat** from the extracted PRX (see
 
 ```bash
 . .venv/bin/activate
-splat split config/rel_movie_viewer.example.yaml   # creates asm/…  (regenerated, not versioned)
+splat split config/rel_movie_viewer.yaml   # creates asm/…  (regenerated, not versioned)
 ```
 
 In `asm/` you'll find one file per function, in the format spimdisasm/decomp.me

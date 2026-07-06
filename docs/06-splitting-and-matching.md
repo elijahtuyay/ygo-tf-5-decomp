@@ -60,14 +60,21 @@ pip install "splat64[mips]"     # pulls in spimdisasm + rabbitizer
 
 ### Verified example on a real module
 
-With the `config/rel_movie_viewer.example.yaml` config:
+`config/rel_movie_viewer.yaml` is a **complete, section-accurate** config for the
+smallest module (superseding the earlier `.example.yaml`, kept only as a minimal
+`.text`-only reference):
 
 ```bash
-splat split config/rel_movie_viewer.example.yaml
+splat split config/rel_movie_viewer.yaml
 ```
 
-produces `asm/text.s` with labeled functions and symbolically resolved relocations —
-tested, real output:
+produces `asm/rel_movie_viewer/text.s` + `sceStub_text.s` (both disassembled as
+code, so `.sceStub.text` import stubs get proper `func_XXXXXXXX` labels too —
+needed since the game's own code jumps into them directly, see e.g.
+`func_00000CEC` in `src/rel_movie_viewer.c`) and one `.bin` blob per remaining
+raw section (`.lib.ent`/`.lib.stub` tables, `.rodata.sceModuleInfo`,
+`.rodata.sceNid`, `.data`, and the tail ELF/relocation metadata) — tested, real
+output:
 
 ```asm
 glabel func_00000000
@@ -81,10 +88,13 @@ glabel func_00000000
 endlabel func_00000000
 ```
 
-splat figures out function boundaries and `%hi/%lo` on its own. What's left is
-mapping the PSP-specific sections in the config (`.sceStub.text`, `.rodata.sceNid`,
-`.lib.stub`, `.data`, `.bss`) so the linker script is also generated: see the
-comments in the example file, with the real section layout.
+splat figures out function boundaries and `%hi/%lo` on its own. Full byte
+coverage is verified: concatenating every extracted piece in order reproduces
+the original `.prx` exactly (same sha1) — see the comments in
+`config/rel_movie_viewer.yaml` for the byte-offset table and a caveat about
+splat's auto-generated linker script (it groups by output section, so a `bin`
+subsegment placed BEFORE an `asm` one in the same `code` segment silently
+breaks physical ordering — put it in its own top-level segment instead).
 
 ### PRX quirks (important)
 
@@ -132,6 +142,56 @@ automatically tries equivalent variants of the source to find one that matches:
 ```bash
 tools/decomp-permuter/permuter.py funzione_dir/
 ```
+
+### 3b. Local matching (no decomp.me account, no asm-differ project scaffolding)
+
+`tools/asm-differ` expects a full project layout (a `build.map`, an `expected/`
+tree mirroring your build dir) that this repo doesn't have yet. Until that's set
+up, two small scripts give the exact same relocation-aware verification decomp.me
+does, working directly off a single `src/*.c` and splat's target asm:
+
+```bash
+scripts/mwcc_build.sh src/rel_movie_viewer.c        # compiles with wibo+mwccpsp
+scripts/mwcc_diff.py asm/rel_movie_viewer/text.s build/mwcc/rel_movie_viewer.o
+#   -> per function: "MATCH (N words)" or a list of differing instructions
+```
+
+`mwcc_build.sh` accepts extra args to override the default `-O4,p -sdatathreshold 0`
+flags. `mwcc_diff.py` optionally takes function names to restrict the report.
+
+**Why "relocation-aware" matters**: a freshly compiled, unlinked `.o` has ZEROED
+placeholder immediates at every `lui`/`addiu`/`jal` that references an external
+symbol — the real address is only filled in at link time. splat's target asm
+(from the actual shipped PRX) is already fully baked. A naive byte-for-byte
+comparison would therefore report false mismatches on every single global/call
+reference. `mwcc_diff.py` instead treats two instruction words as equal when
+EITHER their raw bytes match, OR both carry the same relocation kind
+(`HI16`/`LO16`/`26`) against the same symbol — this is exactly what decomp.me and
+asm-differ do under the hood, and it's how `func_00000184` was confirmed to
+compile identically byte-for-byte (register allocation, delay slots, and all)
+purely from a local build, no browser involved.
+
+**A real gotcha found this way**: some globals in this game are referenced via a
+genuinely BAKED absolute address with **no relocation entry at all** in the
+shipped PRX (e.g. `D_0009DB00` is sometimes emitted as `lui $v1,(0xA0000>>16)` +
+a `-0x2500` low offset — numerically `%hi`/`%lo` of `0x9DB00`, but with no
+`R_MIPS_HI16` record backing it, because the address is a fixed constant the
+original static link fully resolved, not something that depends on this PRX's
+own load base). `mwcc_diff.py`'s `KNOWN_ADDR` table handles this: for any
+symbol whose real absolute address you've confirmed (by matching a function that
+DOES carry a normal relocation for it), add it there, and the script will
+recognize a target's baked immediate as equivalent to your candidate's
+relocation against that symbol. Extend this table as more addresses get
+confirmed.
+
+**Whether a state-blob field shares a base register or gets a fresh symbol is a
+per-function fact you have to check against the target asm, not a rule you can
+guess**: some functions reuse one `volatile T *p = &D_0009DB00;` across several
+distant offsets (a saved register kept alive across calls), others recompute a
+completely independent `lui/addiu` per field even though the fields are
+adjacent in memory. Get this wrong and the function still "looks right" in C
+but never reaches 0 diffs — see the file header of `src/rel_movie_viewer.c` for
+the specific functions where each style was confirmed.
 
 ## 4. Build system and match verification
 

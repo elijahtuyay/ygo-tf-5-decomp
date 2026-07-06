@@ -43,6 +43,28 @@ clone_or_pull https://github.com/John-K/pspdecrypt              pspdecrypt
 pip install --quiet -r tools/asm-differ/requirements.txt 2>/dev/null || true
 pip install --quiet -r tools/m2c/requirements.txt        2>/dev/null || true
 
+# 3) wibo (runs the Windows mwccpsp.exe on Linux) + mwccpsp_3.0.1_219 itself.
+# Both come from decompals/wibo and decompme/compilers releases: real binaries,
+# not built from anything in this repo, so they live under tools/ (gitignored)
+# like everything else in this section.
+WIBO_VERSION=1.1.0
+if [ ! -x tools/wibo-bin/wibo ]; then
+  echo "==> Downloading wibo $WIBO_VERSION"
+  mkdir -p tools/wibo-bin
+  curl -sL -o tools/wibo-bin/wibo \
+    "https://github.com/decompals/wibo/releases/download/${WIBO_VERSION}/wibo-x86_64"
+  chmod +x tools/wibo-bin/wibo
+fi
+if [ ! -f tools/mwccpsp_3.0.1_219/mwccpsp.exe ]; then
+  echo "==> Downloading mwccpsp_3.0.1_219 (from decompme/compilers releases)"
+  mkdir -p tools/mwccpsp_3.0.1_219
+  curl -sL -o /tmp/mwccpsp_3.0.1_219.tar.gz \
+    "https://github.com/decompme/compilers/releases/download/compilers/mwccpsp_3.0.1_219.tar.gz"
+  tar xzf /tmp/mwccpsp_3.0.1_219.tar.gz -C tools/mwccpsp_3.0.1_219
+  rm /tmp/mwccpsp_3.0.1_219.tar.gz
+  chmod +x tools/mwccpsp_3.0.1_219/mwccpsp.exe
+fi
+
 echo
 echo "==> Done. Installed versions:"
 python - <<'PY'

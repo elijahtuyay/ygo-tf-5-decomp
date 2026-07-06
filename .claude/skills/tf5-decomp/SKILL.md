@@ -22,10 +22,21 @@ Project: matching reconstruction of the code of **Yu-Gi-Oh! 5D's Tag Force 5**
   builds 3.0.1_121…219); `2.4.1.01` is a different numbering axis, do NOT look for it
   in the list. Bisect from the high builds (219→210→205…) on a real function to find the
   right one; locally it runs via **wibo**. Details in `docs/09-first-match.md`.
-- **CONFIRMED config (first function at 100%)**: compiler **MWCC 1.3 SP7
-  (mwccpsp_3.0.1_219)**, flags **`-O4,p -sdatathreshold 0`**. `-sdatathreshold 0` =
-  absolute addressing (not gp-relative). Exact build still to be narrowed (180–219 all
-  match simple functions).
+- **CONFIRMED config**: compiler **MWCC 1.3 SP7 (mwccpsp_3.0.1_219)**, flags
+  **`-O4,p -sdatathreshold 0`**. `-sdatathreshold 0` = absolute addressing (not
+  gp-relative). Confirmed on 9 real functions of `rel_movie_viewer` (not just the
+  trivial empty one) — build 219 is proven SUFFICIENT, not yet proven unique
+  (adjacent builds 210/205/... untried on these same functions).
+- **Matching works fully locally now, no decomp.me account needed**:
+  `scripts/mwcc_build.sh src/file.c` (wibo + real mwccpsp_3.0.1_219, both
+  auto-fetched by `setup_tools.sh`) then `scripts/mwcc_diff.py asm/.../text.s
+  build/mwcc/file.o` — relocation-aware, treats a word as matching if either the
+  raw bytes are equal or both sides reference the same relocation (HI16/LO16/26)
+  against the same symbol (unlinked `.o`s have zeroed placeholders; some globals
+  are baked as absolute constants in the shipped PRX with NO relocation at all —
+  see `docs/06-splitting-and-matching.md` "Local matching" for the full story
+  and the `KNOWN_ADDR` table to extend). Needs `binutils-mips-linux-gnu` (`sudo
+  apt install`) for a MIPS-aware `objdump`.
 - **Technique**: game **state globals are `volatile`**; to match, access them via a
   local pointer: `volatile int *p = &G; if (*p) { ... *p ...; *p = 0; }` — this
   reproduces the value reload + use of saved registers (`$s0`). Full case in
@@ -40,7 +51,8 @@ Project: matching reconstruction of the code of **Yu-Gi-Oh! 5D's Tag Force 5**
   understand it.
 - **Local toolchain already installed and verified**: splat64 (platform `psp`),
   spimdisasm, rabbitizer (category `R4000ALLEGREX`, with VFPU), in `.venv`;
-  asm-differ, m2c, decomp-permuter, pspdecrypt in `tools/`.
+  asm-differ, m2c, decomp-permuter, pspdecrypt, wibo, mwccpsp_3.0.1_219 in
+  `tools/`; Ghidra 12.0 + ghidra-allegrex installed system-wide.
 
 ## Hard repository rules
 
@@ -64,13 +76,18 @@ plaintext PRX / EBOOT.elf
 
 ## How to attack a new module (checklist)
 
-1. `readelf -S module.prx` → note the section layout (.text/.rodata.sceNid/.data/.bss).
-2. Write/adapt a splat config (start from `config/rel_movie_viewer.example.yaml`).
+1. `readelf -SW module.prx` → note the section layout (.text/.sceStub.text/.rodata.sceNid/.data/.bss).
+2. Write/adapt a splat config (start from `config/rel_movie_viewer.yaml`, a complete
+   section-accurate example covering 100% of the file — see its header comments for
+   the byte-offset table and a linker-script-ordering gotcha).
 3. `splat split config/module.yaml` → generates `asm/`.
 4. Resolve imports: `.rodata.sceNid` lists the NIDs of imported SDK functions; name them
    with a NID database (see the `psp-allegrex-tools` skill).
-5. For each function: `m2c` → draft C → mwccpsp/decomp.me → iterate with asm-differ until
-   the diff is empty → mark "matched".
+5. For each function: `m2c` → draft C → iterate until the diff is empty, verifying
+   either on decomp.me OR **locally** with `scripts/mwcc_build.sh` +
+   `scripts/mwcc_diff.py` (wibo + real mwccpsp_3.0.1_219, both fetched by
+   `setup_tools.sh` — no decomp.me account needed) → mark "MATCH 100%" in the
+   function's comment.
 6. Rebuild and verify the sha1 against `checksums.sha1`.
 
 ## Recommended module order

@@ -15,11 +15,13 @@ by `scripts/setup_tools.sh`; here are the details of what's needed and why.
 | asm-differ / m2c / decomp-permuter | ✅ cloned in `tools/` | — |
 | pspdecrypt | ✅ **compiled** and working | EBOOT already decrypted (see below) |
 | cmake / ninja / make / gcc / java | ✅ | generic build tools |
-| Ghidra **12.0** | ❌ needs to be installed | ⚠️ **not** 12.1.x — see below |
-| ghidra-allegrex v21.3 | ❌ needs to be installed | extension for Ghidra 12.0.x |
+| Ghidra **12.0** | ✅ installed | ⚠️ **not** 12.1.x — see below |
+| ghidra-allegrex v21.3 | ✅ installed | extension for Ghidra 12.0.x |
 | PPSSPP | ❌ optional | emulator/RE (EBOOT already decrypted without it) |
 | pspdev (psp-gcc, prxtool) | ❌ optional | see below |
-| wibo | ❌ needs to be installed | to run mwccpsp on Linux |
+| wibo | ✅ **fetched by `setup_tools.sh`** | prebuilt release binary in `tools/wibo-bin/` |
+| mwccpsp_3.0.1_219 | ✅ **fetched by `setup_tools.sh`** | real compiler, from decompme/compilers releases |
+| binutils-mips-linux-gnu | ❌ needs `sudo apt install` | MIPS-aware `objdump`, needed for local matching (§9) |
 
 ## 1. Automatic setup (Python + git tools)
 
@@ -121,20 +123,33 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 (There is no reliable official `apt` PPA.) Website/AppImage:
 https://www.ppsspp.org/download/ — Repo: https://github.com/hrydgard/ppsspp
 
-## 6. wibo (for building the match with mwccpsp)
+## 6. wibo + mwccpsp (for building the match locally)
 
 `mwccpsp.exe` is a Windows binary: **wibo** (decompals) runs it on Linux without
 WINE, as is standard practice in decomp projects (sotn-decomp uses it for the PSP
-target).
+target). **Both are fetched automatically by `scripts/setup_tools.sh`**:
 
 ```
-Repo: https://github.com/decompals/wibo   (build with cmake; then:  wibo mwccpsp.exe ...)
+tools/wibo-bin/wibo                    # prebuilt release binary (decompals/wibo, x86_64)
+tools/mwccpsp_3.0.1_219/mwccpsp.exe    # real compiler, from decompme/compilers releases
 ```
 
-The `mwccpsp` compiler itself is not redistributable here: it is obtained from
-decomp.me (PSP scratch) or from the images at
+Manual fetch, if needed:
+
+```bash
+curl -sL -o tools/wibo-bin/wibo \
+  https://github.com/decompals/wibo/releases/download/1.1.0/wibo-x86_64
+chmod +x tools/wibo-bin/wibo
+
+curl -sL https://github.com/decompme/compilers/releases/download/compilers/mwccpsp_3.0.1_219.tar.gz \
+  | tar xz -C tools/mwccpsp_3.0.1_219
+```
+
+The `mwccpsp` compiler itself is not redistributable in THIS repo's git history
+(it's fetched at setup time, into the gitignored `tools/`): it's the same binary
+obtainable from decomp.me (PSP scratch) or from the images at
 https://github.com/decompme/compilers (`platforms/psp/`). See
-`06-splitting-and-matching.md` for the build question.
+`06-splitting-and-matching.md` for the local build-and-diff workflow.
 
 ## 7. pspdev toolchain (optional but convenient)
 
@@ -157,13 +172,29 @@ decomp.dev dashboard. More convenient than asm-differ for projects with many
 objects; configured via an `objdiff.json`. Installation: precompiled binaries from
 the repo's releases.
 
+## 9. MIPS binutils (for local relocation-aware matching)
+
+`scripts/mwcc_diff.py` shells out to `mips-linux-gnu-objdump` to disassemble the
+locally-built candidate `.o` with proper MIPS mnemonics and relocation
+annotations (plain `objdump` refuses: MWCC sets an `e_flags` combination it
+reports as "unknown CPU"). Ubuntu ships a prebuilt cross-binutils package:
+
+```bash
+sudo apt install -y binutils-mips-linux-gnu
+```
+
+This also provides `mips-linux-gnu-as`/`-ld`/`-nm`, useful for hand-assembling a
+target asm snippet to cross-check against candidate objects (see
+`06-splitting-and-matching.md`).
+
 ## Minimal command summary to get started
 
 ```bash
 # 1. system dependencies (once)
-sudo apt install -y p7zip-full build-essential libssl-dev python3-venv cmake ninja-build
+sudo apt install -y p7zip-full build-essential libssl-dev python3-venv cmake ninja-build \
+                    binutils-mips-linux-gnu
 
-# 2. project toolchain
+# 2. project toolchain (also fetches wibo + mwccpsp_3.0.1_219, see §6)
 scripts/setup_tools.sh
 make -C tools/pspdecrypt          # after libssl-dev
 
@@ -172,4 +203,9 @@ scripts/extract_iso.sh "Yu-Gi-Oh 5D's Tag Force 5 (E)(M5)(ZER0)/0-ygotf5.iso"
 scripts/decrypt_eboot.sh
 
 # 4. Ghidra + ghidra-allegrex and PPSSPP: manual installation (sec. 4–5)
+
+# 5. local matching, once you have a config/*.yaml + src/*.c:
+splat split config/rel_movie_viewer.yaml
+scripts/mwcc_build.sh src/rel_movie_viewer.c
+scripts/mwcc_diff.py asm/rel_movie_viewer/text.s build/mwcc/rel_movie_viewer.o
 ```

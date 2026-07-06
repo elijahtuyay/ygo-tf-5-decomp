@@ -26,10 +26,18 @@ in the code rather than in data).
 
 ## Status
 
-Setup is complete and the **decompilation has started**. The first function is
-**matched at 100%** (`func_00000184` in `rel_movie_viewer`, see
-[`src/rel_movie_viewer.c`](src/rel_movie_viewer.c)), which pinned down the compiler
-configuration.
+Setup is complete and the **decompilation has started**. `rel_movie_viewer` (the
+smallest module, 26 KB) is fully split with a complete section-accurate splat config,
+and **9 of its 16 `.text` functions are matched at 100%** (see
+[`src/rel_movie_viewer.c`](src/rel_movie_viewer.c), functions tagged `MATCH 100%`).
+
+Matching can now be verified **entirely locally** (no decomp.me account needed):
+`wibo` + a real `mwccpsp_3.0.1_219` binary compile candidate C, and
+`scripts/mwcc_diff.py` diffs the result against splat's target asm the same way
+decomp.me does — treating relocated words (globals/calls) as equal when they
+reference the same symbol, regardless of the actual baked address. See
+[`docs/06-splitting-and-matching.md`](docs/06-splitting-and-matching.md) "Local
+matching".
 
 **Confirmed compiler configuration**
 
@@ -45,9 +53,10 @@ What is already established:
 - **28 `rel_*.prx` game modules are plain Allegrex ELF** → analyzable immediately.
 - **EBOOT.BIN decrypted** → `build/EBOOT.elf` (the shared `modehsys` engine).
   `BOOT.BIN` is a zeroed dummy.
-- Full pipeline proven end-to-end: ISO extraction → EBOOT decryption → Allegrex
-  disassembly (rabbitizer) → **splat** producing labeled asm → **decomp.me / mwccpsp**
-  matching → 100%.
+- Full pipeline proven end-to-end, **including a local, no-decomp.me matching loop**:
+  ISO extraction → EBOOT decryption → Allegrex disassembly (rabbitizer) → **splat**
+  producing labeled asm + a full section-accurate linker script → **mwccpsp (via
+  wibo) + relocation-aware objdump diff** → 100% match, verified for 9 functions.
 
 ## How it works
 
@@ -71,7 +80,7 @@ README.md              this file
 CONTRIBUTING.md        how to help
 docs/                  full documentation (English)
 scripts/               setup_tools.sh, extract_iso.sh, decrypt_eboot.sh, run_ghidra.sh
-config/                splat configs (rel_movie_viewer.example.yaml = verified example)
+config/                splat configs (rel_movie_viewer.yaml = full, section-accurate config)
 src/                   reconstructed C source (matched functions)
 requirements.txt       Python toolchain (splat / spimdisasm / rabbitizer)
 checksums.sha1         sha1 of the original modules (match targets)
@@ -98,9 +107,16 @@ scripts/extract_iso.sh "path/to/your.iso"
 make -C tools/pspdecrypt            # after libssl-dev
 scripts/decrypt_eboot.sh
 
-# 5. try splitting a small module
+# 5. split a module
 . .venv/bin/activate
-splat split config/rel_movie_viewer.example.yaml
+splat split config/rel_movie_viewer.yaml
+
+# 6. (optional) local matching, no decomp.me account needed —
+#    setup_tools.sh already fetched wibo + mwccpsp_3.0.1_219 into tools/;
+#    a MIPS objdump is the one thing you still need system-wide:
+sudo apt install -y binutils-mips-linux-gnu
+scripts/mwcc_build.sh src/rel_movie_viewer.c
+scripts/mwcc_diff.py asm/rel_movie_viewer/text.s build/mwcc/rel_movie_viewer.o
 ```
 
 Ghidra + the ghidra-allegrex extension and PPSSPP are installed manually — see
