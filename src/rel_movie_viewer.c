@@ -23,15 +23,36 @@
  *    extern form) — this must be checked per function against the target asm,
  *    it is not a blanket rule (func_00000138 does NOT share a register between
  *    D_0009DB00 and D_0009DB04; func_00000034/func_000001C8/func_00000470/
- *    func_00000540 DO share one across several fields).
+ *    func_00000540/func_000005C8/func_000006BC DO share one across several
+ *    fields).
  *
  * Functions below `func_00000184` without a "MATCH 100%" tag are DRAFTS: they
- * compile and their instruction COUNT/logic is right, but a handful of
- * instructions differ from the target — usually MWCC's choice of branch
- * polarity (`beq`-to-handler vs `bne`-skip) or whether it folds a
- * `(x < 0) ? 0 : x` clamp into the Allegrex `max` pseudo-op, which plain
- * portable C does not appear to control reliably. Treat as very-close
- * NONMATCHING, not as verified.
+ * compile and their instruction COUNT/logic is right (each has been narrowed
+ * to the closest word-count achievable and its remaining gap root-caused —
+ * see its own comment), but a handful of instructions differ from the
+ * target, almost always one of these confirmed-uncontrollable-from-portable-C
+ * MWCC codegen choices:
+ *   - branch polarity in an if/else-if chain (`beq`-to-handler vs
+ *     `bne`-skip), and whether a loop test gets rotated to the bottom
+ *     without duplication or WITH a duplicated pre-test — both are
+ *     sometimes forceable with an explicit `goto`-based rewrite that
+ *     mirrors the target's exact block layout (worked for func_00000540,
+ *     func_000007C8's copy loop, and the branch shapes in func_000001C8/
+ *     func_000005C8/func_000006BC), sometimes not (func_00000034's loop
+ *     test);
+ *   - whether it folds a `(x < 0) ? 0 : x` clamp into the Allegrex `max`
+ *     pseudo-op (confirmed unreliable even in an isolated standalone test
+ *     with statement order matching the target exactly — func_00000470,
+ *     func_00000294);
+ *   - whether it caches a global's address in a saved register for reuse
+ *     across many straight-line statements (target sometimes does; this
+ *     compiler was confirmed by isolated experiment to always
+ *     re-materialize a fresh `lui/addiu` per access instead, regardless of
+ *     pointer/struct form — func_00000294, and the `state + 0x6408/0x6534`
+ *     case in func_000006BC/func_000005C8);
+ *   - which of two otherwise-equivalent registers it assigns to a dead/free
+ *     value (func_000007C8's `$a0` vs `$a1` for the copy-loop pointer).
+ * Treat DRAFTs as very-close NONMATCHING, not as verified.
  *
  * Layout notes discovered while drafting (see asm/rel_movie_viewer/text.s):
  *  - D_0009DB00 is the start of a much larger state blob. func_00000138
@@ -146,7 +167,7 @@ void func_00000470(void);
 void func_00000540(void);
 void func_000005C8(void);
 void func_000006BC(void *arg0);
-void func_000007C8(int arg1, int arg2, int arg3);
+void func_000007C8(void *unused, int arg1, int arg2, int arg3);
 void func_00000894(int arg0, int arg1, void *arg2);
 
 /* func_00000000 — module entry point: registers the viewer's main loop
@@ -158,7 +179,15 @@ int func_00000000(void) {
 }
 
 /* func_00000034 — viewer main loop: dispatches on the current mode
- * (D_0009DB00+0x4) each frame until told to exit (mode 4). DRAFT. */
+ * (D_0009DB00+0x4) each frame until told to exit (mode 4). DRAFT: 60/65
+ * target words, logic confirmed correct (tried a goto-based rewrite mirroring
+ * the target's block order — no improvement). The gap is two more instances
+ * of the same MWCC branch-polarity heuristic as func_000001C8 (beq-to-handler
+ * +explicit `b` vs bne-skip, not controllable from portable C per the file
+ * header), plus the loop-exit test: target computes `sltu`+`xori`+`bnez`
+ * (3 words) where this compile collapses the same boolean check to a single
+ * `beqz`/`beq` (tried `volatile int done` to block the optimization — no
+ * effect). */
 void func_00000034(void) {
     volatile int *state = &D_0009DB00;
     int done = 0;
@@ -211,25 +240,40 @@ void func_000001C0(void) {
 }
 
 /* func_000001C8 — state-transition: runs exit logic for the current mode,
- * then sets the new mode and runs its entry logic. DRAFT. */
+ * then sets the new mode and runs its entry logic. DRAFT: 29/33 target words,
+ * logic/instruction selection confirmed correct — the remaining gap is MWCC
+ * choosing `beq`+duplicated epilogue vs `bnel`+merged epilogue for the
+ * mode==2 check, the same branch-polarity heuristic noted in the file header
+ * as not reliably controllable from portable C (tried goto-based rewrites of
+ * both checks; the old_mode read now correctly matches the target's
+ * raw-absolute D_0009DB04 access instead of an offset off D_0009DB00). */
 void func_000001C8(int mode) {
+    int old_mode = D_0009DB04;
     volatile int *s1 = &D_0009DB00;
-    int old_mode = s1[1]; /* +0x4 */
 
     if (old_mode == 2) {
-        func_00000464();
+        goto call464;
     }
-
+    goto after464;
+call464:
+    func_00000464();
+after464:
     s1[1] = mode; /* +0x4 */
 
-    switch (mode) {
-    case 2:
-        func_00000294();
-        return;
-    case 3:
-        *(volatile int *) ((volatile char *) s1 + 0x6534) = 0;
-        return;
+    if (mode == 3) {
+        goto clear;
     }
+    if (mode == 2) {
+        goto call294;
+    }
+    goto end;
+call294:
+    func_00000294();
+    goto end;
+clear:
+    *(volatile int *) ((volatile char *) s1 + 0x6534) = 0;
+end:
+    ;
 }
 
 /* func_0000024C — one-shot: format a string into a stack buffer and hand
@@ -247,7 +291,27 @@ void func_0000024C(void) {
 
 /* func_00000294 — init the "viewer config" blob at D_000A3F0C (font/frame
  * geometry, flags, the func_000007C8 render callback). DRAFT: field names
- * are placeholder byte offsets (`cfg[OFF]`), not yet a real struct. */
+ * are placeholder byte offsets (`cfg[OFF]`), not yet a real struct.
+ * Logic/order/values are all confirmed correct against the target
+ * (statement-by-statement, including the read-modify-write bit twiddling on
+ * +0xCC/+0xCD and the D0/D4/D6 geometry clamp at the end) but target=116
+ * candidate=131 words. Root cause confirmed by isolated experiment (not
+ * guessed): the target keeps `&D_000A3F0C` cached in one register ($s0) for
+ * the whole function and derives `rec = cfg+0x4C` from it with a single
+ * ADDIU, while this compile re-materializes a fresh `lui/addiu` pair for
+ * D_000A3F0C at almost every access (~13 extra pairs = the entire gap).
+ * Tried, none changed it: a plain `char*` local, `register char*`, an
+ * `extern char[]` decl instead of `char`, a real struct with `->field`
+ * access, folding away the scratch locals (b/val_408/val_530/t0/t1) into
+ * single inline expressions, and reproducing the exact statement order in a
+ * standalone test file compiled with the same flags. A minimal repro
+ * confirmed MWCC always re-derives a global's address in straight-line code
+ * this dense regardless of source shape — same class of MWCC-internal
+ * codegen choice as the other DRAFTs in this file, just with a much bigger
+ * word-count impact because of how many fields this one function touches.
+ * The isolated repro also reconfirmed the `(x<0)?0:x`-to-`max`/min-to-`min`
+ * pseudo-op fold is unreliable even with statement order matching the
+ * target exactly, consistent with func_00000470's DRAFT note. */
 void func_00000294(void) {
     char *cfg = &D_000A3F0C;
     char *rec = cfg + 0x4C; /* record cleared/initialized below */
@@ -295,7 +359,7 @@ void func_00000294(void) {
     *(signed char *) (cfg + 0xD2) = 0xA;
     *(short *) (cfg + 0xF4) = 0xF0;
     *(short *) (cfg + 0xF6) = 0x10;
-    *(void (**)(int, int, int)) (cfg + 0x100) = func_000007C8;
+    *(void (**)(void *, int, int, int)) (cfg + 0x100) = func_000007C8;
 
     *(signed char *) (rec + 0x8) = 0;
     *(short *) (rec + 0xC) = 0;
@@ -328,7 +392,12 @@ void func_00000464(void) {
 }
 
 /* func_00000470 — per-frame update for mode 2: tracks a load counter and,
- * once a completion flag is set, transitions to mode 3 or 4. DRAFT. */
+ * once a completion flag is set, transitions to mode 3 or 4. DRAFT: logic
+ * confirmed correct; target=52 candidate=55 words. Confirmed (via an
+ * isolated standalone test of `x = x<0?0:x` and equivalents) that no
+ * portable-C form of the decrement-then-clamp-to-zero idiom makes MWCC emit
+ * the Allegrex `max` pseudo-op here — it stays a `bgez`+move sequence, same
+ * "ternary-to-max fold is unreliable" quirk noted in the file header. */
 void func_00000470(void) {
     volatile int *s1 = &D_0009DB00;
     void *obj = func_00000D74();
@@ -383,33 +452,50 @@ test:
     func_000001C8(2);
 }
 
-/* func_000005C8 — per-frame update for mode... dispatches on the current
- * mode value again (0009DB04) to run small per-mode housekeeping. DRAFT. */
+/* func_000005C8 — per-frame update for mode: dispatches on the current
+ * mode value (D_0009DB04) to run small per-mode housekeeping. The mode==3
+ * handler reads/writes D_0009DB00+0x6530/+0x6534 through the shared state
+ * pointer rather than standalone extern symbols (same field-sharing as
+ * elsewhere in this file), and D_000A3F0C is similarly state+0x640C here.
+ * DRAFT: rewriting the if/else-if chain as an explicit goto chain (matching
+ * the target's default-inline-others-as-labeled-blocks layout, and forcing
+ * mode==3/2/1 check order — a plain `switch` gets sorted ascending by MWCC
+ * regardless of case order in the source, which doesn't match this target)
+ * got this from 65/59 to 60/59 target words. The remaining word is the same
+ * address-CSE choice as func_000006BC: MWCC caches `state + 0x6534` into its
+ * own register for the mode==3 body instead of folding the offset into each
+ * load/store immediate. */
 void func_000005C8(void) {
     int mode = D_0009DB04;
+    volatile int *state = &D_0009DB00;
     int handle;
 
-    switch (mode) {
-    case 2:
-        handle = func_00000DA4(1, 0);
-        func_0000169C(&handle, &D_000A3F0C);
-        func_00000DAC(handle);
-        return;
-    case 1:
-        func_00002EB4(0x10, 0x10);
-        func_00002E94(0, 0, &D_00005A88);
-        return;
-    case 3:
-        if (D_000A4034 != 0) {
-            int slot = D_000A4030;
-            func_00001A5C((void *) ((volatile char *) &D_0009DB00 + (slot << 8) + 8), 0xF3F9);
-            D_000A4034 = 0;
-        }
-        return;
-    default:
-        func_00002EB4(0x10, 0x10);
-        func_00002E94(0, 0, &D_00005A7C);
-        return;
+    if (mode == 3) {
+        goto case3;
+    }
+    if (mode == 2) {
+        goto case2;
+    }
+    if (mode == 1) {
+        goto case1;
+    }
+    func_00002EB4(0x10, 0x10);
+    func_00002E94(0, 0, &D_00005A7C);
+    return;
+case1:
+    func_00002EB4(0x10, 0x10);
+    func_00002E94(0, 0, &D_00005A88);
+    return;
+case2:
+    handle = func_00000DA4(1, 0);
+    func_0000169C(&handle, (void *) ((volatile char *) state + 0x640C));
+    func_00000DAC(handle);
+    return;
+case3:
+    if (*(volatile int *) ((volatile char *) state + 0x6534) != 0) {
+        int slot = *(volatile int *) ((volatile char *) state + 0x6530);
+        func_00001A5C((void *) ((volatile char *) state + (slot << 8) + 8), 0xF3F9);
+        *(volatile int *) ((volatile char *) state + 0x6534) = 0;
     }
 }
 
@@ -422,48 +508,80 @@ void func_000006B4(void) {
 /* func_000006BC — walks a linked list of directory/file entries (via
  * func_00002224/func_00002234/func_0000222C), recursing into
  * subdirectories and appending matched entries into the 0x100-byte-record
- * table at D_0009DB00+0x8. DRAFT. */
+ * table at D_0009DB00+0x8. The func_00002234 out-param is an opaque 0x108-byte
+ * directory-entry record: flags live at +0x0, the name string at +0x58
+ * (confirmed by the target's local frame layout: the out-param buffer sits
+ * at sp+0x20, the name bytes are read/passed at sp+0x78). The running slot
+ * count normally named D_000A3F08 is accessed here through the D_0009DB00
+ * base register (offset 0x6408) rather than its own extern symbol, same as
+ * the state-blob field sharing noted in the file header. DRAFT: rewriting
+ * the `while` as an explicit goto-test-first loop (matching func_00000034's
+ * technique) fixed a loop-rotated-with-duplication issue and got this from
+ * 75/67 to 71/67 target words. The remaining 4 words are MWCC choosing to
+ * CSE the repeated `state + 0x6408` computation into its own cached base
+ * register (2 extra lui/addiu) instead of folding the offset into each
+ * individual load/store's immediate like the target does — tried dropping
+ * the `state` local entirely and re-deriving `&D_0009DB00` at each site,
+ * and array-indexing instead of char-offset casts; the compiler made the
+ * same CSE choice either way, so this is compiler-internal, not
+ * source-shape-driven. */
 void func_000006BC(void *arg0) {
-    char entry[0x100];
-    int flags;
+    volatile int *state = &D_0009DB00;
+    char dirent[0x108];
     int handle = func_00002224();
+    int flags;
 
-    while (func_00002234(handle, &flags) > 0) {
-        if (D_000A3F08 >= 0x64) {
-            break;
-        }
-        if (!(flags & 0x1000)) {
-            if (flags & 0x2000) {
-                int index = D_000A3F08;
-                char *slot = (char *) &D_0009DB00 + (index << 8) + 8;
-                func_00001DBC(slot, arg0);
-                func_00001DCC(slot, entry);
-                D_000A3F08 = index + 1;
-            }
-        } else if (*(signed char *) entry != 0x2E) {
-            int len = func_00001DE4(arg0);
-            func_00001DCC(arg0, entry);
-            func_00001DCC(arg0, &D_00005AA4);
-            func_000006BC(arg0);
-            ((char *) arg0)[len] = 0;
-        }
+    goto test;
+loop:
+    flags = *(int *) dirent;
+    if (*(volatile int *) ((volatile char *) state + 0x6408) >= 0x64) {
+        goto done;
     }
-
+    if (!(flags & 0x1000)) {
+        if (flags & 0x2000) {
+            int index = *(volatile int *) ((volatile char *) state + 0x6408);
+            char *slot = (char *) state + (index << 8) + 8;
+            func_00001DBC(slot, arg0);
+            func_00001DCC(slot, dirent + 0x58);
+            *(volatile int *) ((volatile char *) state + 0x6408) = index + 1;
+        }
+    } else if (*(signed char *) (dirent + 0x58) != 0x2E) {
+        int len = func_00001DE4(arg0);
+        func_00001DCC(arg0, dirent + 0x58);
+        func_00001DCC(arg0, &D_00005AA4);
+        func_000006BC(arg0);
+        ((char *) arg0)[len] = 0;
+    }
+test:
+    if (func_00002234(handle, dirent) > 0) {
+        goto loop;
+    }
+done:
     func_0000222C(handle);
 }
 
 /* func_000007C8 — render callback set into the viewer config
  * (D_000A3F0C+0x100): builds a wide-char label from a table entry's name
- * and draws it. DRAFT. */
-void func_000007C8(int arg1, int arg2, int arg3) {
-    short label[0x104];
+ * and draws it. Real signature takes a leading unused param (target uses
+ * $a1/$a2/$a3 for arg1/arg2/arg3, not $a0/$a1/$a2). DRAFT: byte-identical
+ * except 4 words where the target keeps the `src` copy pointer in $a1
+ * (reusing arg1's register) and this compile allocates it to $a0 instead —
+ * tried reordering/retyping the locals and params, register choice didn't
+ * budge; same class of MWCC-internal-heuristic quirk as the other DRAFTs in
+ * this file. */
+void func_000007C8(void *unused, int arg1, int arg2, int arg3) {
+    short label[0x100];
     signed char *src = (signed char *) &D_0009DB00 + ((arg1 & 0xFFFF) << 8) + 8;
     short *dst = label;
 
-    while (*src != 0) {
-        *dst = (short) *src;
-        dst++;
-        src++;
+    goto test;
+loop:
+    *dst = (short) *src;
+    dst++;
+    src++;
+test:
+    if (*src != 0) {
+        goto loop;
     }
     *dst = 0;
 
@@ -471,10 +589,8 @@ void func_000007C8(int arg1, int arg2, int arg3) {
     func_00002EB4(0xC, 0xC);
     func_00002EC4(0xFF000000);
     func_00000894(arg2 + 2, arg3 + 2,
-                   (void *) (label + (func_00001DE4(
-                                           (void *) (long) func_00000924(3))
-                                       * 2)
-                             + 0x10));
+                   (void *) (label + func_00001DE4(
+                                          (void *) (long) func_00000924(3))));
     func_00002F9C();
 }
 
