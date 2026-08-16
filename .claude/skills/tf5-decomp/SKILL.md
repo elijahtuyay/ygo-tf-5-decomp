@@ -20,13 +20,23 @@ Project: matching reconstruction of the code of **Yu-Gi-Oh! 5D's Tag Force 5**
   (from the `.comment` section of every PRX). Matching uses **`mwccpsp`**, not psp-gcc.
   On decomp.me the PSP builds use the product names **MWCC 1.0 … 1.3 SP7** (internal
   builds 3.0.1_121…219); `2.4.1.01` is a different numbering axis, do NOT look for it
-  in the list. Bisect from the high builds (219→210→205…) on a real function to find the
-  right one; locally it runs via **wibo**. Details in `docs/09-first-match.md`.
+  in the list. Locally it runs via **wibo**. Details in `docs/09-first-match.md`.
+- **Build bisection is DONE** (`scripts/mwcc_bisect.sh`, all 11 builds vs all 16
+  functions of `rel_movie_viewer`): builds **121–151 are ruled out** (they cannot
+  match `func_00000184`, which 180+ does), and **192–219 are indistinguishable** —
+  identical output on every function. Candidate set is now
+  **{192, 201, 205, 210, 219}**; keep 219. No build matches any function that 219
+  misses, so **a failing function is never a reason to switch builds** — the gap is
+  in the C. Re-run the harness on a new module if a function ever matches on a
+  build other than 219; that would finally pin it.
 - **CONFIRMED config**: compiler **MWCC 1.3 SP7 (mwccpsp_3.0.1_219)**, flags
-  **`-O4,p -sdatathreshold 0`**. `-sdatathreshold 0` = absolute addressing (not
+  **`-O4,s -sdatathreshold 0`** (SIZE, not `,p` — corrected 2026-08-16; `func_00000034`
+  is the only function that discriminates: 100% on `,s`, 63/65 words on `,p`, while the
+  other 14 are byte-identical either way. `-O3,s` gives a byte-identical object, so the
+  LEVEL is not pinned, only speed-vs-size). `-sdatathreshold 0` = absolute addressing (not
   gp-relative). Confirmed on 9 real functions of `rel_movie_viewer` (not just the
-  trivial empty one) — build 219 is proven SUFFICIENT, not yet proven unique
-  (adjacent builds 210/205/... untried on these same functions).
+  trivial empty one), and adjacent builds have now been tried — see the bisection
+  entry above.
 - **Matching works fully locally now, no decomp.me account needed**:
   `scripts/mwcc_build.sh src/file.c` (wibo + real mwccpsp_3.0.1_219, both
   auto-fetched by `setup_tools.sh`) then `scripts/mwcc_diff.py asm/.../text.s

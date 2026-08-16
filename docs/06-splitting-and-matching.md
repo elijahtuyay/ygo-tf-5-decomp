@@ -22,7 +22,20 @@ Matching requires **that exact compiler**, not psp-gcc. Implications:
 - The exact flags (optimization level, `-inline`, alignments…) have to be found by
   trial and error, comparing the output: this is the "artisanal" part of matching.
 - **CONFIRMED flags for TF5** (first function matched 100%, `func_00000184`, see
-  `09-first-match.md`): **`-O4,p -sdatathreshold 0`** on **MWCC 1.3 SP7 (3.0.1 219)**.
+  `09-first-match.md`): **`-O4,s -sdatathreshold 0`** on **MWCC 1.3 SP7 (3.0.1 219)**.
+
+> **Correction (2026-08-16): the flag is `-O4,s`, not `-O4,p`.** The `,p`/`,s`
+> suffix selects optimize-for-speed vs optimize-for-size. `-O4,p` was adopted
+> when only simple functions had been matched, and those match under BOTH
+> settings, so it was never actually discriminating. `func_00000034` is the
+> first function that tells them apart: under `-O4,p` MWCC rotates its main
+> loop and elides the entry test (63 words vs the target's 65), while under
+> `-O4,s` it keeps the test and matches exactly. Switching the whole module to
+> `-O4,s` took `rel_movie_viewer` from 14/16 to 15/16 with **zero regressions**
+> — every function previously confirmed at `-O4,p` still matches byte-for-byte.
+> Bare `-O4` produces a byte-identical object to `-O4,s`, i.e. size is the
+> compiler's default. `scripts/mwcc_build.sh` now defaults to `-O4,s`.
+
   `-sdatathreshold 0` = absolute addressing (not gp-relative). The exact build still
   needs to be narrowed down (the function matches across the whole 180–219 family).
   Base flags (sotn-decomp): `-O4,p -lang c -sdatathreshold 0 -char unsigned -fl divbyzerocheck`.
@@ -156,7 +169,7 @@ scripts/mwcc_diff.py asm/rel_movie_viewer/text.s build/mwcc/rel_movie_viewer.o
 #   -> per function: "MATCH (N words)" or a list of differing instructions
 ```
 
-`mwcc_build.sh` accepts extra args to override the default `-O4,p -sdatathreshold 0`
+`mwcc_build.sh` accepts extra args to override the default `-O4,s -sdatathreshold 0`
 flags. `mwcc_diff.py` optionally takes function names to restrict the report.
 
 **Why "relocation-aware" matters**: a freshly compiled, unlinked `.o` has ZEROED
@@ -192,6 +205,58 @@ completely independent `lui/addiu` per field even though the fields are
 adjacent in memory. Get this wrong and the function still "looks right" in C
 but never reaches 0 diffs — see the file header of `src/rel_movie_viewer.c` for
 the specific functions where each style was confirmed.
+
+### 3c. MWCC codegen levers (confirmed on `rel_movie_viewer`)
+
+Things that look like "the compiler just chose differently" but are actually
+driven by the C you write. Each of these was the last blocker on a function
+that now matches 100%.
+
+- **Allegrex `min`/`max` are intrinsics, not a compiler fold.** MWCC never
+  emits them from portable C — no `(x < 0) ? 0 : x` phrasing, no `-O` level
+  and none of the 11 installed builds. The original source called
+  `__builtin_allegrex_min` / `__builtin_allegrex_max` directly. Argument
+  order is `__builtin_allegrex_max(rs, rt)` -> `max rd, rs, rt`.
+  **Gotcha:** `mips-linux-gnu-objdump` does not know the Allegrex opcodes and
+  prints them as a bare `.word`, so a working intrinsic call looks like a
+  failed one. Check the encoding instead (`max` = funct 0x2C, `min` = 0x2D).
+  The full list is recoverable from the compiler binary:
+  `strings tools/mwccpsp_3.0.1_219/mwccpsp.exe | grep __builtin_allegrex`
+  — bitrev, clz/clo, ctz/cto, ext/ins, rotl/rotr, seb/seh, wsbh/wsbw,
+  sqrt_s, and the float round/floor/ceil/trunc.
+
+- **A single-case `switch` is not the same as an `if`.** MWCC compiles a
+  `switch` by branching INTO the case body (`beql`, with a body instruction
+  in the delay slot) and giving the fall-through path its own `b` to the
+  epilogue. Every `if`/`goto` phrasing of the same test folds those into one
+  `bnel`-skip that is a word shorter, and it also changes how the
+  fall-through block's delay slots get filled. Conversely a `switch` over
+  several cases is sorted ASCENDING regardless of source order, so a target
+  that tests its cases descending needs a `goto` chain instead. Try both.
+
+- **Index a state blob as `int[]`, not a recomputed byte offset.** Writing
+  `*(volatile int *)((volatile char *)base + 0x6408)` more than once makes
+  MWCC hoist the address into its own cached register (costing the lui/addiu
+  pair, plus a saved register to spill and restore). `base[0x1902]` keeps the
+  offset in each load/store immediate, which is what the targets do.
+
+- **Bitfields.** A target that does lbu / mask / shift / `or` / sb per field,
+  with the source value truncated once up front, is MWCC's bitfield-insert
+  idiom. It cannot come from hand-rolled `(b & ~N) | (v << k)`, which MWCC
+  folds away entirely when `v` is 0. Declare `unsigned char x : 1` fields.
+  But model only ONE byte per bitfield struct: with two adjacent bitfield
+  bytes MWCC merges the second insert into the first and stores to the wrong
+  address (confirmed in isolation).
+
+- **Known mwccpsp bug — silently dropped byte stores.** In a store-dense
+  function where two pointers share a base (one derived from the other, by
+  `&p->member`, a cast, or a nested access), MWCC drops byte stores whose
+  immediate value also appears in a nearby halfword store. Not
+  volatile-specific, present in all 11 builds, and it does not reproduce in
+  a small isolated function. **Always count stores** (`sb`/`sh`/`sw`) against
+  the target before believing a smaller word count is progress — a wrong
+  object that is closer on size is not closer. This is what currently blocks
+  `func_00000294`.
 
 ## 4. Build system and match verification
 
