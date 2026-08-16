@@ -62,7 +62,7 @@ python tools/m2c/m2c.py --target mips-mwcc-c asm/func.s > src/func.c
 
 ## Matching loop
 - Online: decomp.me, **PSP / mwccpsp** preset. **CONFIRMED config: MWCC 1.3 SP7
-  (mwccpsp_3.0.1_219), flags `-O4,p -sdatathreshold 0`.** State globals are `volatile`
+  (mwccpsp_3.0.1_219), flags `-O4,s -sdatathreshold 0`.** (SIZE, not `,p` — corrected 2026-08-16) State globals are `volatile`
   (access via a local pointer). See `docs/09-first-match.md`.
 - Local: `tools/asm-differ/diff.py -mwo <func>` or **objdiff** (supports MIPS PSP +
   CodeWarrior demangling). Stubborn → `tools/decomp-permuter/permuter.py`.

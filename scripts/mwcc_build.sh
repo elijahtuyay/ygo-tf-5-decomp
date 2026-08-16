@@ -24,7 +24,7 @@ SRC="${1:?usage: $0 <src/file.c> [mwccpsp flags...]}"
 shift || true
 FLAGS=("$@")
 if [ "${#FLAGS[@]}" -eq 0 ]; then
-  FLAGS=(-O4,p -sdatathreshold 0)
+  FLAGS=(-O4,s -sdatathreshold 0)
 fi
 
 BASENAME="$(basename "${SRC%.c}")"

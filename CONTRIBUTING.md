@@ -37,7 +37,9 @@ All matching uses **Metrowerks CodeWarrior for PSP**. On [decomp.me](https://dec
 - **Platform:** PSP
 - **Compiler:** `MWCC 1.3 SP7 (3.0.1 219)` (the exact build is still being narrowed;
   180–219 all match simple functions)
-- **Flags:** `-O4,p -sdatathreshold 0`
+- **Flags:** `-O4,s -sdatathreshold 0` (optimize for SIZE — see the correction in
+  [`docs/06`](docs/06-splitting-and-matching.md#0-the-compiler-to-match-metrowerks-codewarrior-psp);
+  `-O4,p` was the documented value until 2026-08-16 and is wrong)
 
 Two project-specific conventions discovered so far (see
 [`docs/09-first-match.md`](docs/09-first-match.md)):

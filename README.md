@@ -28,7 +28,7 @@ in the code rather than in data).
 
 Setup is complete and the **decompilation has started**. `rel_movie_viewer` (the
 smallest module, 26 KB) is fully split with a complete section-accurate splat config,
-and **9 of its 16 `.text` functions are matched at 100%** (see
+and **15 of its 16 `.text` functions are matched at 100%** (see
 [`src/rel_movie_viewer.c`](src/rel_movie_viewer.c), functions tagged `MATCH 100%`).
 
 Matching can now be verified **entirely locally** (no decomp.me account needed):
@@ -45,7 +45,7 @@ matching".
 |---|---|
 | Original compiler | Metrowerks CodeWarrior for PSP — `MW MIPS C Compiler (2.4.1.01)` |
 | decomp.me / build | **MWCC 1.3 SP7** (`mwccpsp_3.0.1_219`) — exact build still being narrowed (180–219 all match simple functions) |
-| Flags | **`-O4,p -sdatathreshold 0`** |
+| Flags | **`-O4,s -sdatathreshold 0`** (optimize for SIZE — see [`docs/09`](docs/09-first-match.md)) |
 | Key technique | game state globals are **`volatile`**, accessed via a local pointer (see [`docs/09-first-match.md`](docs/09-first-match.md)) |
 
 What is already established:

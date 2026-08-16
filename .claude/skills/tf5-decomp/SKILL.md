@@ -20,13 +20,14 @@ Project: matching reconstruction of the code of **Yu-Gi-Oh! 5D's Tag Force 5**
   (from the `.comment` section of every PRX). Matching uses **`mwccpsp`**, not psp-gcc.
   On decomp.me the PSP builds use the product names **MWCC 1.0 … 1.3 SP7** (internal
   builds 3.0.1_121…219); `2.4.1.01` is a different numbering axis, do NOT look for it
-  in the list. Bisect from the high builds (219→210→205…) on a real function to find the
-  right one; locally it runs via **wibo**. Details in `docs/09-first-match.md`.
+  in the list. Locally it runs via **wibo**. Details in `docs/09-first-match.md`.
 - **CONFIRMED config**: compiler **MWCC 1.3 SP7 (mwccpsp_3.0.1_219)**, flags
-  **`-O4,p -sdatathreshold 0`**. `-sdatathreshold 0` = absolute addressing (not
-  gp-relative). Confirmed on 9 real functions of `rel_movie_viewer` (not just the
-  trivial empty one) — build 219 is proven SUFFICIENT, not yet proven unique
-  (adjacent builds 210/205/... untried on these same functions).
+  **`-O4,s -sdatathreshold 0`** (SIZE, not `,p` — corrected 2026-08-16;
+  `func_00000034` is the only function that discriminates: 100% on `,s`, 63/65
+  words on `,p`, while the other 15 are byte-identical either way. `-O3,s` gives a
+  byte-identical object, so the LEVEL is not pinned, only speed-vs-size).
+  `-sdatathreshold 0` = absolute addressing (not gp-relative). Confirmed on 15 real
+  functions of `rel_movie_viewer`, not just the trivial empty one.
 - **Matching works fully locally now, no decomp.me account needed**:
   `scripts/mwcc_build.sh src/file.c` (wibo + real mwccpsp_3.0.1_219, both
   auto-fetched by `setup_tools.sh`) then `scripts/mwcc_diff.py asm/.../text.s

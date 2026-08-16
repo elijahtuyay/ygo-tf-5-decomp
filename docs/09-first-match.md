@@ -191,7 +191,7 @@ With just `-sdatathreshold 0`, the addressing is right but two differences remai
 These are symptoms of **no optimization**. Fix: add the optimization level:
 
 ```
--O4,p -sdatathreshold 0
+-O4,p -sdatathreshold 0     # SUPERSEDED — the correct flag is -O4,s, see "Third step" below
 ```
 
 An optimization level is needed (fills delay slots, allocates registers), but
@@ -200,6 +200,18 @@ beware: **`-O4,p` over-optimizes** compared to TF5 — it generates `beqzl`
 of the address in `$s0`.
 
 ### Third step: finding the exact level (or the build)
+
+> ✅ **RESOLVED (2026-08-16): the level is `-O4,s`.** The suspicion recorded in
+> this section was right — `-O4,p` does over-optimize. The `,p`/`,s` suffix is
+> optimize-for-speed vs optimize-for-size, and TF5 was built for size. Simple
+> functions match under both settings, which is why `-O4,p` survived so long
+> unchallenged. `func_00000034` is the first function that discriminates: at
+> `-O4,p` MWCC rotates its main loop and drops the entry test (63 words vs the
+> target's 65); at `-O4,s` it keeps the test and matches. Rebuilding the whole
+> module at `-O4,s` took `rel_movie_viewer` from 14/16 to 15/16 with no
+> regressions. Bare `-O4` gives a byte-identical object, so size is the
+> default. The remaining steps below are still worth reading for technique,
+> but the level question itself is settled.
 
 The target is optimized **less aggressively** than `-O4,p`. With
 `-sdatathreshold 0` fixed, try the levels on build 219 in this order, watching
@@ -239,7 +251,7 @@ void func_00000184(void) {
 }
 ```
 
-**Compiler/flags:** `MWCC 1.3 SP7 (3.0.1 219)` + `-O4,p -sdatathreshold 0`.
+**Compiler/flags:** `MWCC 1.3 SP7 (3.0.1 219)` + `-O4,s -sdatathreshold 0`.
 
 > ✅ **CONFIRMED project findings** (first matched function, `func_00000184`):
 > 1. **`-sdatathreshold 0`** — absolute addressing, not gp-relative.
@@ -250,8 +262,10 @@ void func_00000184(void) {
 >    (MWCC 1.2 SP3 → 1.3 SP7); too simple to pin down the exact build. Default to
 >    **219** (like sotn-decomp); this will narrow down with more complex functions.
 >
-> Project's base flag set: `-O4,p -sdatathreshold 0` (plus, to be confirmed,
-> `-lang c -char unsigned -fl divbyzerocheck` as in sotn-decomp).
+> Project's base flag set: `-O4,s -sdatathreshold 0` (corrected from `-O4,p`
+> on 2026-08-16, see "Third step" above; plus, still to be confirmed,
+> `-lang c -char unsigned -fl divbyzerocheck` as in sotn-decomp — these three
+> are NOT currently passed and remain untested).
 
 ## The compiler unknown (important)
 
@@ -300,11 +314,7 @@ Note the outcome here as soon as you find out:
 > ✅ **Update**: build **219** (MWCC 1.3 SP7) with `-O4,p -sdatathreshold 0` has now
 > been confirmed on 9 real functions of `rel_movie_viewer` (not just the trivial
 > empty one), verified locally with `wibo` + the real `mwccpsp_3.0.1_219` binary
-> (see `docs/06-splitting-and-matching.md` "Local matching") — no adjacent build
-> has been tried against these same functions yet, so 219 isn't proven UNIQUE, but
-> it's solidly confirmed SUFFICIENT. If a future function fails to match on 219
-> with otherwise-correct-looking C, that's the point to bisect adjacent builds
-> (210, 205, ...) as originally planned above.
+> (see `docs/06-splitting-and-matching.md` "Local matching").
 
 ## When a function is "done"
 
@@ -312,7 +322,7 @@ Note the outcome here as soon as you find out:
    `06-splitting-and-matching.md` "Local matching" — no decomp.me account needed).
 2. Save the scratch (decomp.me gives you a URL) and/or bring the C back into the
    project's `src/`.
-3. Tag the function's comment `MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0)`
+3. Tag the function's comment `MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0)`
    in `src/*.c` (in the future: tracking with frogress/objdiff).
 
 ## Generating the asm of any function

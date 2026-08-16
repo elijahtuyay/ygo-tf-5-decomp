@@ -2,14 +2,14 @@
  * rel_movie_viewer.prx — reconstructed code (matching decompilation)
  *
  * Compiler:     Metrowerks CodeWarrior for PSP — MWCC 1.3 SP7 (mwccpsp_3.0.1_219)
- * Flags:        -O4,p -sdatathreshold 0
+ * Flags:        -O4,s -sdatathreshold 0   (SIZE, not ,p — see docs/09)
  * Verification: local build with wibo + mwccpsp_3.0.1_219 (see docs/03-tools.md
  *               "local matching" section) — compare with
  *               `mips-linux-gnu-objdump -dr` against asm/rel_movie_viewer/text.s,
  *               treating any word with a matching relocation (HI16/LO16/26,
  *               same symbol) on both sides as equal regardless of its baked
  *               immediate. Only functions marked "MATCH 100%" below have been
- *               confirmed this way; 9/16 functions in this file currently are.
+ *               confirmed this way; 15/16 functions in this file currently are.
  *
  * Conventions (see docs/09-first-match.md):
  *  - global game-state variables are `volatile` and are accessed via a local
@@ -39,20 +39,45 @@
  *     mirrors the target's exact block layout (worked for func_00000540,
  *     func_000007C8's copy loop, and the branch shapes in func_000001C8/
  *     func_000005C8/func_000006BC), sometimes not (func_00000034's loop
- *     test);
- *   - whether it folds a `(x < 0) ? 0 : x` clamp into the Allegrex `max`
- *     pseudo-op (confirmed unreliable even in an isolated standalone test
- *     with statement order matching the target exactly — func_00000470,
- *     func_00000294);
+ *     test). When `goto` will not do it, try a single-case `switch`: it is
+ *     NOT equivalent to `if` here. MWCC compiles a `switch` by branching
+ *     INTO the case body (`beql`, with a body instruction scheduled in the
+ *     delay slot) and giving the fall-through path its own `b` to the
+ *     epilogue, whereas every `if`/`goto` phrasing of the same test folds
+ *     the two into a single `bnel`-skip that is one word shorter. This is
+ *     what matched func_00000470's tail and func_00000034's dispatch;
+ *   - [RESOLVED — was wrong] the Allegrex `min`/`max` instructions were
+ *     recorded here as an unreliable compiler fold of a `(x < 0) ? 0 : x`
+ *     clamp. They are not a fold at all: MWCC NEVER emits them from portable
+ *     C (verified across every `?:`/`if` phrasing, every -O level, and all 11
+ *     installed builds). They are the compiler intrinsics
+ *     `__builtin_allegrex_max` / `__builtin_allegrex_min`, and the original
+ *     source called them directly. Argument order is
+ *     `__builtin_allegrex_max(rs, rt)` -> `max rd, rs, rt`, so the target's
+ *     `max $v1, $zero, $v1` is `__builtin_allegrex_max(0, x)`.
+ *     Beware when probing for these: `mips-linux-gnu-objdump` does not know
+ *     the Allegrex opcodes and prints them as a bare `.word`, so a successful
+ *     intrinsic call looks like a failure unless you check the encoding
+ *     (`max` = funct 0x2C, `min` = 0x2D). The full intrinsic list is
+ *     recoverable with `strings tools/mwccpsp_3.0.1_219/mwccpsp.exe |
+ *     grep __builtin_allegrex` — bitrev, clz/clo, ctz/cto, ext/ins, rotl/rotr,
+ *     seb/seh, wsbh/wsbw, sqrt_s, and the float round/floor/ceil/trunc.
+ *     Used by func_00000470; func_00000294 needs both;
  *   - whether it caches a global's address in a saved register for reuse
  *     across many straight-line statements (target sometimes does; this
  *     compiler was confirmed by isolated experiment to always
  *     re-materialize a fresh `lui/addiu` per access instead, regardless of
  *     pointer/struct form — func_00000294, and the `state + 0x6408/0x6534`
  *     case in func_000006BC/func_000005C8);
- *   - which of two otherwise-equivalent registers it assigns to a dead/free
- *     value (func_000007C8's `$a0` vs `$a1` for the copy-loop pointer).
  * Treat DRAFTs as very-close NONMATCHING, not as verified.
+ *
+ * CAUTION on "the compiler just allocates registers differently" diagnoses:
+ * func_000007C8 was documented as exactly that (`$a0` vs `$a1` for the
+ * copy-loop pointer) and it was NOT — the leading parameter had been typed as
+ * unused when the target actually forwards it into func_00000EB4, so $a0 was
+ * never free to begin with. Fixing the dataflow matched the function outright.
+ * An "unused" leading parameter that the target never writes before a call is
+ * a strong hint that the parameter is being passed straight through.
  *
  * Layout notes discovered while drafting (see asm/rel_movie_viewer/text.s):
  *  - D_0009DB00 is the start of a much larger state blob. func_00000138
@@ -77,7 +102,7 @@ extern volatile int D_0009DB00;
 extern void func_00000CEC(int);
 
 /* func_00000184 — "release-and-clear" cleanup of a global handle.
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00000184(void) {
     volatile int *p = &D_0009DB00;
     if (*p != 0) {
@@ -102,7 +127,7 @@ extern int func_00000CE4(void *, int);
 extern void *func_00000D74(void);
 extern int func_00000DA4(int, int);
 extern void func_00000DAC(int);
-extern int func_00000EB4(int);
+extern int func_00000EB4(void *, int);
 extern int func_00000EFC(int, int, int);
 extern void func_00001694(void *, int, int);
 extern void func_0000169C(void *, void *);
@@ -172,22 +197,32 @@ void func_00000894(int arg0, int arg1, void *arg2);
 
 /* func_00000000 — module entry point: registers the viewer's main loop
  * (func_00000034) and teardown (func_000001C0) callbacks.
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00000000(void) {
     func_000008B4(func_00000034, func_000001C0, (void *) &D_00005AC0);
     return 0;
 }
 
 /* func_00000034 — viewer main loop: dispatches on the current mode
- * (D_0009DB00+0x4) each frame until told to exit (mode 4). DRAFT: 60/65
- * target words, logic confirmed correct (tried a goto-based rewrite mirroring
- * the target's block order — no improvement). The gap is two more instances
- * of the same MWCC branch-polarity heuristic as func_000001C8 (beq-to-handler
- * +explicit `b` vs bne-skip, not controllable from portable C per the file
- * header), plus the loop-exit test: target computes `sltu`+`xori`+`bnez`
- * (3 words) where this compile collapses the same boolean check to a single
- * `beqz`/`beq` (tried `volatile int done` to block the optimization — no
- * effect). */
+ * (D_0009DB00+0x4) each frame until told to exit (mode 4).
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0).
+ *
+ * The dispatch is a `switch`, not an if/else-if chain: the target tests the
+ * cases DESCENDING (4,3,2,1) while laying the bodies out ASCENDING (case 1,
+ * then 2, then 3), which an if-chain cannot produce — MWCC emits switch tests
+ * in reverse and bodies in source order.
+ *
+ * This function is what pinned the project's optimization flag. Its last two
+ * words were the loop's entry test (`b .L000000F4` + `sltu $v0,$zero,$s1`),
+ * which the target emits even though $s1 was just zeroed and the test is
+ * provably true. No source phrasing brought it back: `while`, `for`, a
+ * guarded `do/while`, an explicit `goto` rotation and
+ * `while (1) { if (done) break; }` all fold identically, as does every
+ * storage form for the flag (char/short/array/struct/register) and every one
+ * of the 11 compiler builds. It was never a source problem — eliding a loop
+ * entry test is a SPEED optimization and the documented flag was wrong.
+ * Under `-O4,s` (optimize for size, which is what TF5 was built with) MWCC
+ * keeps the test and this function matches as written. See docs/09. */
 void func_00000034(void) {
     volatile int *state = &D_0009DB00;
     int done = 0;
@@ -200,21 +235,20 @@ void func_00000034(void) {
     while (!done) {
         func_00002FD4();
         mode = state[1]; /* +0x4 */
-        if (mode == 4) {
-            done = 1;
-            continue;
-        }
-        if (mode == 3) {
-            func_00000540();
-            continue;
-        }
-        if (mode == 2) {
-            func_00000470();
-            continue;
-        }
-        if (mode == 1) {
+        switch (mode) {
+        case 1:
             func_0000024C();
             func_000001C8(2);
+            break;
+        case 2:
+            func_00000470();
+            break;
+        case 3:
+            func_00000540();
+            break;
+        case 4:
+            done = 1;
+            break;
         }
     }
 
@@ -226,7 +260,7 @@ void func_00000034(void) {
 
 /* func_00000138 — viewer init: zero the whole state blob, open the movie
  * resource, and set the initial mode.
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00000138(void) {
     func_00001D7C((void *) &D_0009DB00, 0, 0x653C);
     D_0009DB00 = func_00000CE4((void *) &D_00005AD0, 0x80000);
@@ -235,51 +269,61 @@ void func_00000138(void) {
 
 /* func_000001C0 — empty callback (teardown hook registered by
  * func_00000000; nothing to release here).
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_000001C0(void) {
 }
 
-/* func_000001C8 — state-transition: runs exit logic for the current mode,
- * then sets the new mode and runs its entry logic. DRAFT: 29/33 target words,
- * logic/instruction selection confirmed correct — the remaining gap is MWCC
- * choosing `beq`+duplicated epilogue vs `bnel`+merged epilogue for the
- * mode==2 check, the same branch-polarity heuristic noted in the file header
- * as not reliably controllable from portable C (tried goto-based rewrites of
- * both checks; the old_mode read now correctly matches the target's
- * raw-absolute D_0009DB04 access instead of an offset off D_0009DB00). */
+/* func_000001C8 — the viewer's mode-transition routine, and the only writer
+ * of the mode field. Every mode change in this module goes through here:
+ * func_00000034's main loop calls it to enter mode 2, and func_00000470
+ * calls it to reach modes 3 and 4.
+ *
+ * Behaviour, in order:
+ *   1. read the CURRENT mode from D_0009DB04 and run that mode's EXIT hook —
+ *      only mode 2 has one (func_00000464, which tears down the config blob
+ *      built by func_00000294);
+ *   2. store the NEW mode into the state blob at +0x4 (same field, reached
+ *      here through the shared $s1 base rather than the D_0009DB04 symbol —
+ *      see the file header on when each addressing style is correct);
+ *   3. run the new mode's ENTRY hook — mode 2 builds the viewer config
+ *      (func_00000294), mode 3 clears the fade-pending flag at +0x6534.
+ * Modes 1 and 4 have neither hook, which is why they are absent from both
+ * switches rather than present as empty cases.
+ *
+ * MATCHING NOTE — BOTH dispatches must be `switch`, including the first,
+ * which has only a single case. MWCC compiles a switch by branching TO an
+ * out-of-line case body and jumping over it (`beq` to the body, `b` past it,
+ * test constants duplicated into both paths), whereas an equivalent `if` —
+ * however it is written, goto chains included — gets an inverted branch with
+ * the body inline, which is 2 words shorter and cannot be talked out of it.
+ * Recognising that shape is what matched this function, and the same lever
+ * later matched func_00000034's dispatch and func_00000470's tail.
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_000001C8(int mode) {
     int old_mode = D_0009DB04;
     volatile int *s1 = &D_0009DB00;
 
-    if (old_mode == 2) {
-        goto call464;
+    switch (old_mode) {
+    case 2:
+        func_00000464();
+        break;
     }
-    goto after464;
-call464:
-    func_00000464();
-after464:
     s1[1] = mode; /* +0x4 */
 
-    if (mode == 3) {
-        goto clear;
+    switch (mode) {
+    case 2:
+        func_00000294();
+        break;
+    case 3:
+        *(volatile int *) ((volatile char *) s1 + 0x6534) = 0;
+        break;
     }
-    if (mode == 2) {
-        goto call294;
-    }
-    goto end;
-call294:
-    func_00000294();
-    goto end;
-clear:
-    *(volatile int *) ((volatile char *) s1 + 0x6534) = 0;
-end:
-    ;
 }
 
 /* func_0000024C — one-shot: format a string into a stack buffer and hand
  * it to func_000006BC (a size-measurement/wrap routine, going by its own
  * body); buffer size confirmed by the match (0x110 frame - 0x10 = 0x100).
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0000024C(void) {
     char buf[0x100];
 
@@ -292,26 +336,80 @@ void func_0000024C(void) {
 /* func_00000294 — init the "viewer config" blob at D_000A3F0C (font/frame
  * geometry, flags, the func_000007C8 render callback). DRAFT: field names
  * are placeholder byte offsets (`cfg[OFF]`), not yet a real struct.
- * Logic/order/values are all confirmed correct against the target
- * (statement-by-statement, including the read-modify-write bit twiddling on
- * +0xCC/+0xCD and the D0/D4/D6 geometry clamp at the end) but target=116
- * candidate=131 words. Root cause confirmed by isolated experiment (not
- * guessed): the target keeps `&D_000A3F0C` cached in one register ($s0) for
- * the whole function and derives `rec = cfg+0x4C` from it with a single
- * ADDIU, while this compile re-materializes a fresh `lui/addiu` pair for
- * D_000A3F0C at almost every access (~13 extra pairs = the entire gap).
- * Tried, none changed it: a plain `char*` local, `register char*`, an
- * `extern char[]` decl instead of `char`, a real struct with `->field`
- * access, folding away the scratch locals (b/val_408/val_530/t0/t1) into
- * single inline expressions, and reproducing the exact statement order in a
- * standalone test file compiled with the same flags. A minimal repro
- * confirmed MWCC always re-derives a global's address in straight-line code
- * this dense regardless of source shape — same class of MWCC-internal
- * codegen choice as the other DRAFTs in this file, just with a much bigger
- * word-count impact because of how many fields this one function touches.
- * The isolated repro also reconfirmed the `(x<0)?0:x`-to-`max`/min-to-`min`
- * pseudo-op fold is unreliable even with statement order matching the
- * target exactly, consistent with func_00000470's DRAFT note. */
+ * Logic/order/values are confirmed correct against the target
+ * statement-by-statement, and this version emits ALL of the target's stores
+ * (13 sb / 11 sh / 14 data sw). target=116 candidate=129 words.
+ *
+ * The two `?:` clamps at the end are now the intrinsics
+ * `__builtin_allegrex_min`/`_max` (see the file header) — that is confirmed
+ * correct and is what the original wrote, worth 2 words.
+ *
+ * ---- 2026-08-16 investigation. The remaining gap is ONE bug, now
+ * precisely characterised. Read this before retrying: ----
+ *
+ * The whole 13-word gap is address re-materialisation: the target keeps
+ * &D_000A3F0C in $s0 and the record base ($s0 + 0x4C) in $s1 for the entire
+ * function, while this version re-derives a lui/addiu pair per access.
+ * Caching the base IS achievable — a `volatile` pointer does it, and so does
+ * modelling the blob as a real struct (both were tried this session; the
+ * struct form reaches 107 words with lui=5, exactly matching the target's
+ * five lui). Combined with the correct bitfield modelling for +0xCC (see
+ * below) the arithmetic works out to exactly 116.
+ *
+ * WHAT BLOCKS IT — an mwccpsp store-elimination bug. Once two pointers share
+ * a base (i.e. one is derived from the other, however it is written:
+ * `&cfg->rec`, a cast off `cfg`, or a nested `cfg->rec.field` access), the
+ * compiler SILENTLY DROPS byte stores whose immediate value also appears in
+ * a nearby halfword store. In this function that kills exactly four stores —
+ * rec+0x50 and rec+0x5C (0xC, shared with the four `sh ... 0xC` above them),
+ * cfg+0xD2 (0xA, shared with `sh 0xA` at 0xD0), and the cfg+0xCD
+ * read-modify-write (0x10, shared with `sh 0x10` at 0xF6). Those four plus
+ * their setup are 9 words: 107 + 9 = 116, which is the entire gap.
+ *
+ * Established about the bug, so it need not be re-derived:
+ *  - it is NOT `volatile`-specific: it happens with plain non-volatile
+ *    struct members just the same;
+ *  - it is NOT build-specific: all 11 installed mwccpsp builds drop the
+ *    same four stores;
+ *  - it does NOT reproduce in a small isolated function, even with a shared
+ *    base register passed in as a parameter — the surrounding store density
+ *    matters;
+ *  - the direction of derivation flips which stores die. Deriving cfg FROM
+ *    rec (`rec` gets the lui, `cfg = (char *)rec - 0x4C`) keeps all 13 byte
+ *    stores at 115/116 words with lui=5 — but it also swaps the register
+ *    roles ($s0=rec, $s1=cfg) versus the target, so it cannot match
+ *    byte-for-byte even at the right size.
+ *
+ * So a matching version needs the target's shape (cfg is the lui root, rec
+ * derived from it) which is exactly the shape that triggers the bug. The
+ * form committed here re-materialises addresses and is 13 words over, but it
+ * is CORRECT — it writes every field. Do not trade that away for a smaller
+ * word count: an object missing four field writes is a worse result than a
+ * NONMATCHING draft.
+ *
+ * FLAG UPDATE (same session): the store-elimination bug above is specific to
+ * `-O4,p`. Under the project's corrected `-O4,s` it does not happen at all —
+ * every source shape tried (struct members, volatile pointers, casts) emits
+ * all 13 byte stores. But `-O4,s` also never caches the blob's base address
+ * in a saved register here, so the count stays at 129 with lui=32. So the two
+ * halves of the problem now sit on opposite sides of the flag: `-O4,p` gives
+ * the target's five lui but drops four stores, `-O4,s` keeps every store but
+ * re-materialises every address. The version below is the `-O4,s` one, which
+ * is correct. Note the `volatile`+local-pointer trick that works elsewhere in
+ * this file does NOT cache the base here, likely because the accesses cast
+ * the pointer to a different type at each use rather than going through the
+ * declared pointer type — worth attacking from that angle next.
+ *
+ * ALSO ESTABLISHED (reusable): +0xCC is a BITFIELD. The target truncates the
+ * source value once (`andi $a2,$zero,1`) then per field does
+ * lbu / mask / shift / `or` / sb — MWCC's bitfield-insert idiom, which
+ * cannot come from `(b & ~N) | (flag << k)` because MWCC folds the `or` away
+ * once it sees flag == 0 (~3 words lost per field). A struct of
+ * `unsigned char x : 1` fields reproduces them. Do NOT also model +0xCD as a
+ * bitfield in the same struct: MWCC then merges the 0xCD insert into the
+ * preceding 0xCC one and stores the result to the WRONG byte (verified in
+ * isolation). +0xCD and +0xD6 take nonzero constants, so plain masking is
+ * correct for them. */
 void func_00000294(void) {
     char *cfg = &D_000A3F0C;
     char *rec = cfg + 0x4C; /* record cleared/initialized below */
@@ -377,27 +475,30 @@ void func_00000294(void) {
     val_530 = D_000A4030;
     t0 = val_408 - 0xA;
     *(short *) (cfg + 0xD0) = (short) val_408;
-    t0 = (val_530 < t0) ? val_530 : t0;
+    t0 = __builtin_allegrex_min(val_530, t0);
     t1 = (val_530 - val_408) + 0xA;
     *(short *) (cfg + 0xD4) = (short) t0;
-    t1 = (t1 < 0) ? 0 : t1;
+    t1 = __builtin_allegrex_max(0, t1);
     b = *(unsigned char *) (cfg + 0xD6);
     *(unsigned char *) (cfg + 0xD6) = (b & ~0x1F) | (t1 & 0x1F);
 }
 
 /* func_00000464 — tail-calls into func_000016C4 with the config blob.
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00000464(void) {
     func_000016C4(&D_000A3F0C);
 }
 
 /* func_00000470 — per-frame update for mode 2: tracks a load counter and,
- * once a completion flag is set, transitions to mode 3 or 4. DRAFT: logic
- * confirmed correct; target=52 candidate=55 words. Confirmed (via an
- * isolated standalone test of `x = x<0?0:x` and equivalents) that no
- * portable-C form of the decrement-then-clamp-to-zero idiom makes MWCC emit
- * the Allegrex `max` pseudo-op here — it stays a `bgez`+move sequence, same
- * "ternary-to-max fold is unreliable" quirk noted in the file header. */
+ * once a completion flag is set, transitions to mode 3 or 4.
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0).
+ *
+ * Two findings got this over the line, both previously mis-diagnosed as
+ * "uncontrollable MWCC codegen":
+ *  - the clamp is NOT reachable from portable C (no `x<0?0:x` phrasing, no
+ *    optimisation level, and none of the 11 installed builds emit it) — it is
+ *    the compiler intrinsic `__builtin_allegrex_max`. See the file header.
+ *  - the tail's branch polarity needs a single-case `switch`; see the body. */
 void func_00000470(void) {
     volatile int *s1 = &D_0009DB00;
     void *obj = func_00000D74();
@@ -405,36 +506,43 @@ void func_00000470(void) {
     int flags = *(int *) ((char *) obj + 0xC);
     int changed = 0;
     int counter;
-    volatile int *counter_p = (volatile int *) ((volatile char *) s1 + 0x6538);
 
+    /* 0x194E = 0x6538/4: indexed off s1 so the offset folds into the load and
+     * store immediates; hoisting it into a `volatile int *counter_p` instead
+     * makes MWCC materialise the address in its own register (+2 words). */
     if (flags & 0x100) {
         changed = 1;
-        counter = *counter_p - 1;
-        counter = (counter < 0) ? 0 : counter;
-        *counter_p = counter;
+        counter = __builtin_allegrex_max(0, s1[0x194E] - 1);
+        s1[0x194E] = counter;
     } else if (flags & 0x200) {
         changed = 1;
-        counter = *counter_p + 1;
-        *counter_p = counter;
+        counter = s1[0x194E] + 1;
+        s1[0x194E] = counter;
     }
 
     if (changed) {
-        func_00001B8C(*counter_p, changed);
+        func_00001B8C(s1[0x194E], changed);
     }
 
-    if (*(volatile unsigned char *) ((volatile char *) s1 + 0x64F9) == 6) {
-        if (result != -2) {
-            *(volatile int *) ((volatile char *) s1 + 0x6530) = result;
-            func_000001C8(3);
-            return;
+    /* single-case `switch`, not an `if`: the switch is what makes MWCC branch
+     * INTO the body (`beql`, body instruction in the delay slot) and give the
+     * fall-through path its own `b` to the epilogue. Every `if`/`goto` phrasing
+     * folds those two into one `bnel`-skip and comes out a word short. */
+    switch (*(volatile unsigned char *) ((volatile char *) s1 + 0x64F9)) {
+    case 6:
+        if (result == -2) {
+            func_000001C8(4);
+            break;
         }
-        func_000001C8(4);
+        *(volatile int *) ((volatile char *) s1 + 0x6530) = result;
+        func_000001C8(3);
+        break;
     }
 }
 
 /* func_00000540 — per-frame update for mode 3: waits for the fade to
  * finish, sets up the fade-to-black overlay, then hands off to mode 2.
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00000540(void) {
     volatile int *s0 = &D_0009DB00;
     func_00002DEC(0, 1);
@@ -452,19 +560,23 @@ test:
     func_000001C8(2);
 }
 
-/* func_000005C8 — per-frame update for mode: dispatches on the current
- * mode value (D_0009DB04) to run small per-mode housekeeping. The mode==3
- * handler reads/writes D_0009DB00+0x6530/+0x6534 through the shared state
- * pointer rather than standalone extern symbols (same field-sharing as
- * elsewhere in this file), and D_000A3F0C is similarly state+0x640C here.
- * DRAFT: rewriting the if/else-if chain as an explicit goto chain (matching
- * the target's default-inline-others-as-labeled-blocks layout, and forcing
- * mode==3/2/1 check order — a plain `switch` gets sorted ascending by MWCC
- * regardless of case order in the source, which doesn't match this target)
- * got this from 65/59 to 60/59 target words. The remaining word is the same
- * address-CSE choice as func_000006BC: MWCC caches `state + 0x6534` into its
- * own register for the mode==3 body instead of folding the offset into each
- * load/store immediate. */
+/* func_000005C8 — per-frame update: dispatches on the current mode value
+ * (D_0009DB04) to run small per-mode housekeeping. The mode==3 handler
+ * reads/writes D_0009DB00+0x6530/+0x6534 through the shared state pointer
+ * rather than standalone extern symbols (same field-sharing as elsewhere in
+ * this file), and D_000A3F0C is similarly state+0x640C here.
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0).
+ *
+ * Two things this function pinned down:
+ *  - the dispatch is a goto chain, NOT a plain `switch` over all four cases:
+ *    MWCC sorts switch cases ascending regardless of source order, which
+ *    cannot produce this target's 3/2/1 test order.
+ *  - the state blob is indexed as int[] (0x194D = 0x6534/4) rather than via
+ *    recomputed byte offsets; writing the byte form twice makes MWCC CSE the
+ *    address into a saved register, while the target folds 0x6534 into the
+ *    load and store immediates off $s0.
+ *  - the final test of the chain must still be a single-case `switch`; see
+ *    the body for why. */
 void func_000005C8(void) {
     int mode = D_0009DB04;
     volatile int *state = &D_0009DB00;
@@ -476,7 +588,15 @@ void func_000005C8(void) {
     if (mode == 2) {
         goto case2;
     }
-    if (mode == 1) {
+    /* the LAST test of the chain must be a single-case `switch`, not an `if`
+     * (the earlier two are plain `if`s — see the target's `beq`/`beql` mix).
+     * With an `if` here MWCC schedules the fall-through block's
+     * `addu $a1,$a0,$zero` down into the following `jal`'s delay slot; the
+     * `switch` leaves that slot as the target's `nop`. The identical call in
+     * the mode==1 block DOES get its slot filled either way, which is what
+     * made this look like an uncontrollable scheduling asymmetry. */
+    switch (mode) {
+    case 1:
         goto case1;
     }
     func_00002EB4(0x10, 0x10);
@@ -492,84 +612,105 @@ case2:
     func_00000DAC(handle);
     return;
 case3:
-    if (*(volatile int *) ((volatile char *) state + 0x6534) != 0) {
-        int slot = *(volatile int *) ((volatile char *) state + 0x6530);
+    /* indexed as int[] (0x194D = 0x6534/4, 0x194C = 0x6530/4) rather than via a
+     * recomputed byte-offset address: writing the byte form twice makes MWCC
+     * CSE the address into a saved register, while the target folds 0x6534
+     * into the load and the store immediates off $s0. */
+    if (state[0x194D] != 0) {
+        int slot = state[0x194C];
         func_00001A5C((void *) ((volatile char *) state + (slot << 8) + 8), 0xF3F9);
-        *(volatile int *) ((volatile char *) state + 0x6534) = 0;
+        state[0x194D] = 0;
     }
 }
 
 /* func_000006B4 — empty callback (registered alongside func_000005C8 in
  * func_00000034).
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_000006B4(void) {
 }
 
 /* func_000006BC — walks a linked list of directory/file entries (via
  * func_00002224/func_00002234/func_0000222C), recursing into
  * subdirectories and appending matched entries into the 0x100-byte-record
- * table at D_0009DB00+0x8. The func_00002234 out-param is an opaque 0x108-byte
- * directory-entry record: flags live at +0x0, the name string at +0x58
- * (confirmed by the target's local frame layout: the out-param buffer sits
- * at sp+0x20, the name bytes are read/passed at sp+0x78). The running slot
- * count normally named D_000A3F08 is accessed here through the D_0009DB00
- * base register (offset 0x6408) rather than its own extern symbol, same as
- * the state-blob field sharing noted in the file header. DRAFT: rewriting
- * the `while` as an explicit goto-test-first loop (matching func_00000034's
- * technique) fixed a loop-rotated-with-duplication issue and got this from
- * 75/67 to 71/67 target words. The remaining 4 words are MWCC choosing to
- * CSE the repeated `state + 0x6408` computation into its own cached base
- * register (2 extra lui/addiu) instead of folding the offset into each
- * individual load/store's immediate like the target does — tried dropping
- * the `state` local entirely and re-deriving `&D_0009DB00` at each site,
- * and array-indexing instead of char-offset casts; the compiler made the
- * same CSE choice either way, so this is compiler-internal, not
- * source-shape-driven. */
+ * table at D_0009DB00+0x8. The func_00002234 out-param is a 0x160-byte
+ * directory-entry record: flags at +0x0, the name string at +0x58 (the
+ * buffer sits at sp+0x20 and the name is read at sp+0x78; the 0x160 size is
+ * fixed by the target's 0x180 frame, and is the one value that puts the
+ * buffer at 0x20 rather than 0x28).
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0).
+ *
+ * The draft was 4 words over because the slot-count bound was written as a
+ * guard at the top of the body. It is really the second half of the loop
+ * condition, and the value it loads is REUSED as the slot index — the
+ * target's `sll $v0,$v1,8` consumes the very $v1 that the condition's
+ * `lw $v1,0x6408($s0)` produced. Writing it as a guard meant three separate
+ * reads of the field inside the loop, which MWCC then hoisted into its own
+ * cached base register (+2 words, +1 saved register to spill and restore).
+ * Folding it into the condition and indexing the blob as int[]
+ * (state[0x1902] = 0x6408/4) instead of a recomputed byte offset keeps the
+ * offset in each load/store immediate, exactly as the target does. This is
+ * the same int[]-indexing lever that fixed func_000005C8. */
 void func_000006BC(void *arg0) {
     volatile int *state = &D_0009DB00;
-    char dirent[0x108];
+    char dirent[0x160];
     int handle = func_00002224();
     int flags;
+    int count;
 
-    goto test;
-loop:
-    flags = *(int *) dirent;
-    if (*(volatile int *) ((volatile char *) state + 0x6408) >= 0x64) {
-        goto done;
-    }
-    if (!(flags & 0x1000)) {
-        if (flags & 0x2000) {
-            int index = *(volatile int *) ((volatile char *) state + 0x6408);
-            char *slot = (char *) state + (index << 8) + 8;
+    /* the slot-count bound is the SECOND half of the loop condition, not a
+     * guard at the top of the body, and the value it loads is reused as the
+     * slot index below (the target's `sll $v0,$v1,8` consumes the very $v1
+     * the condition's `lw` produced). Hoisting the check into the body is
+     * what made MWCC cache `state + 0x6408` in its own base register. */
+    while (func_00002234(handle, dirent) > 0 &&
+           (count = state[0x1902]) < 0x64) {
+        flags = *(int *) dirent;
+        if (flags & 0x1000) {
+            if (*(signed char *) (dirent + 0x58) != 0x2E) {
+                int len = func_00001DE4(arg0);
+                func_00001DCC(arg0, dirent + 0x58);
+                func_00001DCC(arg0, &D_00005AA4);
+                func_000006BC(arg0);
+                ((char *) arg0)[len] = 0;
+            }
+        } else if (flags & 0x2000) {
+            char *slot = (char *) state + (count << 8) + 8;
             func_00001DBC(slot, arg0);
             func_00001DCC(slot, dirent + 0x58);
-            *(volatile int *) ((volatile char *) state + 0x6408) = index + 1;
+            state[0x1902] = state[0x1902] + 1;
         }
-    } else if (*(signed char *) (dirent + 0x58) != 0x2E) {
-        int len = func_00001DE4(arg0);
-        func_00001DCC(arg0, dirent + 0x58);
-        func_00001DCC(arg0, &D_00005AA4);
-        func_000006BC(arg0);
-        ((char *) arg0)[len] = 0;
     }
-test:
-    if (func_00002234(handle, dirent) > 0) {
-        goto loop;
-    }
-done:
     func_0000222C(handle);
 }
 
-/* func_000007C8 — render callback set into the viewer config
- * (D_000A3F0C+0x100): builds a wide-char label from a table entry's name
- * and draws it. Real signature takes a leading unused param (target uses
- * $a1/$a2/$a3 for arg1/arg2/arg3, not $a0/$a1/$a2). DRAFT: byte-identical
- * except 4 words where the target keeps the `src` copy pointer in $a1
- * (reusing arg1's register) and this compile allocates it to $a0 instead —
- * tried reordering/retyping the locals and params, register choice didn't
- * budge; same class of MWCC-internal-heuristic quirk as the other DRAFTs in
- * this file. */
-void func_000007C8(void *unused, int arg1, int arg2, int arg3) {
+/* func_000007C8 — the per-entry render callback. func_00000294 stores its
+ * address into the viewer config at D_000A3F0C+0x100, and the UI layer calls
+ * it back once per visible list row.
+ *
+ * Behaviour:
+ *   - arg1 is a row index into the 0x100-byte record table that begins at
+ *     D_0009DB00+0x8; the record's name string starts at +0x8 within it,
+ *     hence `&D_0009DB00 + ((arg1 & 0xFFFF) << 8) + 8`;
+ *   - that byte string is widened into a 0x100-entry short[] on the stack,
+ *     one byte per halfword, NUL-terminated — a hand-rolled widening loop,
+ *     not a library call;
+ *   - it then sets the text colour/style (func_00002EB4 / func_00002EC4
+ *     with 0xFF000000) and hands the widened label to func_00000894, which
+ *     applies the <<6 fixed-point coordinate scaling and calls the draw stub;
+ *   - arg2/arg3 are the row's x/y, both offset by +2 before drawing.
+ *
+ * MATCHING NOTES:
+ *  - the copy loop is written test-first with explicit `goto`s to reproduce
+ *    the target's bottom-tested layout;
+ *  - arg0 looked unused and had been typed that way, which was WRONG and cost
+ *    a lot of time. It IS forwarded as the first argument of func_00000EB4:
+ *    the target never writes $a0 before that jal and sets only $a1 = -1 in
+ *    its delay slot. Because $a0 is therefore live, it is unavailable for the
+ *    copy-loop pointer, which is why the target keeps that pointer in $a1 —
+ *    a register-allocation difference that was really a dataflow bug. See the
+ *    CAUTION paragraph in the file header.
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000007C8(void *arg0, int arg1, int arg2, int arg3) {
     short label[0x100];
     signed char *src = (signed char *) &D_0009DB00 + ((arg1 & 0xFFFF) << 8) + 8;
     short *dst = label;
@@ -585,7 +726,7 @@ test:
     }
     *dst = 0;
 
-    func_00002F94(func_00000EFC(func_00000EB4(-1), 0, 1));
+    func_00002F94(func_00000EFC(func_00000EB4(arg0, -1), 0, 1));
     func_00002EB4(0xC, 0xC);
     func_00002EC4(0xFF000000);
     func_00000894(arg2 + 2, arg3 + 2,
@@ -597,7 +738,7 @@ test:
 /* func_00000894 — tail-calls the real draw routine with geometry derived
  * from arg0 (a "used width" the caller subtracts from a fixed 0x1E0
  * total).
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,p -sdatathreshold 0). */
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00000894(int arg0, int arg1, void *arg2) {
     func_00002EE4(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
