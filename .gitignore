@@ -49,6 +49,8 @@ asm/
 # the same address/name info is already documented by hand in config/*.yaml)
 undefined_funcs_auto.txt
 undefined_syms_auto.txt
+# Ghidra exports (derived from the binary: never commit these)
+eboot_funcs
 
 # Ghidra
 *.gpr
