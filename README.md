@@ -44,8 +44,8 @@ matching".
 | Setting | Value |
 |---|---|
 | Original compiler | Metrowerks CodeWarrior for PSP — `MW MIPS C Compiler (2.4.1.01)` |
-| decomp.me / build | **MWCC 1.3 SP7** (`mwccpsp_3.0.1_219`) — bisected against all 11 builds: 121–151 ruled out, 192–219 indistinguishable (`scripts/mwcc_bisect.sh`) |
-| Flags | **`-O4,s -sdatathreshold 0`** (optimize for SIZE; `-O4,p` was documented until 2026-08-16 and is wrong — see [`docs/09`](docs/09-first-match.md)) |
+| decomp.me / build | **MWCC 1.3 SP7** (`mwccpsp_3.0.1_219`) — exact build still being narrowed (180–219 all match simple functions) |
+| Flags | **`-O4,s -sdatathreshold 0`** (optimize for SIZE — see [`docs/09`](docs/09-first-match.md)) |
 | Key technique | game state globals are **`volatile`**, accessed via a local pointer (see [`docs/09-first-match.md`](docs/09-first-match.md)) |
 
 What is already established:

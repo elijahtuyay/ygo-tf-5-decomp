@@ -316,51 +316,6 @@ Note the outcome here as soon as you find out:
 > empty one), verified locally with `wibo` + the real `mwccpsp_3.0.1_219` binary
 > (see `docs/06-splitting-and-matching.md` "Local matching").
 
-### ✅ Bisection performed — all 11 builds tested
-
-The bisection planned above has now been **run exhaustively**. All 11 mwccpsp
-builds were fetched and `src/rel_movie_viewer.c` compiled against each, with
-every function diffed against the target
-(`scripts/mwcc_bisect.sh`, flags `-O4,p -sdatathreshold 0`):
-
-```
-function        121   134   139   147   151   180   192   201   205   210   219
-func_00000000    d4    OK    OK    OK    OK    OK    OK    OK    OK    OK    OK
-func_00000034    -1    -1    -1    -3    -3    -5    -5    -5    -5    -5    -5
-func_00000138    d9    d6    OK    OK    OK    OK    OK    OK    OK    OK    OK
-func_00000184    +2    +2    +2    +2    +2    OK    OK    OK    OK    OK    OK
-func_000001C8    -1    -1    -1    -1    -1    -4    -4    -4    -4    -4    -4
-func_0000024C    d7    OK    OK    OK    OK    OK    OK    OK    OK    OK    OK
-func_00000294   +15   +15   +17   +17   +17   +20   +15   +15   +15   +15   +15
-func_00000470    +5    +5    +5    +5    +5    +6    +3    +3    +3    +3    +3
-func_00000540    d4    OK    OK    OK    OK    OK    OK    OK    OK    OK    OK
-func_000005C8    +6    +6    +6    +4    +4    +1    +1    +1    +1    +1    +1
-func_000006BC   +10   +10   +10    +8    +8    +7    +4    +4    +4    +4    +4
-func_000007C8    +2    +2    +2    +1    +1    d4    d4    d4    d4    d4    d4
-(4 always-OK trivial functions omitted)  totals:  4  7  8  8  8  9  9  9  9  9  9
-```
-
-Cells: `OK` = matches, `dN` = N differing words, `±N` = word-count delta.
-
-**Three conclusions:**
-
-1. **Builds 121–151 are RULED OUT.** `func_00000184` — independently confirmed
-   correct — is 2 words too long on all of them and matches only from **180**
-   upward. That is a falsification, not a preference.
-2. **Builds 192–219 are indistinguishable**: identical results in every cell.
-   219 is still not proven UNIQUE, but the candidate set is now
-   **{192, 201, 205, 210, 219}**. Keep 219 as the project default.
-3. **Build 180 is measurably worse than 192+** on three functions (`func_00000294`
-   +20 vs +15, `func_00000470` +6 vs +3, `func_000006BC` +7 vs +4). None match on
-   either, so this is soft evidence — but it consistently favours 192+.
-
-**Most important:** no build matches ANY of the 7 outstanding functions. The
-remaining gap is therefore **in the C, not in the compiler build** — the
-"uncontrollable MWCC codegen" notes in the header of `src/rel_movie_viewer.c`
-are confirmed as the real obstacle, and switching builds is not a way around
-them. Re-run `scripts/mwcc_bisect.sh` on a future module if a function ever
-matches on a build other than 219; that would finally pin the build exactly.
-
 ## When a function is "done"
 
 1. 100% on decomp.me, **or** `MATCH (N words)` from `scripts/mwcc_diff.py` (see
