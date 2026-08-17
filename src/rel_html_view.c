@@ -22,7 +22,7 @@
  * .bss — uninitialised globals):
  *   D_00005E4C  .data  the URL literal above
  *   D_00005E80  .data  the "/PSP/SAVEDATA/" literal
- *   D_00005EA0  .bss   module-registration blob passed to func_00000818
+ *   D_00005EA0  .bss   module-registration blob passed to ehsys_B4471B5E
  *   D_00005EAC  .bss   the module's state/mode word (1..4), see func_00000670
  *   D_00005EB0  .bss   0xA8-byte browser config struct built by func_00000470
  *   D_00005F68  .bss   0x200-byte URL buffer  (filled by func_00000414)
@@ -30,7 +30,7 @@
  *   D_000061EC  .bss   pointer, initialised to &D_000061F0 by func_00000650
  *   D_000061F0  .bss   the buffer that pointer points at
  *
- * Functions at vram >= 0x760 (func_00000760 and up) are .sceStub.text import
+ * Functions at vram >= 0x760 (sceNetInetInit and up) are .sceStub.text import
  * trampolines, i.e. calls out to the engine/SDK; they are NOT part of this
  * translation unit and are declared extern below. Their signatures are
  * best-effort guesses from call sites until the NID table is resolved.
@@ -53,7 +53,7 @@
  * THREE LEVERS THIS MODULE ADDED (all reusable, all cost real time to find):
  *  1. A dead argument register can double as a switch's comparison constant.
  *     func_000005A0's target tests `beq $v0, $a0` against 2 where every other
- *     case uses $v1 — because the case-2 body calls func_000007E8(2) and MWCC
+ *     case uses $v1 — because the case-2 body calls sceUtilityHtmlViewerUpdate(2) and MWCC
  *     hoisted the argument load above the compare and reused it. An import
  *     whose call site sets up NO argument register is not necessarily a
  *     no-argument function: check whether an earlier constant load already
@@ -83,40 +83,40 @@
  */
 
 /* ---- imports (.sceStub.text trampolines) ---- */
-extern int  func_00000760(void);
-extern int  func_00000768(void);
-extern int  func_00000770(void);
-extern int  func_00000778(int, int);
-extern int  func_00000780(void);
-extern int  func_00000788(void);
-extern int  func_00000790(void);
-extern int  func_00000798(int);
-extern int  func_000007A0(void);
-extern int  func_000007A8(int, int);
-extern int  func_000007B0(int);
-extern int  func_000007B8(void);
-extern int  func_000007C0(int, int, int, int);
-extern int  func_000007C8(void);
-extern int  func_000007D0(void);
-extern int  func_000007D8(void);
-extern int  func_000007E0(int, int, int, int, int);
-extern int  func_000007E8(int);
-extern int  func_000007F0(int);
-extern int  func_000007F8(void);
-extern int  func_00000800(void *);
-extern int  func_00000808(int);
-extern int  func_00000810(void);
-extern void func_00000818(void (*)(void), void (*)(void), void *);
-extern int  func_00001778(int);
-extern void func_00001990(int, int);
-extern void func_000019C8(void *);
-extern void func_00001CE0(void *, int, int);
-extern void func_00001D20(void *, void *);
-extern void func_00001D30(void *, void *);
-extern void func_00001E38(int, int);
-extern void func_00002210(int, int);
-extern void func_00002F38(void);
-extern int  func_000038B8(void);
+extern int  sceNetInetInit(void);
+extern int  sceNetInetTerm(void);
+extern int  sceNetApctlTerm(void);
+extern int  sceNetApctlInit(int, int);
+extern int  sceNetResolverTerm(void);
+extern int  sceNetResolverInit(void);
+extern int  sceSslEnd(void);
+extern int  sceSslInit(int);
+extern int  sceHttpSaveSystemCookie(void);
+extern int  sceHttpsLoadDefaultCert(int, int);
+extern int  sceHttpInit(int);
+extern int  sceHttpEnd(void);
+extern int  sceHttpsInit(int, int, int, int);
+extern int  sceHttpLoadSystemCookie(void);
+extern int  sceHttpsEnd(void);
+extern int  sceNetTerm(void);
+extern int  sceNetInit(int, int, int, int, int);
+extern int  sceUtilityHtmlViewerUpdate(int);
+extern int  sceUtilityLoadModule(int);
+extern int  sceUtilityHtmlViewerGetStatus(void);
+extern int  sceUtilityHtmlViewerInitStart(void *);
+extern int  sceUtilityUnloadModule(int);
+extern int  sceUtilityHtmlViewerShutdownStart(void);
+extern void ehsys_B4471B5E(void (*)(void), void (*)(void), void *);
+extern int  ehsys_8171F765(int);
+extern void ehsys_08813E19(int, int);
+extern void ehsys_57018B7C(void *);
+extern void ehsys_10F3BB61(void *, int, int);
+extern void ehsys_EC6F1CF2(void *, void *);
+extern void ehsys_476FD94A(void *, void *);
+extern void ehsys_EA748E31(int, int);
+extern void ehsys_E8D57DC6(int, int);
+extern void ehsys_F1BC43DB(void);
+extern int  ehsys_31454993(void);
 
 /* ---- module data ---- */
 extern char D_00005E4C;   /* "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php" */
@@ -150,23 +150,23 @@ int  func_00000670(void);
  * (func_00000034) and its (empty) teardown hook (func_00000084).
  * Same shape as rel_movie_viewer's func_00000000. */
 int func_00000000(void) {
-    func_00000818(func_00000034, func_00000084, (void *) &D_00005EA0);
+    ehsys_B4471B5E(func_00000034, func_00000084, (void *) &D_00005EA0);
     return 0;
 }
 
 /* func_00000034 — the module's main routine: init, then pump func_00000670
  * (the state machine) once per frame until it reports "done". */
 void func_00000034(void) {
-    func_00001E38(0, 0x4000);
+    ehsys_EA748E31(0, 0x4000);
     func_00000650();
 loop:
     if (func_00000670() != 0) {
         goto done;
     }
-    func_00002F38();
+    ehsys_F1BC43DB();
     goto loop;
 done:
-    func_00001990(0xD, 0);
+    ehsys_08813E19(0xD, 0);
 }
 
 /* func_00000084 — empty teardown callback registered by func_00000000. */
@@ -180,27 +180,27 @@ void func_00000084(void) {
 int func_0000008C(void) {
     int r;
 
-    r = func_000007F0(0x100);
+    r = sceUtilityLoadModule(0x100);
     if (r < 0) {
         goto fail;
     }
-    r = func_000007F0(0x102);
+    r = sceUtilityLoadModule(0x102);
     if (r < 0) {
         goto fail;
     }
-    r = func_000007F0(0x103);
+    r = sceUtilityLoadModule(0x103);
     if (r < 0) {
         goto fail;
     }
-    r = func_000007F0(0x104);
+    r = sceUtilityLoadModule(0x104);
     if (r < 0) {
         goto fail;
     }
-    r = func_000007F0(0x105);
+    r = sceUtilityLoadModule(0x105);
     if (r < 0) {
         goto fail;
     }
-    r = func_000007F0(0x106);
+    r = sceUtilityLoadModule(0x106);
     if (r < 0) {
         goto fail;
     }
@@ -213,12 +213,12 @@ fail:
 /* func_00000134 — release the six resources acquired by func_0000008C, in
  * reverse order. */
 void func_00000134(void) {
-    func_00000808(0x106);
-    func_00000808(0x105);
-    func_00000808(0x104);
-    func_00000808(0x103);
-    func_00000808(0x102);
-    func_00000808(0x100);
+    sceUtilityUnloadModule(0x106);
+    sceUtilityUnloadModule(0x105);
+    sceUtilityUnloadModule(0x104);
+    sceUtilityUnloadModule(0x103);
+    sceUtilityUnloadModule(0x102);
+    sceUtilityUnloadModule(0x100);
 }
 
 /* func_00000178 — bring up the network/browser stack (0x28000 = 160 KB of
@@ -226,21 +226,21 @@ void func_00000134(void) {
 int func_00000178(void) {
     int r;
 
-    r = func_00000798(0x28000);
+    r = sceSslInit(0x28000);
     if (r < 0) {
         return r;
     }
-    r = func_000007B0(0x28000);
-    if (r < 0) {
-        func_00000244();
-        return r;
-    }
-    r = func_000007C0(0, 0, 0, 0);
+    r = sceHttpInit(0x28000);
     if (r < 0) {
         func_00000244();
         return r;
     }
-    r = func_000007A8(0, 0);
+    r = sceHttpsInit(0, 0, 0, 0);
+    if (r < 0) {
+        func_00000244();
+        return r;
+    }
+    r = sceHttpsLoadDefaultCert(0, 0);
     if (r < 0) {
         func_00000244();
         return r;
@@ -252,7 +252,7 @@ int func_00000178(void) {
      * the delay slot; the duplicated return gives the target's plain `bgez` +
      * `nop`. The earlier checks are unaffected — they already return inside
      * their bodies. */
-    r = func_000007C8();
+    r = sceHttpLoadSystemCookie();
     if (r < 0) {
         func_00000244();
         return r;
@@ -262,10 +262,10 @@ int func_00000178(void) {
 
 /* func_00000244 — tear down what func_00000178 brought up. */
 void func_00000244(void) {
-    func_000007A0();
-    func_000007D0();
-    func_000007B8();
-    func_00000790();
+    sceHttpSaveSystemCookie();
+    sceHttpsEnd();
+    sceHttpEnd();
+    sceSslEnd();
 }
 
 /* func_00000278 — full startup sequence: resources, then a 0x20000-byte
@@ -277,21 +277,21 @@ int func_00000278(void) {
     if (r < 0) {
         return r;
     }
-    r = func_000007E0(0x20000, 0x2A, 0, 0x2A, 0);
+    r = sceNetInit(0x20000, 0x2A, 0, 0x2A, 0);
     if (r < 0) {
         return r;
     }
-    r = func_00000760();
-    if (r < 0) {
-        func_00000358();
-        return r;
-    }
-    r = func_00000788();
+    r = sceNetInetInit();
     if (r < 0) {
         func_00000358();
         return r;
     }
-    r = func_00000778(0x5400, 0x30);
+    r = sceNetResolverInit();
+    if (r < 0) {
+        func_00000358();
+        return r;
+    }
+    r = sceNetApctlInit(0x5400, 0x30);
     if (r < 0) {
         func_00000358();
         return r;
@@ -308,17 +308,17 @@ int func_00000278(void) {
 /* func_00000358 — the module's full teardown path. */
 void func_00000358(void) {
     func_00000244();
-    func_00000770();
-    func_00000780();
-    func_00000768();
-    func_000007D8();
+    sceNetApctlTerm();
+    sceNetResolverTerm();
+    sceNetInetTerm();
+    sceNetTerm();
     func_00000134();
 }
 
-/* func_0000039C — maps the system language (func_000038B8) onto the browser's
+/* func_0000039C — maps the system language (ehsys_31454993) onto the browser's
  * own language id. Compiled with a jump table (jtbl_00005E34, in .data). */
 int func_0000039C(void) {
-    switch (func_000038B8()) {
+    switch (ehsys_31454993()) {
     case 0:
         return 0;
     case 1:
@@ -338,22 +338,22 @@ int func_0000039C(void) {
 
 /* func_00000414 — append the Konami TF5 download URL to dst. */
 void func_00000414(void *dst) {
-    func_00001D30(dst, &D_00005E4C);
+    ehsys_476FD94A(dst, &D_00005E4C);
 }
 
 /* func_00000420 — build the savedata path into dst: copy "/PSP/SAVEDATA/",
- * then append the game's own id (func_000019C8 fills the 0x20-byte buffer). */
+ * then append the game's own id (ehsys_57018B7C fills the 0x20-byte buffer). */
 void func_00000420(void *dst) {
     char buf[0x20];
 
-    func_00001D20(dst, &D_00005E80);
-    func_00001CE0(buf, 0, 0x20);
-    func_000019C8(buf);
-    func_00001D30(dst, buf);
+    ehsys_EC6F1CF2(dst, &D_00005E80);
+    ehsys_10F3BB61(buf, 0, 0x20);
+    ehsys_57018B7C(buf);
+    ehsys_476FD94A(dst, buf);
 }
 
 /* func_00000470 — build the 0xA8-byte browser config at D_00005EB0 and hand
- * it to func_00000800 (the "start browser" import).
+ * it to sceUtilityHtmlViewerInitStart (the "start browser" import).
  *
  * NONMATCHING, but only just: 76/76 words, every word identical except a
  * 4-word permutation at the end. The target schedules the call's argument
@@ -375,11 +375,11 @@ int func_00000470(void *arg0) {
      * store immediate off the single base register the target holds in $s0. */
     int *cfg = (int *) &D_00005EB0;
 
-    func_00001CE0(cfg, 0, 0xA8);
+    ehsys_10F3BB61(cfg, 0, 0xA8);
 
     cfg[0x00 / 4] = 0xA8; /* struct size */
     cfg[0x04 / 4] = func_0000039C();
-    if ((func_00001778(0) & 0xFFFF) == 0x2000) {
+    if ((ehsys_8171F765(0) & 0xFFFF) == 0x2000) {
         cfg[0x08 / 4] = 0;
     } else {
         cfg[0x08 / 4] = 1;
@@ -411,10 +411,10 @@ int func_00000470(void *arg0) {
     cfg[0x58 / 4] = 0;
     cfg[0x78 / 4] = 0;
 
-    return func_00000800(cfg);
+    return sceUtilityHtmlViewerInitStart(cfg);
 }
 
-/* func_000005A0 — per-frame poll while the browser runs. func_000007F8
+/* func_000005A0 — per-frame poll while the browser runs. sceUtilityHtmlViewerGetStatus
  * reports the browser's exit reason: 0 = still running (in which case the
  * config's +0x1C field selects the return code), otherwise dispatch the
  * reason and report 0. */
@@ -422,8 +422,8 @@ int func_000005A0(void) {
     char *cfg = &D_00005EB0;
     int reason;
 
-    func_00002210(0, 0);
-    reason = func_000007F8();
+    ehsys_E8D57DC6(0, 0);
+    reason = sceUtilityHtmlViewerGetStatus();
     if (reason != 0) {
         /* MWCC emits the case TESTS in reverse source order (the target tests
          * 3, 2, 4, 1), while laying the case BODIES out in source order — so
@@ -434,10 +434,10 @@ int func_000005A0(void) {
         case 4:
             break;
         case 2:
-            func_000007E8(2);
+            sceUtilityHtmlViewerUpdate(2);
             break;
         case 3:
-            func_00000810();
+            sceUtilityHtmlViewerShutdownStart();
             break;
         }
     } else {
