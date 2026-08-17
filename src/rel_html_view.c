@@ -18,17 +18,37 @@
  * i.e. it configures and runs the PSP's browser/HTTP stack against Konami's
  * TF5 download page, with a savedata directory for downloads.
  *
- * Data layout (everything at/after vram 0x5EA0 is past the end of .data, i.e.
- * .bss — uninitialised globals):
- *   D_00005E4C  .data  the URL literal above
- *   D_00005E80  .data  the "/PSP/SAVEDATA/" literal
- *   D_00005EA0  .bss   module-registration blob passed to ehsys_B4471B5E
- *   D_00005EAC  .bss   the module's state/mode word (1..4), see func_00000670
- *   D_00005EB0  .bss   0xA8-byte browser config struct built by func_00000470
- *   D_00005F68  .bss   0x200-byte URL buffer  (filled by func_00000414)
- *   D_00006168  .bss   0x84-byte  path buffer (filled by func_00000420)
- *   D_000061EC  .bss   pointer, initialised to &D_000061F0 by func_00000650
- *   D_000061F0  .bss   the buffer that pointer points at
+ * Data layout. Names come from config/symbols/rel_html_view.extra.txt, which
+ * scripts/resolve_nids.py merges into the generated symbol file, so the
+ * disassembly and this source use the SAME names. Everything at or after vram
+ * 0x5EA0 is past the end of .data, i.e. .bss:
+ *
+ *   vram      symbol           where   what
+ *   0x5E34    jtbl_00005E34    .data   func_0000039C's jump table (6 entries)
+ *   0x5E4C    s_download_url   .data   the URL literal above
+ *   0x5E80    s_savedata_dir   .data   "/PSP/SAVEDATA/"
+ *   0x5EA0    g_module_reg     .bss    0xC, 3rd arg of the registration call
+ *   0x5EAC    g_state          .bss    state word 1..4, see func_00000670
+ *   0x5EB0    g_html_param     .bss    0xA8, the SceUtilityHtmlViewerParam
+ *   0x5F68    g_url_buf        .bss    0x200, initialurl/homeurl text
+ *   0x6168    g_dl_dir_buf     .bss    0x84, dldirname text
+ *   0x61EC    g_heap_ptr       .bss    points at g_heap
+ *   0x61F0    g_heap           .bss    the 6 MB block passed as param.memaddr
+ *
+ * HOW THIS MODULE IS ENTERED — it exports NOTHING. Its `libhtml_view_rel`
+ * entry table has 0 functions and 0 variables, and its syslib entry exports
+ * only the two standard variables `module_info` (NID 0xF01D73A7) and
+ * `module_sdk_version` (0x11B97506). No other module imports it, either: it is
+ * absent from every other module's .lib.stub, unlike e.g. rel_cardalbum, which
+ * rel_labo and rel_title both import.
+ *
+ * So nothing calls into this module by name. The PRX's ELF entry point is
+ * 0x0 — func_00000000 — which the engine's module loader calls, and that
+ * function's whole job is to hand the engine two callbacks (func_00000034 to
+ * run, func_00000084 to tear down) plus g_module_reg. Everything after that is
+ * driven by the engine calling those callbacks. rel_movie_viewer has the same
+ * shape (entry 0x0, same registration call ehsys_B4471B5E), so this is the
+ * convention for a leaf module rather than anything specific to the browser.
  *
  * Functions at vram >= 0x760 (sceNetInetInit and up) are .sceStub.text import
  * trampolines, i.e. calls out to the engine/SDK; they are NOT part of this
@@ -132,15 +152,15 @@ extern void ehsys_F1BC43DB(void);
 extern int  ehsys_31454993(void);
 
 /* ---- module data ---- */
-extern char D_00005E4C;   /* "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php" */
-extern char D_00005E80;   /* "/PSP/SAVEDATA/" */
-extern char D_00005EA0;
-extern volatile int D_00005EAC;
-extern char D_00005EB0;
-extern char D_00005F68;
-extern char D_00006168;
-extern char D_000061F0;
-extern void *D_000061EC;
+extern char s_download_url;   /* "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php" */
+extern char s_savedata_dir;   /* "/PSP/SAVEDATA/" */
+extern char g_module_reg;
+extern volatile int g_state;
+extern char g_html_param;
+extern char g_url_buf;
+extern char g_dl_dir_buf;
+extern char g_heap;
+extern void *g_heap_ptr;
 
 /* ---- pspUtilityHtmlViewerParam (the SDK struct func_00000470 fills) ----
  * sceUtilityHtmlViewerInitStart's parameter, identified via the resolved NID
@@ -205,7 +225,7 @@ int  func_00000670(void);
  * (func_00000034) and its (empty) teardown hook (func_00000084).
  * Same shape as rel_movie_viewer's func_00000000. */
 int func_00000000(void) {
-    ehsys_B4471B5E(func_00000034, func_00000084, (void *) &D_00005EA0);
+    ehsys_B4471B5E(func_00000034, func_00000084, (void *) &g_module_reg);
     return 0;
 }
 
@@ -393,7 +413,7 @@ int func_0000039C(void) {
 
 /* func_00000414 — append the Konami TF5 download URL to dst. */
 void func_00000414(void *dst) {
-    ehsys_strcat(dst, &D_00005E4C);
+    ehsys_strcat(dst, &s_download_url);
 }
 
 /* func_00000420 — build the savedata path into dst: copy "/PSP/SAVEDATA/",
@@ -401,13 +421,13 @@ void func_00000414(void *dst) {
 void func_00000420(void *dst) {
     char buf[0x20];
 
-    ehsys_strcpy(dst, &D_00005E80);
+    ehsys_strcpy(dst, &s_savedata_dir);
     ehsys_memset(buf, 0, 0x20);
     ehsys_57018B7C(buf);
     ehsys_strcat(dst, buf);
 }
 
-/* func_00000470 — build the 0xA8-byte browser config at D_00005EB0 and hand
+/* func_00000470 — build the 0xA8-byte browser config at g_html_param and hand
  * it to sceUtilityHtmlViewerInitStart (the "start browser" import).
  *
  * NONMATCHING, but only just: 76/76 words, every word identical except WHERE
@@ -437,7 +457,7 @@ void func_00000420(void *dst) {
  * rel_movie_viewer) — see the file header for the int[]-indexing +
  * pointer-typed-store combination that made $s0 stick. */
 int func_00000470(void *arg0) {
-    SceUtilityHtmlViewerParam *cfg = (SceUtilityHtmlViewerParam *) &D_00005EB0;
+    SceUtilityHtmlViewerParam *cfg = (SceUtilityHtmlViewerParam *) &g_html_param;
 
     ehsys_memset(cfg, 0, sizeof(*cfg));
 
@@ -455,21 +475,21 @@ int func_00000470(void *arg0) {
     cfg->memsize = 0x600000;   /* 6 MB browser heap */
     cfg->memaddr = arg0;
 
-    func_00000414(&D_00005F68);
-    cfg->initialurl = &D_00005F68;
+    func_00000414(&g_url_buf);
+    cfg->initialurl = &g_url_buf;
     cfg->numtabs = 3;
     cfg->interfacemode = 2;
     cfg->options = 0x2BA;
 
-    func_00000420(&D_00006168);
-    cfg->dldirname = &D_00006168;
+    func_00000420(&g_dl_dir_buf);
+    cfg->dldirname = &g_dl_dir_buf;
     cfg->cookiemode = 3;
     cfg->unknown3 = 0x200;
     cfg->textsize = 1;
     cfg->displaymode = 1;
     cfg->connectmode = 1;
     cfg->unknown4[9] = 1;
-    cfg->homeurl = &D_00005F68;
+    cfg->homeurl = &g_url_buf;
     cfg->dlfilename = 0;
     cfg->ulfilename = 0;
     cfg->uldirname = 0;
@@ -483,7 +503,7 @@ int func_00000470(void *arg0) {
  * config's +0x1C field selects the return code), otherwise dispatch the
  * reason and report 0. */
 int func_000005A0(void) {
-    char *cfg = &D_00005EB0;
+    char *cfg = &g_html_param;
     int reason;
 
     ehsys_sceGuSync(0, 0);
@@ -512,31 +532,31 @@ int func_000005A0(void) {
 
 /* func_00000650 — enter state 1 and point the state machine at its buffer. */
 void func_00000650(void) {
-    D_00005EAC = 1;
-    D_000061EC = &D_000061F0;
+    g_state = 1;
+    g_heap_ptr = &g_heap;
 }
 
 /* func_00000670 — the state machine, pumped once per frame by func_00000034.
  * Returns nonzero once state 4 (done) is reached. */
 int func_00000670(void) {
-    switch (D_00005EAC) {
+    switch (g_state) {
     case 1:
         if (func_00000278() < 0) {
-            D_00005EAC = 3;
-        } else if (func_00000470(D_000061EC) < 0) {
-            D_00005EAC = 3;
+            g_state = 3;
+        } else if (func_00000470(g_heap_ptr) < 0) {
+            g_state = 3;
         } else {
-            D_00005EAC = D_00005EAC + 1;
+            g_state = g_state + 1;
         }
         break;
     case 2:
         if (func_000005A0() != 0) {
-            D_00005EAC = D_00005EAC + 1;
+            g_state = g_state + 1;
         }
         break;
     case 3:
         func_00000358();
-        D_00005EAC = D_00005EAC + 1;
+        g_state = g_state + 1;
         break;
     case 4:
         return 1;
