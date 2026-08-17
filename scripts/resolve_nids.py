@@ -129,6 +129,23 @@ def exports(d, ents, lib):
     return []
 
 
+def manual_ehsys_names():
+    """Hand-identified engine functions from nids/ehsys.names.csv.
+
+    Unlike the sce* names these are NOT hash-verifiable — the engine's original
+    symbol names are gone, so a NID can never be re-derived from a name we chose.
+    They are inferences backed by the evidence recorded in that file, which is why
+    it carries a `confidence` column. Editing that file and re-running renames the
+    function across all 28 modules at once."""
+    path = os.path.join(ROOT, "nids/ehsys.names.csv")
+    out = {}
+    if os.path.exists(path):
+        for row in csv.DictReader(open(path)):
+            if row.get("name"):
+                out[int(row["nid"], 16)] = row["name"]
+    return out
+
+
 def sdk_names():
     """NID -> name from the candidate corpus, each one re-hashed to prove it."""
     names = set()
@@ -173,6 +190,7 @@ def called_stubs(module, vram_name):
 def main():
     mods = sorted(f[:-4] for f in os.listdir(GMODULE) if f.endswith(".prx"))
     sdk = sdk_names()
+    manual = manual_ehsys_names()
 
     # --- the engine's export table, from the decrypted EBOOT
     ed = open(EBOOT, "rb").read()
@@ -206,7 +224,7 @@ def main():
             # known name. Keep the ehsys_ prefix anyway: these are the engine's
             # exports, not the SDK's, and a bare `memset` would let MWCC expand
             # its own builtin instead of emitting the call we need to match.
-            hit = sdk.get(nid)
+            hit = sdk.get(nid) or manual.get(nid)
             return f"ehsys_{hit}" if hit else f"ehsys_{nid:08X}"
         short = lib[3:-4] if lib.startswith("lib") else lib
         return f"{short}_{nid:08X}"
@@ -281,7 +299,7 @@ def main():
         w.writerow(["index", "nid", "eboot_vaddr", "call_sites", "name"])
         for n, a in ehsys:
             w.writerow([ehsys_index[n], f"0x{n:08X}", f"0x{a:08X}", eh_callers.get(n, 0),
-                        sdk.get(n, "")])
+                        sdk.get(n) or manual.get(n, "")])
 
     with open(os.path.join(ROOT, "nids/modules.csv"), "w", newline="") as fh:
         w = csv.writer(fh)

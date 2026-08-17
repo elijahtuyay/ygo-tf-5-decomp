@@ -86,6 +86,22 @@ is identical everywhere, so those names are cross-module stable too.
 That is the point of the indirection: one edit renames a function across the
 whole project.
 
+## Hand-identified engine functions
+
+`nids/ehsys.names.csv` carries names we worked out by reading the EBOOT, for
+engine functions whose NIDs hash to nothing known. **These are inferences, not
+proofs** — the engine's original symbol names are gone, so unlike a `sce*` name
+a chosen name can never be re-derived from its NID. The file therefore records
+`confidence` and the `evidence` behind each one, and `resolve_nids.py` merges it
+in the same way as `<module>.extra.txt`: edit the file, re-run, and the function
+is renamed across all 28 modules at once.
+
+| nid | name | call sites | confidence |
+|---|---|---:|---|
+| `0x31454993` | `ehsys_get_language` | 334 | high — a 3-bit settings field with a matching setter next to it, mapped onto SDK language ids by `rel_html_view`'s `func_0000039C` |
+| `0x8171F765` | `ehsys_get_button_code` | 288 | high — returns one of two adjacent halfwords by arg; the arg-0 result is compared to `PSP_CTRL_CIRCLE` to set `buttonSwap` |
+| `0xF1BC43DB` | `ehsys_frame_sync` | 172 | inferred — updates a timer object, then `sceKernelWakeupThread`; called once per main-loop iteration |
+
 ## Files
 
 | file | contents |
