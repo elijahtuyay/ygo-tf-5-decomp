@@ -165,6 +165,27 @@ void func_00023A5C();
 void func_00023A64();
 void func_00023A6C();
 void func_00024220(void);
+/* func_000068B4 — 31 words. MATCH 100% (shape: m2c). */
+void func_000068B4(void) {
+    extern int D_0002CFE0;
+    extern int D_0002E0B0;
+    extern int D_0002E0FC;
+    extern int ehsys_20E340D9();
+    extern int ehsys_834A6E13();
+    extern int func_000068B4();
+    s32 temp_a1;
+
+    ehsys_834A6E13(&D_0002E0B0, (*(int *)((char *)D_0002CFE0 + 0x24C)));
+    temp_a1 = (*(int *)((char *)D_0002CFE0 + 0x24C));
+    if (temp_a1 != 0) {
+        ehsys_20E340D9(D_0002E0FC, temp_a1);
+        (*(int *)((char *)D_0002CFE0 + 0x24C)) = 0;
+    }
+    if (D_0002CFE0 != 0) {
+        ehsys_20E340D9(D_0002E0FC, D_0002CFE0);
+    }
+    D_0002CFE0 = 0;
+}
 
 /* func_0000B440 — 11 words. MATCH 100% (shape: m2c). */
 s32 func_0000B440(s32 arg0) {
@@ -173,6 +194,25 @@ s32 func_0000B440(s32 arg0) {
     sp1C = arg0;
     ehsys_EF9B5D06(&sp1C, &D_0002CFE8);
     return sp1C;
+}
+/* func_0000BF78 — 35 words. MATCH 100% (shape: m2c). */
+void func_0000BF78(void) {
+    extern int D_0002D910;
+    extern int D_0002E0FC;
+    extern int ehsys_20E340D9();
+    extern int ehsys_E1139F1A();
+    extern int func_0000BF78();
+    s32 temp_a0;
+
+    temp_a0 = (*(int *)((char *)D_0002D910 + 0x14));
+    if (temp_a0 != 0) {
+        ehsys_E1139F1A(temp_a0);
+        ehsys_20E340D9(D_0002E0FC, (*(int *)((char *)D_0002D910 + 0x14)));
+    }
+    ehsys_E1139F1A((*(int *)((char *)D_0002D910 + 0x10)));
+    ehsys_20E340D9(D_0002E0FC, (*(int *)((char *)D_0002D910 + 0x10)));
+    ehsys_20E340D9(D_0002E0FC, D_0002D910);
+    D_0002D910 = 0;
 }
 
 /* func_0000C858 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */

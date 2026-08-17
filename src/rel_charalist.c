@@ -191,6 +191,19 @@ int func_00005C58(void) {
     func_00005C90();
     return 1;
 }
+/* func_00006574 — 14 words. MATCH 100% (shape: m2c). */
+void func_00006574(void) {
+    extern void * D_00027918;
+    extern int ehsys_2A501391();
+    extern int ehsys_2EE943AC();
+    extern int func_00006574();
+    int sp1C;
+    void *temp_s0;
+
+    temp_s0 = D_00027918;
+    ehsys_2EE943AC(&sp1C);
+    ehsys_2A501391((*(int *)((char *)temp_s0 + 0x20)), (*(int *)((char *)temp_s0 + 0x24)));
+}
 
 /* func_00006A08 — plain tail call to func_00006FAC with a literal 0 first
  * argument (same shape as func_000002A8).

@@ -257,6 +257,25 @@ s32 func_00005644(s32 arg0) {
     ehsys_EF9B5D06(&sp1C, &D_0001F040);
     return sp1C;
 }
+/* func_00006150 — 35 words. MATCH 100% (shape: m2c). */
+void func_00006150(void) {
+    extern int D_0001E89C;
+    extern int D_0001F968;
+    extern int ehsys_20E340D9();
+    extern int ehsys_E1139F1A();
+    extern int func_00006150();
+    s32 temp_a0;
+
+    temp_a0 = (*(int *)((char *)D_0001F968 + 0x14));
+    if (temp_a0 != 0) {
+        ehsys_E1139F1A(temp_a0);
+        ehsys_20E340D9(D_0001E89C, (*(int *)((char *)D_0001F968 + 0x14)));
+    }
+    ehsys_E1139F1A((*(int *)((char *)D_0001F968 + 0x10)));
+    ehsys_20E340D9(D_0001E89C, (*(int *)((char *)D_0001F968 + 0x10)));
+    ehsys_20E340D9(D_0001E89C, D_0001F968);
+    D_0001F968 = 0;
+}
 
 /* func_0000627C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000627C(int a0, unsigned short a1, int a2, int a3) {
@@ -324,6 +343,31 @@ void func_00007EEC(u16 *a0, s32 a1, u8 *a2) {
         a2[a0[t0]] = 0xFF;
     }
 }
+/* func_00008D70 — 43 words. MATCH 100% (shape: m2c). */
+void func_00008D70(void) {
+    extern int D_0001E89C;
+    extern int D_0001F980;
+    extern int ehsys_20E340D9();
+    extern int ehsys_E1139F1A();
+    extern int func_00008D70();
+    s32 temp_a0;
+    s32 temp_a1;
+
+    temp_a0 = (*(int *)((char *)D_0001F980 + 0x14));
+    if (temp_a0 != 0) {
+        ehsys_E1139F1A(temp_a0);
+        ehsys_20E340D9(D_0001E89C, (*(int *)((char *)D_0001F980 + 0x14)));
+        (*(int *)((char *)D_0001F980 + 0x14)) = 0;
+    }
+    ehsys_E1139F1A((*(int *)((char *)D_0001F980 + 0x10)));
+    temp_a1 = (*(int *)((char *)D_0001F980 + 0x10));
+    if (temp_a1 != 0) {
+        ehsys_20E340D9(D_0001E89C, temp_a1);
+        (*(int *)((char *)D_0001F980 + 0x10)) = 0;
+    }
+    ehsys_20E340D9(D_0001E89C, D_0001F980);
+    D_0001F980 = 0;
+}
 
 /* func_0000A1B8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000A1B8(int a0, unsigned short a1, int a2, int a3) {
@@ -386,6 +430,39 @@ int func_0000D24C(int a0, unsigned short a1, int a2, int a3) {
 /* func_0000D9D8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0000D9D8(void) {
     func_0000D7DC();
+}
+/* func_0000E5B8 — 55 words. MATCH 100% (shape: m2c). */
+void func_0000E5B8(void) {
+    extern int D_0001E89C;
+    extern int D_0001F998;
+    extern int ehsys_20E340D9();
+    extern int ehsys_E1139F1A();
+    extern int func_0000E5B8();
+    extern int func_0000ED10();
+    extern int func_0000ED64();
+    s32 temp_a0;
+    s32 temp_a0_2;
+    s32 temp_a0_3;
+
+    temp_a0 = (*(int *)((char *)D_0001F998 + 0x94));
+    if (temp_a0 != 0) {
+        ehsys_E1139F1A(temp_a0);
+        ehsys_20E340D9(D_0001E89C, (*(int *)((char *)D_0001F998 + 0x94)));
+    }
+    temp_a0_2 = (*(int *)((char *)D_0001F998 + 0x90));
+    if (temp_a0_2 != 0) {
+        ehsys_E1139F1A(temp_a0_2);
+        ehsys_20E340D9(D_0001E89C, (*(int *)((char *)D_0001F998 + 0x90)));
+    }
+    func_0000ED10();
+    func_0000ED64();
+    temp_a0_3 = (*(int *)((char *)D_0001F998 + 0x8C));
+    if (temp_a0_3 != 0) {
+        ehsys_E1139F1A(temp_a0_3);
+        ehsys_20E340D9(D_0001E89C, (*(int *)((char *)D_0001F998 + 0x8C)));
+    }
+    ehsys_20E340D9(D_0001E89C, D_0001F998);
+    D_0001F998 = 0;
 }
 
 /* func_0000EDBC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

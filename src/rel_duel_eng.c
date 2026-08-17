@@ -37,6 +37,41 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 #define NULL 0
+/* func_00000254 — 3 words. MATCH 100% (shape: hand). */
+void func_00000254(int a0) {
+    extern int D_00325D30;
+    D_00325D30 = a0;
+}
+/* func_00000458 — 3 words. MATCH 100% (shape: hand). */
+void func_00000458(void) {
+    extern int D_00325D3C;
+    D_00325D3C = 0;
+}
+/* func_00000578 — 3 words. MATCH 100% (shape: hand). */
+int func_00000578(void) {
+    extern int D_00325D48;
+    return D_00325D48;
+}
+/* func_000005E8 — 3 words. MATCH 100% (shape: hand). */
+void func_000005E8(int a0) {
+    extern int D_00325D4C;
+    D_00325D4C = a0;
+}
+/* func_000005F4 — 3 words. MATCH 100% (shape: hand). */
+int func_000005F4(void) {
+    extern int D_00325D4C;
+    return D_00325D4C;
+}
+/* func_00000600 — 3 words. MATCH 100% (shape: hand). */
+void func_00000600(int a0) {
+    extern int D_00325D50;
+    D_00325D50 = a0;
+}
+/* func_0000060C — 3 words. MATCH 100% (shape: hand). */
+int func_0000060C(void) {
+    extern int D_00325D50;
+    return D_00325D50;
+}
 /* func_00000618 — 6 words. MATCH 100% (shape: hand). */
 void func_00000618(int a0) {
 
@@ -49,7 +84,16 @@ void func_00000630(int a0) {
     extern int D_00325D54;
     D_00325D54 = D_00325D54 & ~a0;
 }
-
+/* func_0000064C — 3 words. MATCH 100% (shape: hand). */
+int func_0000064C(void) {
+    extern int D_00325D54;
+    return D_00325D54;
+}
+/* func_00000658 — 3 words. MATCH 100% (shape: hand). */
+void func_00000658(int a0) {
+    extern int D_00325D58;
+    D_00325D58 = a0;
+}
 
 
 
@@ -95,17 +139,6 @@ void func_00004D40(void) {
 }
 /* func_0000EBFC — 2 words. MATCH 100% (shape: hand). */
 extern int func_0000EB18();
-/* func_00006738 — 20 words. MATCH 100% (shape: m2c). */
-void func_00006738(void) {
-    extern char D_0034DF34;
-    extern char D_0035175C;
-    extern int func_00006738();
-    extern int func_00040550();
-    D_0035175C = 0xA;
-    func_00040550(0xE, 0, 0, 0);
-    func_00040550(0x26, 0, 0, 0);
-    D_0034DF34 = 0;
-}
 int func_0000EBFC(int a0, int a1, int a2, int a3) {
     extern int func_0000EB18();
     extern int func_0000EBFC(); return func_0000EB18(0, a1, a2, a3); }
@@ -338,6 +371,12 @@ s32 func_00031424(void) {
 }
 /* func_0003349C — 3 words. MATCH 100% (shape: hand). */
 extern int func_00033320();
+/* func_00031A28 — 5 words. MATCH 100% (shape: m2c). */
+s32 func_00031A28(void) {
+    extern char D_00351768;
+    extern int func_00031A28();
+    return D_00351768 == 6;
+}
 int func_0003349C(int a0, int a1, int a2, int a3) {
     extern int func_00033320();
     extern int func_0003349C(); return func_00033320((0x1 - a0), a1, a2, a3); }

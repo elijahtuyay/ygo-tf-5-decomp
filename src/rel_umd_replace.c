@@ -195,6 +195,12 @@ void func_00002E78(void) {
 s32 func_00002EC8(void) {
     return *(s32 *)0xBAC4;
 }
+/* func_00002ED4 — 3 words. MATCH 100% (shape: m2c). */
+void **func_00002ED4(void) {
+    extern void * D_BCC0;
+    extern int func_00002ED4();
+    return &D_BCC0;
+}
 
 /* func_0000327C — 2 words. MATCH 100% (shape: m2c). */
 s32 func_0000327C(void) {

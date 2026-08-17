@@ -38,15 +38,22 @@ def defined_in(text):
     return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;]*$", text, re.M))
 
 
-def block_decls(src, symtab):
+# The declared type of a global decides the load width MWCC emits — `char` gives
+# `lb`, `int` gives `lw`, `unsigned short` gives `lhu`. auto_decomp.py picks the
+# flavour that matches while trying a function on its own, but does not record
+# which one it used, so the merge has to rediscover it.
+DATA_FLAVOURS = ["int", "char", "unsigned short", "void *"]
+
+
+def block_decls(src, symtab, flavour="int"):
     """Externs for one function, at block scope (widths differ between users)."""
     out = []
     for n in sorted(set(re.findall(r"\b\w+\b", src))):
         if n in symtab:
             out.append(f"    extern int {n}();" if symtab[n] == "func"
-                       else f"    extern char {n};")
+                       else f"    extern {flavour} {n};")
         elif re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n):
-            out.append(f"    extern char {n};")
+            out.append(f"    extern {flavour} {n};")
         elif re.match(r"^func_[0-9A-F]{8}$", n):
             out.append(f"    extern int {n}();")
     return out
@@ -163,13 +170,15 @@ def main():
     for e in todo:
         before = open(path).read()
         names = defined_in(before) | {e["func"]}
-        decls = block_decls(e["src"], symtab) if needs_decls(e["src"]) else []
-        open(path, "w").write(insert(before, e, decls))
-        bad = verify(module, names)
-        if bad is None or bad:
-            open(path, "w").write(before)      # roll back, try the next one
-        else:
-            added += 1
+        flavours = DATA_FLAVOURS if needs_decls(e["src"]) else [None]
+        for flavour in flavours:
+            decls = block_decls(e["src"], symtab, flavour) if flavour else []
+            open(path, "w").write(insert(before, e, decls))
+            bad = verify(module, names)
+            if bad is not None and not bad:
+                added += 1
+                break
+            open(path, "w").write(before)      # roll back, try the next flavour
     print(f"{module}: added {added} of {len(todo)} candidates "
           f"({len(defined_in(open(path).read()))} now in file)")
 
