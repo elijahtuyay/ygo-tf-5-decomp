@@ -854,6 +854,36 @@ s32 func_000034DC(s32 *arg0, s32 arg1) {
     temp_v0 = (arg0[116] & (1 << arg1)) != 0;
     return (temp_v0 ^ 1) & 0xFF;
 }
+/* func_000035BC — 10 words. MATCH 100% (verified). */
+typedef s32 (*FnPtr0)(void);
+s32 func_000035BC(void *arg0) {
+    FnPtr0 fn = *(FnPtr0 *)((char *)arg0 + 0x18);
+    s32 v0 = 0;
+    if (fn != 0) {
+        v0 = fn();
+    }
+    return v0;
+}
+
+/* func_000035E4 — 10 words. MATCH 100% (verified). */
+s32 func_000035E4(void *arg0) {
+    FnPtr0 fn = *(FnPtr0 *)((char *)arg0 + 0x1C);
+    s32 v0 = 0;
+    if (fn != 0) {
+        v0 = fn();
+    }
+    return v0;
+}
+
+/* func_0000360C — 10 words. MATCH 100% (verified). */
+s32 func_0000360C(void *arg0, s32 arg1) {
+    FnPtr0 fn = *(FnPtr0 *)((char *)arg0 + 0x20);
+    if (fn != 0) {
+        return fn();
+    }
+    return arg1;
+}
+
 /* func_00003634 — 0 words. MATCH 100% (shape: twin of func_00002EB0). */
 void func_00003634(void *arg0) {
 
@@ -867,6 +897,19 @@ void func_00003640(void *arg0) {
     void (*fn)(void *);
     fn = *(void (**)(void *))((char *)arg0 + 0x28);
     fn(arg0);
+}
+
+/* func_00003C18 — 12 words. MATCH 100% (verified). */
+s32 func_00003C18(void *arg0) {
+    extern s32 D_0007F300;
+    s32 v0 = *(s32 *)arg0;
+    if (v0 >= 0) {
+        v0 = *(s32 *)((char *)arg0 + 0x48);
+        if (v0 != 0) {
+            return v0;
+        }
+    }
+    return D_0007F300;
 }
 
 /* func_000040D0 — 8 words. MATCH 100% (verified). */
@@ -1055,6 +1098,16 @@ void func_0000B464(s32 arg0, void *arg1) {
     (&D_000909E0)[arg0] = arg1;
 }
 
+/* func_0000EBA0 — 10 words. MATCH 100% (verified). */
+typedef struct Node0EBA0 { struct Node0EBA0 *next; struct Node0EBA0 *prev; } Node0EBA0;
+s32 func_0000EBA0(Node0EBA0 *arg0) {
+    arg0->next->prev = arg0->prev;
+    arg0->prev->next = arg0->next;
+    arg0->prev = 0;
+    arg0->next = 0;
+    return 1;
+}
+
 /* func_0000EBC8 — 9 words. MATCH 100% (verified). */
 typedef struct Node0EBC8 { struct Node0EBC8 *next; struct Node0EBC8 *prev; } Node0EBC8;
 s32 func_0000EBC8(Node0EBC8 *arg0, Node0EBC8 *arg1) {
@@ -1073,6 +1126,14 @@ s32 func_0000EBEC(Node0EBEC *arg0, Node0EBEC *arg1) {
     arg1->prev = arg0;
     arg0->prev->next = arg0;
     return 1;
+}
+
+/* func_0000F4F8 — 12 words. MATCH 100% (verified). */
+extern s32 func_00051770(void);
+f32 func_0000F4F8(void) {
+    extern f32 D_00077BA0[];
+    s32 v0 = func_00051770();
+    return D_00077BA0[v0];
 }
 
 /* func_0001095C — 5 words. MATCH 100% (verified). */
@@ -1197,6 +1258,23 @@ s32 func_00014140(arg0, arg1)
 s32 arg0, arg1;
 {
     return func_000142D8(arg0, arg1, 0);
+}
+
+/* func_00014060 — 10 words. MATCH 100% (verified). */
+extern void func_00004908(s32, void *);
+void func_00014060(s32 arg0) {
+    char *v1 = &D_00090D20;
+    if (arg0 != 0) {
+        func_00004908(arg0, v1 + 0x1C0);
+    }
+}
+
+/* func_000140D4 — 10 words. MATCH 100% (verified). */
+void func_000140D4(s32 arg0) {
+    char *v1 = &D_00090D20;
+    if (arg0 != 0) {
+        func_000048E0((V4_58A0_48B8 *)arg0, (V4_58A0_48B8 *)(v1 + 0x210));
+    }
 }
 
 /* func_00015304 — 4 words. MATCH 100% (shape: m2c). */
@@ -2532,6 +2610,13 @@ s32 func_00051768(void) {
     return 0;
 }
 
+/* func_000517C4 — 12 words. MATCH 100% (verified). */
+f32 func_000517C4(void) {
+    extern f32 D_00079088[];
+    s32 v0 = func_00051770();
+    return D_00079088[v0];
+}
+
 /* func_000517F4 — 12 words. MATCH 100% (shape: m2c). */
 void *func_000517F4(void) {
     return (&D_00094124)[func_0006DE7C()];
@@ -3756,6 +3841,17 @@ s32 func_00063B48(s32 arg0) {
 /* func_00063C48 — 8 words. MATCH 100% (shape: thunk). */
 s32 func_00063C48(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_B89D38DC((arg0 << 6), (arg1 << 6), ((0x1E0 - arg0) << 6), arg2);
+}
+
+/* func_00064F78 — 12 words. MATCH 100% (verified). */
+typedef struct { u16 a, b, c, d, e; } S5_64F78;
+void *func_00064F78(S5_64F78 *arg0, S5_64F78 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    arg0->d = arg1->d;
+    arg0->e = arg1->e;
+    return arg0;
 }
 
 /* func_000650E8 — 5 words. MATCH 100% (shape: thunk). */
