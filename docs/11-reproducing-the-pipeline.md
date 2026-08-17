@@ -243,6 +243,22 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     `func_00002DF0`/`func_0002D520` in `rel_field`). The moment one matches, try
     the same body at its twin.
 
+40. **A global holding a POINTER is not a global holding a struct.** For
+    `D_00034484` and friends, m2c's draft re-dereferences the global at every
+    field access, emitting an extra `lui`/`lw` per field. The original wrote
+    `extern s32 D_XXXXXXXX;` then `char *p = (char *)D_XXXXXXXX;` once and
+    indexed every field off `p`. Same idea for an accessor function: call it
+    once into a local (`void *p = (void *)func_00002358();`) and index off that.
+41. **Do not hoist a store out of an if/else.** Writing it once after the branch
+    makes MWCC materialise an address register the target does not have; the
+    original duplicated the store in both branches, exactly as m2c drafts it
+    before anyone "simplifies" it.
+42. **Commutative `addu` operand order is fixed by the compiler.** For
+    `base + index * stride` MWCC picks an order independent of source text
+    order, temporaries, statement splitting, or optimisation level. Roughly nine
+    `rel_story` near-misses die on this and it should be treated as a dead end,
+    like lever 27's argument evaluation order.
+
 ### A known limitation of the differ
 
 `scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
