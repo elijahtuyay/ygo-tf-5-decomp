@@ -252,7 +252,10 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
 41. **Do not hoist a store out of an if/else.** Writing it once after the branch
     makes MWCC materialise an address register the target does not have; the
     original duplicated the store in both branches, exactly as m2c drafts it
-    before anyone "simplifies" it.
+    before anyone "simplifies" it. Confirmed independently in `rel_story`
+    (`func_00002420`) and `rel_deckswap` (`func_000024CC`), so this is a rule
+    rather than a coincidence. The tell is a target carrying two separate `lui`
+    for the same symbol where one would obviously do.
 42. **Two freshly-loaded globals in one address expression fix their own load
     order.** This is the precise form of what first looked like a blanket
     "commutative `addu`" dead end. `base + index * stride` is NOT generally
