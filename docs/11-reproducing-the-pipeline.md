@@ -350,6 +350,20 @@ times over. Recognise these before starting from m2c:
     function went from a two-word near-miss to an exact match purely by
     dropping an argument that was never there. The companion to lever 45.
 
+56. **Arguments 9 and beyond go on the stack, and they are ordinary
+    parameters.** Lever 11 covers arguments 1-8 in `$a0`-`$a3` then `$t0`-`$t3`;
+    everything after that is stored to plain slots at `0x0($sp)`, `0x4($sp)`,
+    ... in call order immediately before the `jal`. Declare them as normal `int`
+    parameters and pass them positionally — no special idiom is needed. Seven
+    `rel_duel_eng` functions were written off as "beyond the register model"
+    until this was tried, and six matched on the first or second attempt.
+    It applies to a function's own signature too: `func_001EED48` reads two of
+    its own parameters from its caller's stack and forwards eleven onward.
+
+    Caveat: `nids/func_arity/*.csv` is register-only, so it UNDERCOUNTS any
+    callee that takes stack arguments. For a heavily-reused dispatcher the CSV's
+    `max_args` is a floor, not the answer.
+
 ### Matching order matters: some functions unlock others
 
 MWCC will only keep a value in a caller-saved register across a call when it can

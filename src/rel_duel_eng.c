@@ -9142,3 +9142,12 @@ int func_002714B4(int a0, int a1, int a2, int a3) {
     extern int func_002714B4();
     return func_00270D5C(a0, -1, a1, a2, a3, 4, 0, 0, 1, 1) > 0;
 }
+
+/* func_0027160C — 24 words. MATCH 100% (shape: hand). */
+int func_0027160C(int a0, int a1) {
+    extern int func_0017CA90();
+    extern int func_00270D5C();
+    extern int func_0027160C();
+    int r = func_0017CA90(a0, a1);
+    return func_00270D5C(a0, a1, r, 0, a1, 0x20, 0, 0, 1, 1);
+}
