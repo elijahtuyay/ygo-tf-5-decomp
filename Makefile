@@ -14,9 +14,15 @@
 # that the config's layout is exact; the non-code blobs are carried over
 # verbatim, as the config declares them, and are not reconstructed.
 #
-# SRC=1 is the one that proves the decompilation: it swaps our compiled C in
-# for the disassembly. Functions that do not match yet stay as INCLUDE_ASM in
-# the .c, so the build stays byte-exact while the C documents the attempt.
+# SRC=1 is the one that proves the decompilation: it swaps our compiled C in for
+# the disassembly, so it only passes when EVERY function in the module matches.
+# Until then it fails at the first differing byte, which is exactly the signal
+# you want. For rel_html_view today it builds to the correct 26900 bytes and
+# differs at byte 1481 (vram 0x574) — the one instruction func_00000470
+# schedules differently. Every other byte of the module, all 15 other functions
+# and the jump table included, is identical.
+#
+# Definition of done for a module: `make MODULE=<name> SRC=1` prints OK.
 
 MODULE  ?= rel_html_view
 SRC     ?=
@@ -39,10 +45,13 @@ ASSET_SRCS := $(wildcard assets/$(MODULE)/*.bin)
 ASSET_OBJS := $(patsubst assets/$(MODULE)/%.bin,build/assets/$(MODULE)/%.bin.o,$(ASSET_SRCS))
 
 ifeq ($(SRC),1)
-  # our compiled C replaces the disassembled .text
+  # our compiled C replaces the disassembled .text. The linker script names that
+  # object by path, so it needs a variant with the substitution applied.
   CODE_OBJS := build/mwcc/$(MODULE).o $(filter-out build/asm/$(MODULE)/text.s.o,$(ASM_OBJS))
+  LINK_LD   := build/$(MODULE).src.ld
 else
   CODE_OBJS := $(ASM_OBJS)
+  LINK_LD   := $(LD)
 endif
 
 .PHONY: all verify clean
@@ -74,8 +83,24 @@ build/$(MODULE).symbols.ld: config/symbols/$(MODULE).txt $(ASM_SRCS)
 build/mwcc/$(MODULE).o: src/$(MODULE).c
 	scripts/mwcc_build.sh $<
 
-$(OUT): $(CODE_OBJS) $(ASSET_OBJS) $(LD) build/$(MODULE).symbols.ld
-	$(LDD) -EL -T build/$(MODULE).symbols.ld -T $(LD) -o $@ --no-check-sections
+# Our compiled object also carries any compiler-generated jump tables, in its own
+# .rodata. The shipped module keeps them in .data (it has no .rodata at all), and
+# those bytes are already inside the data blob we link verbatim — verified
+# identical by scripts/mwcc_diff.py. So the table is placed at its real address
+# as NOLOAD: the symbol resolves correctly and no bytes are emitted twice.
+build/$(MODULE).src.ld: $(LD) $(ASM_SRCS)
+	@sed 's|build/asm/$(MODULE)/text\.s\.o|build/mwcc/$(MODULE).o|' $< \
+		| grep -v 'build/mwcc/$(MODULE)\.o(\.rodata)' > $@.tmp
+	@jt=$$(grep -ohE '\bjtbl_[0-9A-F]{8}\b' $(ASM_SRCS) | sort -u | head -1 | sed 's/jtbl_/0x/'); \
+	if [ -n "$$jt" ]; then \
+		awk -v addr="$$jt" -v obj="build/mwcc/$(MODULE).o" \
+			'/\/DISCARD\//{printf "    .jtbl %s (NOLOAD) : { %s(.rodata) }\n\n", addr, obj} {print}' \
+			$@.tmp > $@; \
+	else mv $@.tmp $@; fi
+	@rm -f $@.tmp
+
+$(OUT): $(CODE_OBJS) $(ASSET_OBJS) $(LINK_LD) build/$(MODULE).symbols.ld
+	$(LDD) -EL -T build/$(MODULE).symbols.ld -T $(LINK_LD) -o $@ --no-check-sections
 
 $(BIN): $(OUT)
 	$(OBJCOPY) -O binary $< $@
@@ -95,4 +120,5 @@ verify: $(BIN)
 	fi
 
 clean:
-	rm -rf build/asm/$(MODULE) build/assets/$(MODULE) $(OUT) $(BIN) build/$(MODULE).symbols.ld
+	rm -rf build/asm/$(MODULE) build/assets/$(MODULE) $(OUT) $(BIN) \
+		build/$(MODULE).symbols.ld build/$(MODULE).src.ld
