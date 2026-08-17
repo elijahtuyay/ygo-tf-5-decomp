@@ -136,6 +136,24 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
 16. **`(x << 27) >> 29` is not `(x >> 2) & 7`** — the latter folds into a single
     Allegrex `ext`, one word shorter, and can never match a `sll`+`srl` target.
 
+17. **Not every function was compiled at -O4,s.** Some targets have an UNFILLED
+    branch delay slot, or a real `jal`+stack frame where MWCC would tail-call
+    optimise. Per `mwccpsp -help all`, **instruction scheduling and tail-call
+    optimisation both start at level 3** — so those functions cannot have been
+    built at -O4. They match at `-O2,s`.
+
+    This does not mean changing the project's flags: `#pragma optimization_level 2`
+    around the function reproduces it exactly inside the normal `-O4,s` build,
+    verified on 6 functions in `rel_title`. `scripts/auto_decomp.py` now tries both
+    levels and tags the shape, and the merge tooling emits the pragma
+    automatically. The tell is a target whose delay slot is a `nop` that our
+    version fills, or a call the target makes with `jal` that we turn into `j`.
+
+    A related shape in the same family: a large stack frame for a trivial body
+    (e.g. 0x60 bytes to hold one value) comes from a `volatile` local array —
+    `volatile s32 sp[24]; sp[0] = x; return sp[0];` matched a 6-word target that
+    no -O4 phrasing could reach.
+
 ### A verification bug worth remembering
 
 `scripts/mwcc_diff.py` originally treated two words as equal whenever both

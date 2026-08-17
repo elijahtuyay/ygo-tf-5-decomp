@@ -33,6 +33,14 @@ MWCC = os.path.join(ROOT, "tools/mwccpsp_3.0.1_219/mwccpsp.exe")
 WIBO = os.path.join(ROOT, "tools/wibo-bin/wibo")
 FLAGS = ["-O4,s", "-sdatathreshold", "0"]
 
+# Most of the game is -O4,s, but not all of it. rel_title contains functions that
+# only match at -O2,s: level 3 is where MWCC turns on instruction scheduling, so a
+# target with an UNFILLED branch delay slot cannot have been built at -O4. A module
+# is linked from several translation units and they were not all compiled alike, so
+# each candidate is tried at both levels.
+FLAG_SETS = [["-O4,s", "-sdatathreshold", "0"],
+             ["-O2,s", "-sdatathreshold", "0"]]
+
 # m2c writes its output in terms of these; MWCC has no stdint and no m2c header.
 PRELUDE = """typedef signed char s8;
 typedef unsigned char u8;
@@ -312,10 +320,10 @@ SHAPES = [
 
 
 # -------------------------------------------------------------------- compile
-def try_candidate(module, fn, decls, body, workdir):
+def try_candidate(module, fn, decls, body, workdir, flags=None):
     src = PRELUDE + "\n" + "\n".join(decls) + "\n\n" + body + "\n"
     open(os.path.join(workdir, f"{fn}.c"), "w").write(src)
-    r = subprocess.run([WIBO, MWCC, "-c", *FLAGS, "-o", f"{fn}.o", f"{fn}.c"],
+    r = subprocess.run([WIBO, MWCC, "-c", *(flags or FLAGS), "-o", f"{fn}.o", f"{fn}.c"],
                        capture_output=True, text=True, cwd=workdir)
     if r.returncode != 0:
         return None, "compile-error"
@@ -367,7 +375,12 @@ def main():
                 body = shape(draft)
                 if not body:
                     continue
-                ok, verdict = try_candidate(mod, fn, decls, body, workdir)
+                ok = False
+                for fl in FLAG_SETS:
+                    ok, verdict = try_candidate(mod, fn, decls, body, workdir, fl)
+                    if ok:
+                        name = name if fl is FLAG_SETS[0] else name + " -O2"
+                        break
                 if verdict != "compile-error":
                     compiled = True
                 if ok:

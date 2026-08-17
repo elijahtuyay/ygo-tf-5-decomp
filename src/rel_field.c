@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 226 functions matched here. The rest of the module is not
+ * STATUS: 233 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -137,6 +137,7 @@ extern int ehsys_025FE238();
 extern int ehsys_04E1CB0F();
 extern int ehsys_06380DFA();
 extern int ehsys_1EC5342B();
+extern int ehsys_31D0BD26();
 extern int ehsys_4175E3DB();
 extern int ehsys_42110BF9();
 extern int ehsys_4AA58320();
@@ -160,6 +161,7 @@ extern int ehsys_C62F9EAC();
 extern int ehsys_C792FA38();
 extern int ehsys_C9D9E989();
 extern int ehsys_D2A768F4();
+extern int ehsys_D4DE5DD8();
 extern int ehsys_D853F15C();
 extern int ehsys_DFCA450B();
 extern int ehsys_E11E4575();
@@ -204,7 +206,6 @@ extern int func_00024754();
 extern int func_00024C54();
 extern int func_0002D07C();
 extern int func_0002F5F0();
-extern int func_0002F60C();
 extern int func_0002F614();
 extern int func_00030138();
 extern int ehsys_20E340D9();
@@ -342,7 +343,7 @@ void func_000300AC(void);
 void func_000300DC(void);
 void func_000304D4();
 void func_000304DC();
-void func_000304E4();
+void func_000304E4(u16 *arg0);
 void func_000304EC();
 void func_000306FC(void);
 void func_00030CA0(void);
@@ -1474,6 +1475,22 @@ s32 func_00029F60(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, 0xFFFFFFFF);
 }
 
+/* func_00029F74 — 50 words. MATCH 100% (shape: m2c). */
+void func_00029F74(s32 *arg0) {
+    s32 temp_s0;
+
+    *(s32 *)0xB7AB1C = ehsys_D4DE5DD8() % 5;
+    temp_s0 = ehsys_D4DE5DD8() % 3;
+    *(s32 *)0xB7AB20 = ehsys_D4DE5DD8() % 6;
+    *(s32 *)0xB7AB24 = ehsys_31D0BD26(func_00010E0C(), 2);
+    arg0[0] = func_00010E0C();
+    arg0[1] = 4;
+    arg0[2] = temp_s0 + ((*(s32 *)0xB7AB1C * 3) + 1);
+    arg0[3] = arg0[0];
+    arg0[4] = arg0[1];
+    arg0[5] = arg0[2];
+}
+
 /* func_0002D044 — bulk-matched thunk into ehsys_BC8E65D7. */
 s32 func_0002D044(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, 0xFFFFFFFF);
@@ -1597,9 +1614,19 @@ void func_0002F428(void) {
     ehsys_60B55A50(0xFF000000);
 }
 
+/* func_0002F470 — 2 words. MATCH 100% (shape: m2c). */
+void func_0002F470(s32 *arg0) {
+    arg0[2] = 0;
+}
+
 /* func_0002F5E8 — 2 words. MATCH 100% (shape: m2c). */
 void func_0002F5E8(void) {
 
+}
+
+/* func_0002F60C — 2 words. MATCH 100% (shape: m2c). */
+u16 func_0002F60C(u16 *arg0) {
+    return arg0[1];
 }
 
 /* func_0002FAF8 — bulk-matched thunk into ehsys_BC8E65D7. */
@@ -1621,7 +1648,7 @@ void func_0002FB70(void) {
 
 /* func_0002FB80 — 3 words. MATCH 100% (verified). */
 void func_0002FB80(void) {
-    func_000304E4(&D_B7B268);
+    func_000304E4((u16 *)&D_B7B268);
 }
 
 /* func_0002FD58 — bulk-matched thunk into ehsys_3BB2BAC6. */
@@ -1667,8 +1694,8 @@ void func_000304DC() {
 }
 
 /* func_000304E4 — 2 words. MATCH 100% (shape: m2c). */
-void func_000304E4() {
-    func_0002F60C();
+void func_000304E4(u16 *arg0) {
+    func_0002F60C(arg0);
 }
 
 /* func_000304EC — 2 words. MATCH 100% (shape: m2c). */
@@ -1700,7 +1727,7 @@ void func_00030754(s32 arg0) {
 
 /* func_00030764 — 3 words. MATCH 100% (verified). */
 void func_00030764(void) {
-    func_000304E4(&D_B7B38C);
+    func_000304E4((u16 *)&D_B7B38C);
 }
 
 /* func_00030770 — 4 words. MATCH 100% (verified). */
@@ -1726,6 +1753,33 @@ void func_00030CA0(void) {
     ehsys_4AA58320(1);
     ehsys_942B03D0(0xE, 0xE);
     ehsys_60B55A50(0xFF000000);
+}
+
+/* func_00030D28 — 2 words. MATCH 100% (shape: m2c). */
+s32 func_00030D28(s32 *arg0) {
+    return arg0[3];
+}
+
+/* func_00030D54 — 2 words. MATCH 100% (shape: m2c). */
+s32 func_00030D54(s32 *arg0) {
+    return arg0[2];
+}
+
+/* func_00030D5C — 2 words. MATCH 100% (shape: m2c). */
+s32 func_00030D5C(s32 *arg0) {
+    return arg0[3];
+}
+
+/* func_00030DF8 — 35 words. MATCH 100% (shape: m2c). */
+void func_00030DF8(s32 *arg0) {
+    *(s32 *)0xB7B498 = ehsys_31D0BD26(func_00010E0C(), 1);
+    *(s32 *)0xB7B494 = ehsys_D4DE5DD8() % 5;
+    arg0[0] = func_00010E0C();
+    arg0[1] = 0x12;
+    arg0[2] = (*(s32 *)0xB7B494 * 4) + 1;
+    arg0[3] = arg0[0];
+    arg0[4] = arg0[1];
+    arg0[5] = arg0[2];
 }
 
 /* func_00035F50 — 5 words. MATCH 100% (verified). */

@@ -77,6 +77,14 @@ def insert(text, entry, decls):
     m = re.search(r"\{", body)
     if m:
         body = body[:m.end()] + "\n" + "\n".join(decls) + body[m.end():]
+    # Some functions only match at optimisation level 2 — level 3 is where MWCC
+    # turns on instruction scheduling and tail-call optimisation, and these
+    # targets have unfilled delay slots or real jal+frame calls. A per-function
+    # `#pragma optimization_level` reproduces that inside the project's normal
+    # -O4,s build, so the module still compiles as one translation unit.
+    if "-O2" in entry.get("shape", ""):
+        body = ("#pragma optimization_level 2\n" + body +
+                "\n#pragma optimization_level 4")
     chunk = (f"\n/* {entry['func']} — {entry['words']} words. MATCH 100% "
              f"(shape: {entry['shape']}). */\n{body}\n")
     lines = text.split("\n")
