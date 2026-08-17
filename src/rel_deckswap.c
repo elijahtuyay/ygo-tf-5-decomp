@@ -469,6 +469,23 @@ int func_0000A210(int a0) {
     return func_00007FD0(a0 & 0xFFFF);
 }
 
+/* func_0000AADC -- MATCH 100% (shape: twin-of-rel_decktutorial-func_00007BF8,
+ * via find_twins.py same-shape tier). */
+s32 func_0000AADC(void *arg0) {
+    extern unsigned short D_0001E75C;
+    extern char D_0001E2E0;
+    extern int ehsys_memcpy();
+    char *addr;
+
+    if (D_0001E75C == 0) {
+        return 0;
+    }
+    D_0001E75C = D_0001E75C - 1;
+    addr = (char *)&D_0001E2E0 + (D_0001E75C * 0xA) + 0x47E;
+    ehsys_memcpy(arg0, addr, 0xA);
+    return 1;
+}
+
 /* func_0000B55C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000B55C(void) {
     unsigned char *p = D_0001F984;

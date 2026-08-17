@@ -296,6 +296,13 @@ int func_0000D710(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) {
     return ehsys_3BB2BAC6(a0 << 6, a1 << 6, a2 << 6, a3 << 6, a4, -1, 0);
 }
 
+/* func_0000F530 — 8 words. MATCH 100% (shape: twin-of-rel_deck-func_0001B428,
+ * via find_twins.py same-shape tier). */
+s32 func_0000F530(void) {
+    extern int ehsys_B2B9FEFA();
+    return ((s32 *)ehsys_B2B9FEFA())[1];
+}
+
 /* func_00010DC0 — 4 words. MATCH 100% (shape: hand). */
 void func_00010DC0(s32 arg0, s32 arg1, s32 arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);

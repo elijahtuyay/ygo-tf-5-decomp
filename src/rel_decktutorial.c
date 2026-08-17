@@ -69,7 +69,6 @@ extern int ehsys_E62CCE79();
 extern int ehsys_EF9B5D06();
 extern int ehsys_memcpy();
 extern int ehsys_memset();
-extern int func_000032CC();
 extern int func_000033B4();
 extern int func_000168C0();
 extern int func_00017B1C();
@@ -233,6 +232,19 @@ void func_000032C4(void) {
     func_000032CC();
 }
 
+/* func_000032CC — 14 words. MATCH 100% (shape: twin-of-rel_deckswap-
+ * func_0000BB8C, via find_twins.py same-shape tier). */
+int func_000032CC(void) {
+    extern int D_00028D44;
+    extern int D_0002951C;
+    extern int ehsys_20E340D9();
+
+    if (D_00028D44 != 0) {
+        ehsys_20E340D9(D_0002951C, D_00028D44);
+        D_00028D44 = 0;
+    }
+}
+
 /* func_0000353C — 4 words. MATCH 100% (shape: m2c). */
 s32 func_0000353C(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
@@ -242,6 +254,23 @@ s32 func_0000353C(u16 *arg0, u16 *arg1) {
 s32 func_000035C4(void) {
     return 0;
 }
+/* func_00004BC8 — 19 words. MATCH 100% (shape: twin-of-rel_deckswap-
+ * func_00008D24, via find_twins.py same-shape tier). */
+s32 func_00004BC8(s32 arg0) {
+    extern int D_0002B7B4;
+    extern int ehsys_EF9B5D06();
+    s32 sp1C;
+    s32 temp_a1;
+
+    sp1C = arg0;
+    ehsys_EF9B5D06(&sp1C, (*(int *)((char *)D_0002B7B4 + 0x10)));
+    temp_a1 = (*(int *)((char *)D_0002B7B4 + 0x14));
+    if (temp_a1 != 0) {
+        ehsys_EF9B5D06(&sp1C, temp_a1);
+    }
+    return sp1C;
+}
+
 /* func_00004C14 — 0 words. MATCH 100% (shape: harvested). */
 void func_00004C14(void) {
     extern int D_0002951C;
@@ -351,6 +380,32 @@ s32 func_00009674(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
+/* func_00009874 — 41 words. MATCH 100% (shape: twin-of-rel_deck-
+ * func_0000D198, via find_twins.py same-shape tier). */
+void func_00009874(void *arg0, s32 arg1) {
+    extern char D_0002B7B8;
+    extern short D_0002B7BA;
+    extern int D_0002B7C0;
+    extern int D_0002B7C4;
+    extern int D_0002B7C8;
+    extern int D_0002951C;
+    extern int ehsys_41AABF28();
+    extern int ehsys_memset();
+    s32 temp_v0;
+    u16 v0;
+
+    ehsys_memset(&D_0002B7B8, 0, 0x14);
+    D_0002B7BA = *(u16 *)((char *)arg0 + 0x14);
+    D_0002B7C4 = arg1;
+    v0 = *(volatile u16 *)&D_0002B7BA;
+    if (v0 > 0) {
+        D_0002B7C0 = ehsys_41AABF28(D_0002951C, v0 * 2);
+    }
+    temp_v0 = ehsys_41AABF28(D_0002951C, 0x10000);
+    D_0002B7C8 = temp_v0;
+    ehsys_memset((void *)temp_v0, 0xFF, 0x10000);
+}
+
 /* func_00009D4C — 24 words. MATCH 100% (shape: m2c). */
 s32 func_00009D4C(s32 arg0, s32 arg1) {
     s32 temp_a0;
@@ -422,6 +477,22 @@ void func_0000B0F0(void) {
     D_0002B7CC = 0;
 }
 
+/* func_0000B220 — 12 words. MATCH 100% (shape: twin-of-rel_deck-
+ * func_0000C0A8, via find_twins.py same-shape tier). */
+void func_0000B220(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern char D_000284E4;
+    extern int func_00020124();
+
+    func_00020124(arg0, (char *)&D_000284E4 + ((arg1 & 0xFFFF) + 1) * 6, arg2, arg3 + 1, 0xA4, 0);
+}
+
+/* func_0000B9D8 — 8 words. MATCH 100% (shape: twin-of-rel_gallery-
+ * func_000032F0-family, via find_twins.py same-shape tier). */
+s32 func_0000B9D8(s32 arg0, s32 arg1, s32 arg2) {
+    extern int ehsys_B89D38DC();
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
 /* func_0000B9F8 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_0000B9F8(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
@@ -477,6 +548,26 @@ s32 func_000165CC(u16 *arg0, u16 *arg1) {
 void func_00017D20(void) {
     func_00017B1C();
 }
+/* func_0001755C — 12 words. MATCH 100% (shape: twin-of-rel_decktutorial-
+ * func_0000B220, via find_twins.py same-shape tier). */
+void func_0001755C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern char D_00028BD8;
+    extern int func_00020124();
+
+    func_00020124(arg0, (char *)&D_00028BD8 + ((arg1 & 0xFFFF) + 1) * 6, arg2, arg3 + 1, 0x88, 0);
+}
+
+/* func_0001758C — 14 words. MATCH 100% (shape: twin-of-rel_deckswap-
+ * func_0000D24C, via find_twins.py same-shape tier). */
+s32 func_0001758C(s32 arg0, u16 arg1, s32 arg2, s32 arg3) {
+    extern char D_00028C1C;
+    extern int D_0002C104;
+    extern int func_00020124();
+    char *p = *(char **)(D_0002C104 + 0x14);
+    u16 val = *(u16 *)(p + 0xF4);
+    return func_00020124(arg0, &D_00028C1C + arg1 * 6, arg2, arg3 + 1, val, 0);
+}
+
 /* func_00018880 — 0 words. MATCH 100% (shape: harvested). */
 void func_00018880(void) {
     extern int D_0002951C;
@@ -523,6 +614,33 @@ void func_00019088(s32 arg0, int arg1, int arg2, int arg3) {
     ehsys_A4AFF8E6();
 }
 
+/* func_00019138 — 45 words. MATCH 100% (shape: twin-of-rel_deckswap-
+ * func_0000EE6C, via find_twins.py same-shape tier). */
+void func_00019138(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern unsigned short D_00028E9A;
+    extern int func_000168C0();
+    extern int ehsys_E58C0FDC();
+    extern int ehsys_B8AD96EA();
+    extern int ehsys_942B03D0();
+    extern int ehsys_60B55A50();
+    extern int func_00019124();
+    extern int ehsys_A4AFF8E6();
+    s32 var_s4;
+    s32 temp_s4;
+
+    if (D_00028E9A == 0) {
+        var_s4 = 0x99;
+    } else {
+        var_s4 = 0x98;
+    }
+    temp_s4 = ehsys_E58C0FDC(func_000168C0(0x8033), var_s4);
+    ehsys_B8AD96EA(arg0);
+    ehsys_942B03D0(0xC, 0xC);
+    ehsys_60B55A50(0xFF000000);
+    func_00019124(arg1, arg2 - 2, arg3, temp_s4);
+    ehsys_A4AFF8E6();
+}
+
 /* func_00019124 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_00019124(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
@@ -533,9 +651,30 @@ s32 func_00019694(s32 arg0, s32 arg1, s32 arg2) {
     return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
 }
 
+/* func_00019674 — 8 words. MATCH 100% (shape: twin-of-rel_gallery-
+ * func_000032F0-family, via find_twins.py same-shape tier). */
+s32 func_00019674(s32 arg0, s32 arg1, s32 arg2) {
+    extern int ehsys_B89D38DC();
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
 /* func_0001B854 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_0001B854(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_00019DA8 — 8 words. MATCH 100% (shape: twin-of-rel_gallery-
+ * func_000032F0-family, via find_twins.py same-shape tier). */
+s32 func_00019DA8(s32 arg0, s32 arg1, s32 arg2) {
+    extern int ehsys_B89D38DC();
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
+/* func_0001BE5C — 8 words. MATCH 100% (shape: twin-of-rel_deck-func_0001B428,
+ * via find_twins.py same-shape tier). */
+s32 func_0001BE5C(void) {
+    extern int ehsys_B2B9FEFA();
+    return ((s32 *)ehsys_B2B9FEFA())[1];
 }
 
 /* func_0001CB4C — bulk-matched thunk into ehsys_3BB2BAC6. */
