@@ -567,7 +567,9 @@ s32 func_00014038(void) {
 }
 
 /* func_00014140 — 2 words. MATCH 100% (shape: hand). */
-s32 func_00014140(s32 arg0, s32 arg1) {
+s32 func_00014140(arg0, arg1)
+s32 arg0, arg1;
+{
     return func_000142D8(arg0, arg1, 0);
 }
 
@@ -679,7 +681,9 @@ void func_0003159C(void) {
 }
 
 /* func_00031A08 — 2 words. MATCH 100% (shape: hand). */
-void func_00031A08(s32 arg0) {
+s32 func_00031A08(arg0)
+s32 arg0;
+{
     func_0003199C(arg0, 1);
 }
 

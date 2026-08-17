@@ -272,6 +272,8 @@ int func_00012F60(int a0) {
 
 /* func_00012F68 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00012F68(void) {
+    extern int func_0000B1D0();
+
     func_0000A6BC();
     ehsys_4F22C9AA(2);
     if (func_0000B1D0((u8) D_0002E017) & 0xFFFF) {

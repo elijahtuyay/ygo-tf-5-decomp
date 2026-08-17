@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 9 functions matched here. The rest of the module is not
+ * STATUS: 15 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -57,6 +57,7 @@ void func_00003510(s32 *arg0, s32 arg1);
 void func_00003D7C(s32 arg0, s32 *arg1, s32 arg2);
 s32 func_00003D84(s32 *arg0, s32 arg1);
 void func_00003F94(void);
+s32 func_00003F9C(s32 *arg0, s32 arg1);
 s32 func_000041DC(s32 *arg0, s32 arg1);
 void func_000042B8(void);
 void func_00004314(void);
@@ -76,9 +77,19 @@ void func_00000228(void) {
 
 }
 
+/* func_00000720 — 2 words. MATCH 100% (shape: m2c). */
+s32 func_00000720(s32 arg0, s32 arg1) {
+    return arg1;
+}
+
 /* func_00001818 — 2 words. MATCH 100% (shape: m2c). */
 void func_00001818(void) {
 
+}
+
+/* func_00001D00 — 2 words. MATCH 100% (shape: m2c). */
+s32 func_00001D00(s32 *arg0) {
+    return func_00003D84(arg0, *(int *)((char *)arg0 + 0x188));
 }
 
 /* func_00003204 — 2 words. MATCH 100% (shape: m2c). */
@@ -86,9 +97,39 @@ void func_00003204(void) {
 
 }
 
+/* func_00003510 — 23 words. MATCH 100% (shape: m2c). */
+void func_00003510(s32 *arg0, s32 arg1) {
+    s32 v0 = func_00003D84((s32 *)arg0[0], 0x5E);
+    v0 = ehsys_C6C15111(v0, D_0000A318, 0);
+    ehsys_E58C0FDC(v0, D_000098A0[arg1]);
+}
+
+/* func_00003D7C — 2 words. MATCH 100% (shape: m2c). */
+void func_00003D7C(s32 arg0, s32 *arg1, s32 arg2) {
+    *arg1 = arg2;
+}
+
+/* func_00003D84 — 4 words. MATCH 100% (shape: m2c). */
+s32 func_00003D84(s32 *arg0, s32 arg1) {
+    return arg0[arg1];
+}
+
 /* func_00003F94 — 2 words. MATCH 100% (shape: m2c). */
 void func_00003F94(void) {
     func_00003F30();
+}
+
+/* func_00003F9C — 2 words. MATCH 100% (shape: m2c). */
+s32 func_00003F9C(s32 *arg0, s32 arg1) {
+    *(int *)((char *)arg0 + 0x188) = arg1;
+    return func_00003D94(arg0, arg1);
+}
+
+/* func_000041DC — 3 words. MATCH 100% (shape: m2c). */
+s32 func_000041DC(s32 *arg0, s32 arg1) {
+    s32 v0 = 0 < arg1;
+    *arg0 = v0;
+    return v0;
 }
 
 /* func_000042B8 — 2 words. MATCH 100% (shape: m2c). */

@@ -224,6 +224,20 @@ s32 func_0000910C(s32 arg0, s32 arg1) {
     return (arg1 & (1 << ehsys_FE91A2EC(arg0 & 0xFFFF))) != 0;
 }
 
+/* func_00009E20 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00009E20(int a0) {
+    int v0 = 0;
+    int v1 = (unsigned char) D_0001EB90 & 0xF;
+    if (v1 < 2) {
+        v0 += a0;
+    } else if (v1 >= 4) {
+        v0 += 3;
+    } else {
+        v0 += 2;
+    }
+    return v0;
+}
+
 /* func_0000BCC0 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000BCC0(int a0, unsigned short a1, int a2, int a3) {
     return func_00011968(a0, &D_0001DBA8 + a1 * 6, a2, a3 + 1, 0xE8, 0);
