@@ -376,6 +376,9 @@ times over. Recognise these before starting from m2c:
     Declaring the parameter as a pointer to a small struct and reading
     `a0->field2` twice stops the fold and matches.
 
+    It generalises to more than one call: `func_0016E2CC` re-reads the same
+    field before two separate calls and matched the same way.
+
     The boundary matters: the same trick does NOT work without an intervening
     call. For three consecutive float reads from a global with no call between
     them, struct field, array index and offset pointer all produce identical
