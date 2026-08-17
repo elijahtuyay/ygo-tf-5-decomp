@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 8 functions matched here. The rest of the module is not
+ * STATUS: 9 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -67,6 +67,7 @@ extern char D_00006A48;
 extern char D_00006A4C;
 extern char D_00006A50;
 extern int ehsys_06A1D1D8();
+extern int ehsys_088F768A();
 extern int ehsys_13A4081A();
 extern int ehsys_1856E536();
 extern int ehsys_20E340D9();
@@ -78,19 +79,26 @@ extern int ehsys_4AA58320();
 extern int ehsys_4B0DABFA();
 extern int ehsys_5998BFD7();
 extern int ehsys_6367AE39();
+extern int ehsys_65DA0419();
 extern int ehsys_6E42DDCD();
+extern int ehsys_AA9913C7();
 extern int ehsys_BC8E65D7();
+extern int ehsys_BE3756D0();
 extern int ehsys_BF3E9066();
 extern int ehsys_C07BB470();
 extern int ehsys_C6C15111();
+extern int ehsys_C859D5FE();
 extern int ehsys_C9D9E989();
 extern int ehsys_D2A768F4();
 extern int ehsys_D470D0B2();
+extern int ehsys_D5D33185();
 extern int ehsys_D853F15C();
 extern int ehsys_D979E9BF();
 extern int ehsys_ED1410E0();
 extern int ehsys_F6414A71();
+extern int ehsys_F6905EFA();
 extern int ehsys_FDAFCF3A();
+extern int ehsys_frame_sync();
 extern int ehsys_get_language();
 extern int ehsys_memset();
 extern int ehsys_sceKernelChangeCurrentThreadAttr();
@@ -106,6 +114,7 @@ void func_00000234(void);
 void func_0000023C(void);
 void func_00000280(void);
 s32 func_000013FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+s32 func_0000148C(s32 arg0, s32 arg1);
 void func_000015B8(void);
 
 /* func_00000000 — 2 words. MATCH 100% (shape: m2c). */
@@ -239,6 +248,41 @@ void func_00000280(void) {
 /* func_000013FC — 5 words. MATCH 100% (shape: hand). */
 s32 func_000013FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_0000148C — 75 words. MATCH 100% (shape: hand). */
+s32 func_0000148C(s32 arg0, s32 arg1) {
+    s32 *p1;
+    s32 *p2;
+    s32 a0;
+
+    if (arg0 >= 0) {
+        ehsys_088F768A(*(int *) ((char *) &D_00006820 + arg1 * 4));
+        ehsys_6367AE39(0x3E8);
+        while (ehsys_06A1D1D8() != 0) {
+            ehsys_frame_sync();
+        }
+        p2 = (s32 *) ((char *) &D_00006820 + arg0 * 4);
+        ehsys_65DA0419(*p2);
+        while (ehsys_06A1D1D8() != 0) {
+            ehsys_frame_sync();
+        }
+        ehsys_D5D33185(*p2);
+        a0 = *p2;
+        while (ehsys_AA9913C7(a0) != 0) {
+            ehsys_frame_sync();
+            a0 = *p2;
+        }
+    }
+    p1 = (s32 *) ((char *) &D_00006820 + arg1 * 4);
+    ehsys_C859D5FE(*p1);
+    a0 = *p1;
+    while (!ehsys_AA9913C7(a0)) {
+        ehsys_frame_sync();
+        a0 = *p1;
+    }
+    ehsys_F6905EFA(0x7F, 0x64);
+    return ehsys_BE3756D0(*p1);
 }
 
 /* func_000015B8 — 12 words. MATCH 100% (shape: hand). */

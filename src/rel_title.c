@@ -18,7 +18,7 @@
  * file-scope declaration would change the load/store width and break the
  * match. See scripts/assemble_module.py.
  *
- * STATUS: 20 functions matched. build/auto/rel_title.json has the
+ * STATUS: 29 functions matched. build/auto/rel_title.json has the
  * status of every attempt, including what the rest of the module still needs.
  *
  * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,
@@ -52,6 +52,17 @@ void func_0000D420(int a, int b, int c, int d) {
     extern int func_0000D420();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
+
+/* func_0000D860 — 6 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x60 stack frame). */
+#pragma optimization_level 2
+int func_0000D860(int a) {
+    extern int func_0000D860();
+    volatile int sp[24];
+    sp[0] = a;
+    return sp[0];
+}
+#pragma optimization_level 4
 
 /* func_0000F028 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0000F028(int a, int b, int c, int d) {
@@ -194,6 +205,28 @@ void func_0002B944(int a, int b, int c, int d) {
     extern int func_0002B944();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
+/* func_0002C7C4 — 6 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x40 stack frame). */
+#pragma optimization_level 2
+int func_0002C7C4(int a) {
+    extern int func_0002C7C4();
+    volatile int sp[16];
+    sp[0] = a;
+    return sp[0];
+}
+#pragma optimization_level 4
+
+/* func_0002C870 — 6 words. MATCH 100% (shape: m2c -O2; spill/reload of a1
+ * through a wasted 0x20 stack frame; a0 unused). */
+#pragma optimization_level 2
+int func_0002C870(int a, int b) {
+    extern int func_0002C870();
+    volatile int sp[8];
+    sp[4] = b;
+    return sp[4];
+}
+#pragma optimization_level 4
+
 /* func_0003AD7C — 9 words. MATCH 100% (shape: m2c -O2). */
 #pragma optimization_level 2
 void func_0003AD7C(void) {
