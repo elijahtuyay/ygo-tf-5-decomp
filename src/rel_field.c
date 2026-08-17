@@ -541,6 +541,20 @@ int *func_00002C5C(void) {
     return &D_000536F8;
 }
 
+/* func_00002D50 — 40 words. MATCH 100% (verified). */
+extern int ehsys_23E69878();
+extern int ehsys_8EA6B1E7();
+extern int ehsys_FDD168CA();
+
+int func_00002D50(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    s32 temp_v0;
+
+    temp_v0 = ehsys_4175E3DB(arg0, 9);
+    temp_v0 = ehsys_23E69878(temp_v0, arg5);
+    temp_v0 = ehsys_8EA6B1E7(temp_v0, 1, 1, arg3, arg4);
+    return ehsys_FDD168CA(temp_v0, arg1, arg2, 0, 0, 0, 0, 0);
+}
+
 /* func_00003384 — 20 words. MATCH 100% (verified). */
 void func_00003384(s32 *arg0) {
     while (!*arg0) {
@@ -1516,6 +1530,16 @@ void func_0002D1A4(s32 arg0, s32 arg1) {
 void func_0002D1E4(void ***arg0, void ***arg1) {
     *arg0 = (void **)&D_B7AB44;
     *arg1 = (void **)&D_B7AD44;
+}
+
+/* func_0002D480 — 40 words. MATCH 100% (verified). */
+int func_0002D480(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    s32 temp_v0;
+
+    temp_v0 = ehsys_4175E3DB(arg0, 9);
+    temp_v0 = ehsys_23E69878(temp_v0, arg5);
+    temp_v0 = ehsys_8EA6B1E7(temp_v0, 1, 1, arg3, arg4);
+    return ehsys_FDD168CA(temp_v0, arg1, arg2, 0, 0, 0, 0, 0);
 }
 
 /* func_0002D950 — bulk-matched thunk into ehsys_97BB99A5. */

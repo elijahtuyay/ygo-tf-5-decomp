@@ -70,6 +70,14 @@ def verify(module, names):
     return bad
 
 
+def needs_decls(src):
+    """Agent-written functions already declare their externs inside the body.
+    Injecting a second set with different types changes the load widths and
+    breaks a function that verified fine on its own."""
+    body = src[src.index("{"):] if "{" in src else src
+    return "extern " not in body
+
+
 def insert(text, entry, decls):
     """Place a function in address order among the existing definitions."""
     addr = int(entry["func"][5:], 16)
@@ -155,7 +163,8 @@ def main():
     for e in todo:
         before = open(path).read()
         names = defined_in(before) | {e["func"]}
-        open(path, "w").write(insert(before, e, block_decls(e["src"], symtab)))
+        decls = block_decls(e["src"], symtab) if needs_decls(e["src"]) else []
+        open(path, "w").write(insert(before, e, decls))
         bad = verify(module, names)
         if bad is None or bad:
             open(path, "w").write(before)      # roll back, try the next one

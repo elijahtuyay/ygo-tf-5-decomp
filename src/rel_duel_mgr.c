@@ -295,6 +295,25 @@ void func_00011A30(void) {
 
 /* func_000126D0 — 5 words. MATCH 100% (verified). */
 extern s32 D_0001E7A8;
+/* func_00012660 — 28 words. MATCH 100% (shape: bool-fold). */
+s32 func_00012660(void) {
+    extern int ehsys_0D3E34B5();
+    extern int ehsys_1460C6FD();
+    extern int ehsys_2630B590();
+    extern int ehsys_6DD74ECC();
+    extern int func_00012660();
+    s32 temp_v0;
+
+    if (!ehsys_1460C6FD()) {
+        return 0;
+    }
+    temp_v0 = ehsys_0D3E34B5();
+    if ((temp_v0 != 0xA) && (temp_v0 != -1)) {
+        return 0;
+    }
+    ehsys_6DD74ECC();
+    return (!ehsys_2630B590()) & 0xFF;
+}
 int func_000126D0(void) {
     return ehsys_memset(&D_0001E7A8, 0, 0x104);
 }

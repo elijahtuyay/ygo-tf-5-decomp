@@ -341,6 +341,22 @@ void func_000028BC(void) {
     ehsys_memset(&D_80AB9C, 0, 0xE90);
     ehsys_FC53D253();
 }
+/* func_00002D44 — 21 words. MATCH 100% (shape: m2c). */
+void func_00002D44(void) {
+    extern char D_80AFA0;
+    extern int ehsys_8852C022();
+    extern int ehsys_EF9EFF0F();
+    extern int ehsys_F5E3080C();
+    extern int func_00002D44();
+    s32 temp_s0;
+
+    temp_s0 = ehsys_F5E3080C();
+    *(s32 *)0x80AB9C = 4;
+    ehsys_EF9EFF0F(&D_80AFA0);
+    if ((*(int *)((char *)temp_s0 + 0x1C)) & 0x4000) {
+        ehsys_8852C022();
+    }
+}
 
 /* draws a screen-space rectangle/scissor region (see func_00000BE4).
  * MATCH 100% */

@@ -537,6 +537,19 @@ u16 arg1;
 {
     *(u16 *)((char *)arg0 + 2) = arg1;
 }
+/* func_0002308C — 16 words. MATCH 100% (shape: m2c). */
+void func_0002308C(void) {
+    extern char D_F76D64;
+    extern char D_F76D7C;
+    extern char D_F76DB0;
+    extern int ehsys_5DF04F49();
+    extern int ehsys_memset();
+    extern int func_0002308C();
+    extern int func_00023A54();
+    func_00023A54(&D_F76D7C);
+    ehsys_5DF04F49(&D_F76DB0);
+    ehsys_memset(&D_F76D64, 0, 0x124);
+}
 
 /* func_000230F0 — 4 words. MATCH 100% (shape: m2c). */
 void func_000230F0(void) {
@@ -618,6 +631,19 @@ void func_00023C7C(void) {
  * forwarded into $a0 so the target only has to set $a1 = &D_F76EA0). */
 void func_00023C88(int arg0) {
     func_000237FC(arg0, &D_F76EA0);
+}
+/* func_00023C94 — 16 words. MATCH 100% (shape: m2c). */
+void func_00023C94(void) {
+    extern char D_F76E88;
+    extern char D_F76EA0;
+    extern char D_F76ED4;
+    extern int ehsys_5DF04F49();
+    extern int ehsys_memset();
+    extern int func_00023A54();
+    extern int func_00023C94();
+    func_00023A54(&D_F76EA0);
+    ehsys_5DF04F49(&D_F76ED4);
+    ehsys_memset(&D_F76E88, 0, 0x11C);
 }
 
 /* func_00023CD4 — 4 words. MATCH 100% (shape: thunk; forwards arg0 into
