@@ -367,6 +367,21 @@ times over. Recognise these before starting from m2c:
     callee that takes stack arguments. For a heavily-reused dispatcher the CSV's
     `max_args` is a floor, not the answer.
 
+57. **A struct field defeats an address CSE that pointer arithmetic cannot —
+    but only across a call.** Where a target reads the same field twice, once as
+    a call argument and once afterwards, and keeps the base pointer untouched in
+    a saved register re-deriving the offset both times, every pointer phrasing
+    (`*(u16 *)((char *)a0 + 2)` repeated, `((u16 *)a0)[1]`, a local variable)
+    gets folded into computing `a0 + 2` once — one instruction short, every time.
+    Declaring the parameter as a pointer to a small struct and reading
+    `a0->field2` twice stops the fold and matches.
+
+    The boundary matters: the same trick does NOT work without an intervening
+    call. For three consecutive float reads from a global with no call between
+    them, struct field, array index and offset pointer all produce identical
+    code. So this is a lever about crossing a call boundary, not about struct
+    syntax being generally "stronger" than pointer syntax.
+
 ### Matching order matters: some functions unlock others
 
 Working UP the call graph — matching leaf callees first, then their callers —
