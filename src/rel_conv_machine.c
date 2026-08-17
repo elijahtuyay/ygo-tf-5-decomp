@@ -153,7 +153,9 @@ typedef struct {
     s32 unk0;
     s8 pad4[0xE8 - 4];
     s32 unkE8;
-    s8 padEC[0x154 - 0xE8 - 4];
+    s8 padEC[0x14C - 0xE8 - 4];
+    s32 unk14C;
+    s8 pad150[0x154 - 0x14C - 4];
     s32 unk154;
     s8 pad158[0x164 - 0x154 - 4];
     s32 unk164;

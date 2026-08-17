@@ -350,6 +350,27 @@ times over. Recognise these before starting from m2c:
     function went from a two-word near-miss to an exact match purely by
     dropping an argument that was never there. The companion to lever 45.
 
+### Matching order matters: some functions unlock others
+
+MWCC will only keep a value in a caller-saved register across a call when it can
+see the callee's body in the same translation unit and verify the callee does
+not clobber that register. Against a bare `extern` declaration it must assume
+the worst and spills.
+
+So a caller that needs that optimisation **cannot** match until its callee is
+already present in `src/<module>.c`. `func_0006E640` and `func_000319D4` in
+`rel_duel_draw` are both blocked this way, waiting on the
+`func_0006DE84`/`func_00031718` families. This is not a dead end — it is an
+ordering dependency, and the function becomes reachable the moment its callee
+lands.
+
+Two practical consequences:
+
+- A near-miss whose only diff is an extra spill around a call is a candidate to
+  RETRY later, not to abandon. Keep a list.
+- When a module stalls, matching leaf callees first can unlock their callers for
+  free. Prefer working up the call graph rather than down it.
+
 ### A harder category than levers
 
 Everything numbered above is a rule: a source shape that reproducibly produces a

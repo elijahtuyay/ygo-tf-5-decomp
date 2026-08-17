@@ -142,6 +142,14 @@ void func_00001F28(int arg0, int arg1, int arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 
+/* func_00002CA8 — 8 words. Reads field [1] out of whatever record
+ * ehsys_B2B9FEFA() returns. MATCH 100% (mwccpsp_3.0.1_219, -O4,s
+ * -sdatathreshold 0). */
+int func_00002CA8(void) {
+    extern int ehsys_B2B9FEFA(void);
+    return ((int *) ehsys_B2B9FEFA())[1];
+}
+
 /* func_00005950 — forwards its own two args plus two literal 0s to
  * ehsys_97BB99A5 (4-arg draw/layout primitive).
  * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -285,6 +293,18 @@ void func_00006D50(void) {
     if (*p == 1) {
         *p = 2;
     }
+}
+/* func_00006E48 — 6 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00006E48(int arg0) {
+    extern int D_00027918;
+    int *p = (int *)((char *) D_00027918 + 0x174);
+    return p[arg0];
+}
+/* func_00007D2C — 0 words. MATCH 100% (shape: twin of func_00001B38). */
+int func_00007D2C(int arg0, int arg1, int arg2, int arg3) {
+
+    extern int ehsys_BC8E65D7(int, int, int, int, int);
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
 /* func_00008598 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
