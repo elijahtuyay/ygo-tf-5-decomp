@@ -17,12 +17,14 @@
  * deck/deckswap.ehp, ocg/tcg pack list/name tables, and the usual UI .gim/.ehf
  * assets (see docs/modules/rel_deckswap.md for the full survey).
  *
- * STATUS -- this is a MECHANICAL first pass, not a hand-audited module: 36 of
+ * STATUS -- this is a MECHANICAL first pass, not a hand-audited module: 41 of
  * 245 functions are byte-identical to the target (mwccpsp_3.0.1_219, -O4,s
- * -sdatathreshold 0), verified with mwcc_diff.py. Every match below is a
- * standalone leaf "thunk" (tail-call wrapper around an ehsys_ import or
- * another internal func_XXXXXXXX with some argument massaging) or a tiny
- * routine -- the large stateful functions are still unmatched. Every function
+ * -sdatathreshold 0), verified with mwcc_diff.py. Most matches below are
+ * standalone leaf "thunk"s (tail-call wrappers around an ehsys_ import or
+ * another internal func_XXXXXXXX with some argument massaging) or tiny
+ * routines, but a handful (func_00000008, func_0000EE6C, func_000077C0,
+ * func_0000D24C) are small stateful/branching functions with real control
+ * flow -- the large stateful functions are still unmatched. Every function
  * present in this file is tagged "MATCH 100%"; nothing here is a draft.
  *
  * NEW MWCC LEVERS FOUND WORKING THIS MODULE (all reusable elsewhere):
@@ -62,6 +64,37 @@
  *     in rel_shop, not this module, but recorded here since it was found
  *     during this module's sweep) could not be forced to re-materialise the
  *     `lui` a second time from any portable-C phrasing tried; left NONMATCHING.
+ *  6. `if (cond) {A} else {B}` branch POLARITY (which block is the fallthrough
+ *     vs. the branch target) is chosen by MWCC based on something other than
+ *     source order -- writing the comparison the "natural" way sometimes
+ *     produces a target/fallthrough swap (observed as a `beqzl`/`bnezl`
+ *     polarity flip, or an outright swap of which branch's constant gets
+ *     assigned to which case, e.g. func_0000EE6C, func_000077C0). If a
+ *     candidate is byte-for-byte identical except the true/false bodies (or
+ *     the branch sense) look swapped, try inverting the comparison operator
+ *     (`==`/`!=`, `<`/`>=`) and swapping the if/else bodies to match --
+ *     the diff output is very readable for this (compare the target's
+ *     `bnez`/`beqz`/`bnel`/`beql` mnemonic against the candidate's).
+ *  7. NOT REPRODUCIBLE FROM PORTABLE C in this module: several places where a
+ *     target reuses a materialized register (e.g. `addiu $v1,$zero,0x1` once,
+ *     then `or $v1,$v0,$v1` / `addiu $v0,$v1,0x3` twice more) instead of
+ *     letting MWCC constant-fold the literal into each use (`ori`/`li`
+ *     directly) save exactly 1-2 words per occurrence. Every portable-C
+ *     phrasing tried (separate locals, assignment order, `volatile`, explicit
+ *     goto-merge control flow) either reproduced the fold anyway or changed
+ *     register allocation elsewhere without forcing the CSE'd-register shape.
+ *     Left NONMATCHING at 1-2 words: func_000087A8, func_0000AADC (register
+ *     swap only, not a fold issue -- see below), func_0000C314,
+ *     func_00015778, func_0000C72C. Likely needs inline asm or a different
+ *     mwcc optimization flag combination the auto-build harness doesn't use.
+ *  8. Also NOT REPRODUCIBLE: cases where MWCC's register allocator assigns a
+ *     value to a *different but equivalent* temp register ($a0 vs $a1, $v0 vs
+ *     $v1, or $v1 vs $s3) purely due to internal scheduling around a `jal`
+ *     delay slot or a loop-rotation transform -- byte-identical instructions,
+ *     wrong register, in every combination of C statement order tried
+ *     (func_0000AADC, func_00017CC0, func_00007F24). These read as "so close"
+ *     but appear to need either inline asm or exact original source
+ *     structure/naming this reconstruction can't guess.
  *
  * CAUTION recorded from this module: scripts/mwcc_diff.py's relocation
  * leniency (matching R_MIPS_HI16/LO16/26 by symbol+kind only) does NOT check
