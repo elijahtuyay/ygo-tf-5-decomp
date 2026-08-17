@@ -146,7 +146,7 @@ extern int  sceUtilityHtmlViewerInitStart(void *);
 extern int  sceUtilityUnloadModule(int);
 extern int  sceUtilityHtmlViewerShutdownStart(void);
 extern void ehsys_B4471B5E(void (*)(void), void (*)(void), void *);
-extern int  ehsys_8171F765(int);
+extern int  ehsys_get_button_code(int);
 extern void ehsys_08813E19(int, int);
 extern void ehsys_57018B7C(void *);
 extern void ehsys_memset(void *, int, int);
@@ -154,8 +154,8 @@ extern void ehsys_strcpy(void *, void *);
 extern void ehsys_strcat(void *, void *);
 extern void ehsys_sceKernelChangeCurrentThreadAttr(int, int);
 extern void ehsys_sceGuSync(int, int);
-extern void ehsys_F1BC43DB(void);
-extern int  ehsys_31454993(void);
+extern void ehsys_frame_sync(void);
+extern int  ehsys_get_language(void);
 
 /* ---- module data ---- */
 extern char s_download_url;   /* "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php" */
@@ -244,7 +244,7 @@ loop:
     if (func_00000670() != 0) {
         goto done;
     }
-    ehsys_F1BC43DB();
+    ehsys_frame_sync();
     goto loop;
 done:
     ehsys_08813E19(0xD, 0);
@@ -396,10 +396,10 @@ void func_00000358(void) {
     func_00000134();
 }
 
-/* func_0000039C — maps the system language (ehsys_31454993) onto the browser's
+/* func_0000039C — maps the system language (ehsys_get_language) onto the browser's
  * own language id. Compiled with a jump table (jtbl_00005E34, in .data). */
 int func_0000039C(void) {
-    switch (ehsys_31454993()) {
+    switch (ehsys_get_language()) {
     case 0:
         return 0;
     case 1:
@@ -469,7 +469,7 @@ int func_00000470(void *arg0) {
 
     cfg->base.size = sizeof(*cfg);
     cfg->base.language = func_0000039C();
-    if ((ehsys_8171F765(0) & 0xFFFF) == 0x2000) {
+    if ((ehsys_get_button_code(0) & 0xFFFF) == 0x2000) {
         cfg->base.buttonSwap = 0;
     } else {
         cfg->base.buttonSwap = 1;
