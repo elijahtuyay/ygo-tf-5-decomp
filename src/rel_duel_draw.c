@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 453 functions matched here (of 1546 total). The rest of the
+ * STATUS: 457 functions matched here (of 1546 total). The rest of the
  * module is not yet decompiled; build/auto/<module>.json has the status
  * of every attempt.
  *
