@@ -9176,3 +9176,18 @@ int func_00218938(struct s_00218938 *a0) {
     return (unsigned int)(val + r) < 6;
 }
 
+
+
+
+/* func_0016E2CC — 35 words. MATCH 100% (shape: hand). */
+struct s_0016E2CC { unsigned short f0; };
+int func_0016E2CC(struct s_0016E2CC *a0, int a1, int a2) {
+    extern int func_00161DF0();
+    extern int func_00162B50();
+    extern int func_00162DD0();
+    extern int func_0016E2CC();
+    int local1 = 0x200F;
+    int local2 = 0x46;
+    func_00161DF0(a1, a0->f0, a2, (int)&func_00162B50, (int)&local1, 0xE, 0x11);
+    return func_00161DF0(a1, a0->f0, a2, (int)&func_00162DD0, (int)&local2, 2, 0x11);
+}
