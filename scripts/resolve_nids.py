@@ -30,7 +30,9 @@ NAMING
 ------
   sce* imports      real SDK name            sceHttpInit
   libehsys_rel      ehsys_<NID>              ehsys_B4471B5E
-  lib<mod>_rel      <mod>_<NID>              cardalbum_1A2B3C4D
+                    ehsys_<name> when the NID hashes to a known name — the
+                    engine re-exports much of the C library and several kernel
+                    functions under their real names:   ehsys_memset
 
 The NID is the identity: stable across modules, independent of load address,
 and renameable in one place (nids/ehsys.csv `name` column) once a function is
@@ -56,6 +58,24 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GMODULE = os.path.join(ROOT, "iso_extracted/PSP_GAME/USRDIR/gmodule")
 EBOOT = os.path.join(ROOT, "build/EBOOT.elf")
 FILE_BASE = 0x54  # vaddr -> file offset for these single-PT_LOAD images
+
+
+# Candidate names for the C library and kernel functions the ENGINE re-exports
+# under their real names. Anything here is still hash-verified before use, so a
+# wrong guess in this list can only fail to match — it can never mis-name
+# anything. Extending this list is the cheapest way to name more of the 1729.
+EXTRA_CANDIDATES = """
+strcpy strncpy strcat strncat strcmp strncmp strchr strrchr strstr strlen strtok strdup strspn strcspn strpbrk
+memset memcpy memmove memcmp memchr malloc calloc realloc free sprintf snprintf vsprintf vsnprintf sscanf printf puts
+atoi atol atof strtol strtoul strtod abs labs rand srand qsort bsearch toupper tolower isalpha isdigit isspace
+sqrt sqrtf sin cos tan sinf cosf tanf atan2 atan2f fabs fabsf floor ceil pow powf exp log fmod fmodf
+sceKernelChangeCurrentThreadAttr sceKernelCreateThread sceKernelStartThread sceKernelTerminateDeleteThread
+sceKernelDelayThread sceKernelExitThread sceKernelSleepThread sceKernelGetThreadCurrentPriority sceKernelGetThreadId
+sceKernelCreateSema sceKernelWaitSema sceKernelSignalSema sceKernelDeleteSema sceKernelGetSystemTimeWide
+sceIoOpen sceIoClose sceIoRead sceIoWrite sceIoLseek sceIoDopen sceIoDread sceIoDclose sceIoGetstat sceIoRemove sceIoMkdir
+sceUtilityOskInitStart sceUtilityOskUpdate sceUtilityOskGetStatus sceUtilityOskShutdownStart
+sceGuStart sceGuFinish sceGuSync sceGuSwapBuffers sceDisplayWaitVblankStart
+""".split()
 
 
 def nid_of(name):
@@ -119,20 +139,33 @@ def sdk_names():
     table = {}
     for n in names:
         table.setdefault(nid_of(n), n)
+    for n in EXTRA_CANDIDATES:
+        table.setdefault(nid_of(n), n)
     return table
 
 
-def called_stubs(module, stub_vrams):
-    """Which stub addresses .text actually calls."""
+def called_stubs(module, vram_name):
+    """Which stub addresses .text actually calls.
+
+    Must handle BOTH spellings: a module split before this script ran calls
+    `jal func_00001D30`, while one split afterwards calls `jal ehsys_memset`
+    (the config now feeds splat config/symbols/<module>.txt). Counting only the
+    first spelling silently undercounts every module that has been re-split."""
     p = os.path.join(ROOT, "asm", module, "text.s")
     hits = Counter()
     if not os.path.exists(p):
         return hits
+    by_name = {n: v for v, n in vram_name.items()}
     for line in open(p, errors="replace"):
-        m = re.search(r"\b(?:jal|j)\s+func_([0-9A-F]+)", line)
-        if m:
-            v = int(m.group(1), 16)
-            if v in stub_vrams:
+        m = re.search(r"\b(?:jal|j)\s+(\w+)", line)
+        if not m:
+            continue
+        op = m.group(1)
+        if op in by_name:
+            hits[by_name[op]] += 1
+        elif re.match(r"^func_[0-9A-F]+$", op):
+            v = int(op[5:], 16)
+            if v in vram_name:
                 hits[v] += 1
     return hits
 
@@ -168,7 +201,13 @@ def main():
         if not lib.endswith("_rel"):
             return sdk.get(nid, f"{lib}_{nid:08X}")
         if lib == "libehsys_rel":
-            return f"ehsys_{nid:08X}"
+            # The engine re-exports much of the C library and several kernel
+            # functions under their REAL names, so a NID here often hashes to a
+            # known name. Keep the ehsys_ prefix anyway: these are the engine's
+            # exports, not the SDK's, and a bare `memset` would let MWCC expand
+            # its own builtin instead of emitting the call we need to match.
+            hit = sdk.get(nid)
+            return f"ehsys_{hit}" if hit else f"ehsys_{nid:08X}"
         short = lib[3:-4] if lib.startswith("lib") else lib
         return f"{short}_{nid:08X}"
 
@@ -205,7 +244,7 @@ def main():
                         sdk_rows[(lib, n)] = sdk[n]
                     else:
                         unresolved_sdk.append((lib, n))
-        for v, c in called_stubs(m, set(vram_name)).items():
+        for v, c in called_stubs(m, vram_name).items():
             lib, n = vram_meta[v]
             if lib == "libehsys_rel":
                 eh_callers[n] += c
@@ -232,7 +271,8 @@ def main():
         w = csv.writer(fh)
         w.writerow(["index", "nid", "eboot_vaddr", "call_sites", "name"])
         for n, a in ehsys:
-            w.writerow([ehsys_index[n], f"0x{n:08X}", f"0x{a:08X}", eh_callers.get(n, 0), ""])
+            w.writerow([ehsys_index[n], f"0x{n:08X}", f"0x{a:08X}", eh_callers.get(n, 0),
+                        sdk.get(n, "")])
 
     with open(os.path.join(ROOT, "nids/modules.csv"), "w", newline="") as fh:
         w = csv.writer(fh)

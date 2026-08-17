@@ -52,6 +52,29 @@ can only fail to produce one. All 47 verify; `nids/sdk.csv` carries the
 | engine | `ehsys_<NID>` | `ehsys_B4471B5E` |
 | module export | `<module>_<NID>` | `cardalbum_1A2B3C4D` |
 
+**The engine re-exports the C library.** 107 of the 1729 engine exports hash to
+a name we already know, because `libehsys_rel` re-exports much of the C library
+and several kernel functions under their real names. Those become
+`ehsys_memset`, `ehsys_strcpy`, `ehsys_sceGuSync` and so on — 43 of them are
+actually called, and they are the most-called imports in the whole project:
+
+| engine export | call sites, project-wide |
+|---|---:|
+| `ehsys_memset` | 1064 |
+| `ehsys_memcpy` | 257 |
+| `ehsys_sprintf` | 97 |
+| `ehsys_qsort` | 73 |
+| `ehsys_strcpy` | 58 |
+| `ehsys_strcat` | 48 |
+| `ehsys_strncmp` | 36 |
+| `ehsys_strcmp` | 32 |
+
+The `ehsys_` prefix is kept deliberately: these are the *engine's* exports, not
+the SDK's, and a bare `memset` would let MWCC expand its own builtin instead of
+emitting the call we need to match. Extending `EXTRA_CANDIDATES` in the script
+is the cheapest way to name more of the 1729 — every addition is hash-verified,
+so a wrong guess there can only fail to match, never mis-name.
+
 The NID is the identity: stable across all 28 modules, independent of any load
 address, and the same string in the disassembly and in the C. 26 of the engine's
 1729 exports are listed twice (both entries point at the same address — genuine
