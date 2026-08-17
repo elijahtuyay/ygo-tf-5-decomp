@@ -1,0 +1,16 @@
+// Hand-written symbol names for rel_html_view — merged into the generated
+// rel_html_view.txt by scripts/resolve_nids.py, which never overwrites this file.
+//
+// Convention: s_ = read-only string constant in .data, g_ = mutable global.
+// Everything here is evidence-backed; see src/rel_html_view.c for the reasoning.
+
+s_download_url  = 0x00005E4C; // type:data size:0x34  "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php"
+s_savedata_dir  = 0x00005E80; // type:data size:0x20  "/PSP/SAVEDATA/"
+
+g_module_reg    = 0x00005EA0; // type:data size:0xC   3rd argument of the module-registration call
+g_state         = 0x00005EAC; // type:data size:0x4   state machine word, 1..4 (func_00000670)
+g_html_param    = 0x00005EB0; // type:data size:0xA8  SceUtilityHtmlViewerParam
+g_url_buf       = 0x00005F68; // type:data size:0x200 initialurl/homeurl text, built by func_00000414
+g_dl_dir_buf    = 0x00006168; // type:data size:0x84  dldirname text, built by func_00000420
+g_heap_ptr      = 0x000061EC; // type:data size:0x4   points at g_heap; set by func_00000650
+g_heap          = 0x000061F0; // type:data            the 6 MB block passed as param.memaddr
