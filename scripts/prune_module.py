@@ -58,12 +58,21 @@ def cut(text, names):
         if is_def and m.group(1) in names:
             while out and not out[-1].strip():
                 out.pop()
+            # Remove the comment block above the function — but only if we
+            # actually find where it opens. Popping until a line starts with
+            # `/*` will eat the ENTIRE file when the preceding `*/` belongs to
+            # something this scan cannot see; that emptied a module source file
+            # holding 22 verified functions before the bound below existed.
             if out and out[-1].rstrip().endswith("*/"):
-                block = []
-                while out and not out[-1].lstrip().startswith("/*"):
-                    block.append(out.pop())
-                if out:
-                    out.pop()
+                block, found = [], False
+                while out and len(block) < 80:
+                    line = out.pop()
+                    block.append(line)
+                    if line.lstrip().startswith("/*"):
+                        found = True
+                        break
+                if not found:
+                    out.extend(reversed(block))   # put it back untouched
             depth, started = 0, False
             while i < len(lines):
                 depth += lines[i].count("{") - lines[i].count("}")
