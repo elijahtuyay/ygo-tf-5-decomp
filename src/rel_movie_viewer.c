@@ -109,15 +109,6 @@
 extern volatile int D_0009DB00;
 extern void ehsys_1078C73B(int);
 
-/* func_00000184 — "release-and-clear" cleanup of a global handle.
- * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
-void func_00000184(void) {
-    volatile int *p = &D_0009DB00;
-    if (*p != 0) {
-        ehsys_1078C73B(*p);
-        *p = 0;
-    }
-}
 
 /* ============================================================
  * Remaining functions of the module. Each is individually tagged
@@ -190,6 +181,7 @@ extern volatile unsigned char D_000A3FF9; /* +0x64F9: substate byte */
 /* forward declarations: call graph is not in address order */
 void func_00000034(void);
 void func_00000138(void);
+void func_00000184(void);
 void func_000001C0(void);
 void func_000001C8(int mode);
 void func_000006B4(void);
@@ -273,6 +265,16 @@ void func_00000138(void) {
     ehsys_memset((void *) &D_0009DB00, 0, 0x653C);
     D_0009DB00 = ehsys_1856E536((void *) &D_00005AD0, 0x80000);
     D_0009DB04 = 1;
+}
+
+/* func_00000184 — "release-and-clear" cleanup of a global handle.
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00000184(void) {
+    volatile int *p = &D_0009DB00;
+    if (*p != 0) {
+        ehsys_1078C73B(*p);
+        *p = 0;
+    }
 }
 
 /* func_000001C0 — empty callback (teardown hook registered by
