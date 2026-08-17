@@ -50,11 +50,22 @@ ASM_OBJS   := $(patsubst asm/$(MODULE)/%.s,build/asm/$(MODULE)/%.s.o,$(ASM_SRCS)
 ASSET_SRCS := $(wildcard assets/$(MODULE)/*.bin)
 ASSET_OBJS := $(patsubst assets/$(MODULE)/%.bin,build/assets/$(MODULE)/%.bin.o,$(ASSET_SRCS))
 
+.DEFAULT_GOAL := all
+
+# Symbols our object references that nothing defines: D_XXXXXXXX / jtbl_XXXXXXXX
+# globals the ORIGINAL bakes as absolute constants with no relocation, so splat
+# never emitted a name for them (see KNOWN_ADDR in scripts/mwcc_diff.py). Their
+# address is encoded in the name, which is what makes this safe to automate.
+build/$(MODULE).srcsyms.ld: build/mwcc/$(MODULE).o
+	@$(CROSS)nm -u $< | grep -oE '\b(jtbl|D)_[0-9A-F]{4,8}\b' | sort -u | awk -F_ \
+		'{ printf "PROVIDE(%s = 0x%s);\n", $$0, $$2 }' > $@
+
 ifeq ($(SRC),1)
   # our compiled C replaces the disassembled .text. The linker script names that
   # object by path, so it needs a variant with the substitution applied.
   CODE_OBJS := build/mwcc/$(MODULE).o $(filter-out build/asm/$(MODULE)/text.s.o,$(ASM_OBJS))
   LINK_LD   := build/$(MODULE).src.ld
+  EXTRA_LD  := build/$(MODULE).srcsyms.ld
 else
   CODE_OBJS := $(ASM_OBJS)
   LINK_LD   := $(LD)
@@ -94,8 +105,10 @@ build/$(MODULE).symbols.ld: config/symbols/$(MODULE).txt $(ASM_SRCS)
 	@mkdir -p $(dir $@)
 	@sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\) *= *\(0x[0-9A-Fa-f]*\);.*/PROVIDE(\1 = \2);/p' \
 		config/symbols/$(MODULE).txt > $@
-	@grep -ohE '\b(jtbl|D)_[0-9A-F]{4,8}\b' $(ASM_SRCS) | sort -u | \
-		sed -E 's/^(.*)_([0-9A-F]{4,8})$$/PROVIDE(\1_\2 = 0x\2);/' >> $@
+	@grep -ohE '\b(jtbl|D)_[0-9A-F]{4,8}\b' $(ASM_SRCS) | sort -u | awk -F_ \
+		'{ printf "PROVIDE(%s = 0x%s);\n", $$0, $$2; \
+		   p = sprintf("%s_%08X", $$1, strtonum("0x" $$2)); \
+		   if (p != $$0) printf "PROVIDE(%s = 0x%s);\n", p, $$2 }' >> $@
 
 build/mwcc/$(MODULE).o: src/$(MODULE).c
 	scripts/mwcc_build.sh $<
@@ -116,8 +129,9 @@ build/$(MODULE).src.ld: $(LD) $(ASM_SRCS)
 	else mv $@.tmp $@; fi
 	@rm -f $@.tmp
 
-$(OUT): $(CODE_OBJS) $(ASSET_OBJS) $(LINK_LD) build/$(MODULE).symbols.ld
-	$(LDD) -EL -T build/$(MODULE).symbols.ld -T $(LINK_LD) -o $@ --no-check-sections
+$(OUT): $(CODE_OBJS) $(ASSET_OBJS) $(LINK_LD) build/$(MODULE).symbols.ld $(EXTRA_LD)
+	$(LDD) -EL $(if $(EXTRA_LD),-T $(EXTRA_LD),) -T build/$(MODULE).symbols.ld \
+		-T $(LINK_LD) -o $@ --no-check-sections
 
 $(BIN): $(OUT)
 	$(OBJCOPY) -O binary $< $@
@@ -147,4 +161,4 @@ verify: $(BIN)
 
 clean:
 	rm -rf build/asm/$(MODULE) build/assets/$(MODULE) $(OUT) $(BIN) \
-		build/$(MODULE).symbols.ld build/$(MODULE).src.ld
+		build/$(MODULE).symbols.ld build/$(MODULE).src.ld build/$(MODULE).srcsyms.ld
