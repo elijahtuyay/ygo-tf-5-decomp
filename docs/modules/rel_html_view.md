@@ -70,6 +70,35 @@ Globals referenced by the code: 9 distinct symbols, 7 of them past the end of `.
 0x005E80  /PSP/SAVEDATA/
 ```
 
+## What we know now (hand analysis, 2026-08-17)
+
+**Status: 15 of 16 functions match.** See `src/rel_html_view.c` on branch
+`pr2/rel-html-view` for the full reasoning; this section is the summary.
+
+- **The module exports nothing.** `libhtml_view_rel` has 0 functions and 0
+  variables; the syslib entry exports only `module_info` and
+  `module_sdk_version`. No other module imports it. The ELF entry point is
+  `0x0` = `func_00000000`, which the engine's loader calls; that function hands
+  the engine a run callback and a teardown callback (via `ehsys_B4471B5E`, the
+  same registration call every module uses) and everything else is driven from
+  there. `rel_movie_viewer` has the identical shape, so this is the convention
+  for a leaf module.
+- **What it actually does:** brings up the PSP network stack
+  (`sceUtilityLoadModule` of the net/http/ssl modules, `sceNetInit`,
+  `sceSslInit`, `sceHttpInit`, `sceHttpsInit`, cookies), fills in a
+  `SceUtilityHtmlViewerParam` and calls `sceUtilityHtmlViewerInitStart` — i.e.
+  it configures the PSP's *system* browser rather than implementing one. The
+  0xA8-byte blob at `g_html_param` is that SDK struct exactly.
+- **Data symbols are named** in `config/symbols/rel_html_view.extra.txt`:
+  `s_download_url`, `s_savedata_dir`, `g_module_reg`, `g_state`,
+  `g_html_param`, `g_url_buf`, `g_dl_dir_buf`, `g_heap_ptr`, `g_heap` (the 6 MB
+  block passed as `param.memaddr`).
+- **Still open:** `func_00000470` differs by a 4-word instruction *scheduling*
+  permutation and nothing else; the six `ehsys_<NID>` imports it uses are
+  unnamed, three of which are heavily used project-wide (`0x31454993` 334 call
+  sites, `0x8171F765` 288, `0xF1BC43DB` 172); and the module has never been
+  linked or checksum-verified, because the project has no build system yet.
+
 ## Next steps
 
 1. `splat split config/rel_html_view.yaml` (already run; `asm/rel_html_view/` is gitignored)
