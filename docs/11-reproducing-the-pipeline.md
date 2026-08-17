@@ -343,6 +343,13 @@ times over. Recognise these before starting from m2c:
     operands swapped relative to the target, under every declaration order,
     temporary and statement split tried.
 
+55. **Not everything in a delay slot is an argument.** An instruction in a
+    `jal`'s delay slot that stores through `$v0` (or any non-argument register)
+    is a field store that merely shares the slot, not a second argument. Read
+    WHICH register it touches before adding a parameter — one `rel_deck`
+    function went from a two-word near-miss to an exact match purely by
+    dropping an argument that was never there. The companion to lever 45.
+
 ### A harder category than levers
 
 Everything numbered above is a rule: a source shape that reproducibly produces a
