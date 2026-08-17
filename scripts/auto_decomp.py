@@ -44,6 +44,8 @@ typedef long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
+#define NULL 0
+#define M2C_UNK int
 """
 
 
@@ -98,12 +100,24 @@ def referenced(asm_lines, symtab, self_name=None, data_type="char"):
     return [d for d in decls if f" {self_name}(" not in d and f" {self_name};" not in d]
 
 
+ASM_HEADER = '.include "macro.inc"\n\n.set noat\n.set noreorder\n\n.section .text, "ax"\n\n'
+
+
+def slice_path(module, fn, lines, workdir):
+    """m2c re-parses whatever .s you hand it, so give it ONE function. On
+    rel_duel_eng (3 MB of text.s, 7487 functions) parsing the whole file per
+    function would dominate the runtime."""
+    p = os.path.join(workdir, f"{fn}.s")
+    open(p, "w").write(ASM_HEADER + "".join(lines))
+    return p
+
+
 # ------------------------------------------------------------------ m2c draft
-def m2c_draft(module, fn, ctx_path=None):
+def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     r = subprocess.run(
         [sys.executable, os.path.join(ROOT, "tools/m2c/m2c.py"), "-f", fn]
         + (["--context", ctx_path] if ctx_path else [])
-        + [os.path.join(ROOT, "asm", module, "text.s")],
+        + [asm_path or os.path.join(ROOT, "asm", module, "text.s")],
         capture_output=True, text=True, cwd=ROOT)
     if r.returncode != 0:
         return None
@@ -122,9 +136,17 @@ def m2c_draft(module, fn, ctx_path=None):
     if not src or f"{fn}(" not in src:
         return None
     # m2c writes unknown types as '?'; make them compilable
-    src = re.sub(r"\?\s*\*", "void *", src)
+    src = re.sub(r"\?\s*\*", "int *", src)   # int* not void*: m2c dereferences these
     src = re.sub(r"(?<![\w*])\?(?!\w)", "int", src)
     src = src.replace("static ", "")
+    # --valid-syntax marks what m2c could not infer; make those compile. A
+    # function containing M2C_ERROR is usually unmatchable anyway (m2c read an
+    # unset register), but it costs nothing to let the compiler judge.
+    src = re.sub(r"M2C_ERROR\([^)]*\)", "0", src)
+    src = src.replace("M2C_UNK", "int")
+    # m2c renders a load from an address it knows nothing about as *(void *)addr,
+    # which is not a legal dereference; a word load is what the asm actually does
+    src = src.replace("*(void *)", "*(int *)").replace("*(void*)", "*(int *)")
     return src
 
 
@@ -173,8 +195,19 @@ def shape_single_switch(src):
 
 DATA_FLAVOURS = ["char", "void *", "int"]
 
+def shape_baked_address(src):
+    """Some globals are baked into the ORIGINAL as raw absolute immediates with
+    no relocation at all. Declaring them as extern symbols forces a HI16/LO16
+    relocation and can never match; a literal `*(int *)0xADDR` reproduces the
+    baked constant. (Found on rel_umd_replace func_00003898.)"""
+    out = re.sub(r"&(D_([0-9A-F]{4,8}))\b", lambda m: f"(int *)0x{m.group(2)}", src)
+    out = re.sub(r"\bD_([0-9A-F]{4,8})\b(?!\s*\()", lambda m: f"(*(int *)0x{m.group(1)})", out)
+    return out if out != src else None
+
+
 SHAPES = [
     ("m2c", shape_identity),
+    ("baked-address", shape_baked_address),
     ("goto-loop", shape_while_to_goto),
     ("dup-return", shape_dup_return),
     ("single-switch", shape_single_switch),
@@ -222,7 +255,7 @@ def main():
             decls = referenced(lines, symtab, fn, flavour)
             ctx = os.path.join(workdir, f"{fn}.ctx.c")
             open(ctx, "w").write(PRELUDE + "\n" + "\n".join(decls) + "\n")
-            draft = m2c_draft(mod, fn, ctx)
+            draft = m2c_draft(mod, fn, ctx, slice_path(mod, fn, lines, workdir))
             if not draft:
                 continue
             for name, shape in SHAPES:
