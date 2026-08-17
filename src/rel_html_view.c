@@ -33,9 +33,22 @@
  * Functions at vram >= 0x760 (sceNetInetInit and up) are .sceStub.text import
  * trampolines, i.e. calls out to the engine/SDK; they are NOT part of this
  * translation unit and are declared extern below. Their signatures are
- * best-effort guesses from call sites until the NID table is resolved.
+ * best-effort guesses from call sites; the NAMES are now resolved and proven —
+ * see docs/nids/README.md. Every import below is either a real SDK function
+ * (its NID re-hashes to that exact name) or an engine export named
+ * `ehsys_<NID>` / `ehsys_<name>`, and those names are identical in all 28
+ * modules, so anything learned here transfers.
  *
- * STATUS — 15 of 17 functions are byte-identical to the target
+ * Resolution confirmed the whole reading of this module and named the thing it
+ * is really doing: `sceUtilityHtmlViewerInitStart` takes a
+ * **`pspUtilityHtmlViewerParam`**, a documented SDK struct that is exactly the
+ * 0xA8 bytes func_00000470 fills in, and func_000005A0 is the standard utility
+ * dialog pump (`GetStatus()` -> 2 = `Update()`, 3 = `ShutdownStart()`).
+ * Re-typing func_00000470's 30 stores against the real field layout is the
+ * obvious next step.
+ *
+ * STATUS — the module has 16 functions (an earlier version of this header said
+ * 17, which was a miscount). 14 are byte-identical to the target
  * (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0), verified with mwcc_diff.py:
  *
  *   MATCH 100%  func_00000000 func_00000034 func_00000084 func_0000008C
@@ -53,8 +66,9 @@
  * THREE LEVERS THIS MODULE ADDED (all reusable, all cost real time to find):
  *  1. A dead argument register can double as a switch's comparison constant.
  *     func_000005A0's target tests `beq $v0, $a0` against 2 where every other
- *     case uses $v1 — because the case-2 body calls sceUtilityHtmlViewerUpdate(2) and MWCC
- *     hoisted the argument load above the compare and reused it. An import
+ *     case uses $v1 — because the case-2 body calls
+ *     sceUtilityHtmlViewerUpdate(2) and MWCC hoisted the argument load above
+ *     the compare and reused it. An import
  *     whose call site sets up NO argument register is not necessarily a
  *     no-argument function: check whether an earlier constant load already
  *     put the value there.
@@ -110,11 +124,11 @@ extern void ehsys_B4471B5E(void (*)(void), void (*)(void), void *);
 extern int  ehsys_8171F765(int);
 extern void ehsys_08813E19(int, int);
 extern void ehsys_57018B7C(void *);
-extern void ehsys_10F3BB61(void *, int, int);
-extern void ehsys_EC6F1CF2(void *, void *);
-extern void ehsys_476FD94A(void *, void *);
-extern void ehsys_EA748E31(int, int);
-extern void ehsys_E8D57DC6(int, int);
+extern void ehsys_memset(void *, int, int);
+extern void ehsys_strcpy(void *, void *);
+extern void ehsys_strcat(void *, void *);
+extern void ehsys_sceKernelChangeCurrentThreadAttr(int, int);
+extern void ehsys_sceGuSync(int, int);
 extern void ehsys_F1BC43DB(void);
 extern int  ehsys_31454993(void);
 
@@ -157,7 +171,7 @@ int func_00000000(void) {
 /* func_00000034 — the module's main routine: init, then pump func_00000670
  * (the state machine) once per frame until it reports "done". */
 void func_00000034(void) {
-    ehsys_EA748E31(0, 0x4000);
+    ehsys_sceKernelChangeCurrentThreadAttr(0, 0x4000);
     func_00000650();
 loop:
     if (func_00000670() != 0) {
@@ -338,7 +352,7 @@ int func_0000039C(void) {
 
 /* func_00000414 — append the Konami TF5 download URL to dst. */
 void func_00000414(void *dst) {
-    ehsys_476FD94A(dst, &D_00005E4C);
+    ehsys_strcat(dst, &D_00005E4C);
 }
 
 /* func_00000420 — build the savedata path into dst: copy "/PSP/SAVEDATA/",
@@ -346,10 +360,10 @@ void func_00000414(void *dst) {
 void func_00000420(void *dst) {
     char buf[0x20];
 
-    ehsys_EC6F1CF2(dst, &D_00005E80);
-    ehsys_10F3BB61(buf, 0, 0x20);
+    ehsys_strcpy(dst, &D_00005E80);
+    ehsys_memset(buf, 0, 0x20);
     ehsys_57018B7C(buf);
-    ehsys_476FD94A(dst, buf);
+    ehsys_strcat(dst, buf);
 }
 
 /* func_00000470 — build the 0xA8-byte browser config at D_00005EB0 and hand
@@ -375,7 +389,7 @@ int func_00000470(void *arg0) {
      * store immediate off the single base register the target holds in $s0. */
     int *cfg = (int *) &D_00005EB0;
 
-    ehsys_10F3BB61(cfg, 0, 0xA8);
+    ehsys_memset(cfg, 0, 0xA8);
 
     cfg[0x00 / 4] = 0xA8; /* struct size */
     cfg[0x04 / 4] = func_0000039C();
@@ -422,7 +436,7 @@ int func_000005A0(void) {
     char *cfg = &D_00005EB0;
     int reason;
 
-    ehsys_E8D57DC6(0, 0);
+    ehsys_sceGuSync(0, 0);
     reason = sceUtilityHtmlViewerGetStatus();
     if (reason != 0) {
         /* MWCC emits the case TESTS in reverse source order (the target tests

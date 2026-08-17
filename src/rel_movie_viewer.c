@@ -344,61 +344,78 @@ void func_0000024C(void) {
  * `__builtin_allegrex_min`/`_max` (see the file header) — that is confirmed
  * correct and is what the original wrote, worth 2 words.
  *
- * ---- 2026-08-16 investigation. The remaining gap is ONE bug, now
- * precisely characterised. Read this before retrying: ----
+ * ---- 2026-08-17 investigation. SUPERSEDES the earlier "store-elimination
+ * bug" theory recorded here, which did not hold up. Read this before
+ * retrying so the dead ends are not walked again: ----
  *
  * The whole 13-word gap is address re-materialisation: the target keeps
  * &D_000A3F0C in $s0 and the record base ($s0 + 0x4C) in $s1 for the entire
- * function, while this version re-derives a lui/addiu pair per access.
- * Caching the base IS achievable — a `volatile` pointer does it, and so does
- * modelling the blob as a real struct (both were tried this session; the
- * struct form reaches 107 words with lui=5, exactly matching the target's
- * five lui). Combined with the correct bitfield modelling for +0xCC (see
- * below) the arithmetic works out to exactly 116.
+ * function, while this version re-derives a lui/addiu pair per access
+ * (lui=32 vs the target's 5).
  *
- * WHAT BLOCKS IT — an mwccpsp store-elimination bug. Once two pointers share
- * a base (i.e. one is derived from the other, however it is written:
- * `&cfg->rec`, a cast off `cfg`, or a nested `cfg->rec.field` access), the
- * compiler SILENTLY DROPS byte stores whose immediate value also appears in
- * a nearby halfword store. In this function that kills exactly four stores —
- * rec+0x50 and rec+0x5C (0xC, shared with the four `sh ... 0xC` above them),
- * cfg+0xD2 (0xA, shared with `sh 0xA` at 0xD0), and the cfg+0xCD
- * read-modify-write (0x10, shared with `sh 0x10` at 0xF6). Those four plus
- * their setup are 9 words: 107 + 9 = 116, which is the entire gap.
+ * ROOT CAUSE. It is not a bug and not flag-specific. At -O2 and above MWCC
+ * enables "copy and expression propagation" (see `mwccpsp.exe -help`, -opt
+ * level=2), which propagates &D_000A3F0C as a compile-time constant into all
+ * 31 use sites and re-materialises it at each one instead of keeping it live
+ * in a saved register. There is no sub-option to disable propagation alone —
+ * -opt exposes only `level=` and `[no]intrinsics` — so no flag fixes this
+ * without regressing the 15 functions that already match.
  *
- * Established about the bug, so it need not be re-derived:
- *  - it is NOT `volatile`-specific: it happens with plain non-volatile
- *    struct members just the same;
- *  - it is NOT build-specific: all 11 installed mwccpsp builds drop the
- *    same four stores;
- *  - it does NOT reproduce in a small isolated function, even with a shared
- *    base register passed in as a parameter — the surrounding store density
- *    matters;
- *  - the direction of derivation flips which stores die. Deriving cfg FROM
- *    rec (`rec` gets the lui, `cfg = (char *)rec - 0x4C`) keeps all 13 byte
- *    stores at 115/116 words with lui=5 — but it also swaps the register
- *    roles ($s0=rec, $s1=cfg) versus the target, so it cannot match
- *    byte-for-byte even at the right size.
+ * MEASURED, so it need not be re-derived (struct model, all stores correct):
+ *  - -O4,s / -O4,p / -O4 / -O3,s : 128 words, lui=31 — IDENTICAL. The flag
+ *    makes no difference to this function at all.
+ *  - -O2,s : 131 words, lui=31.
+ *  - -O1,s : 143 words, lui=5 — the target's cached-base shape appears, but
+ *    the rest of the function is then unoptimised.
+ *  - all 11 installed mwccpsp builds (121..219) at -O4,s : 128 words, lui=31.
+ *    The compiler build is not the variable.
+ *  - `register` on the pointers, and -inline on/all/auto/level=8/deferred:
+ *    no effect. Forcing the body inline just re-exposes the constant and it
+ *    folds again.
  *
- * So a matching version needs the target's shape (cfg is the lui root, rec
- * derived from it) which is exactly the shape that triggers the bug. The
- * form committed here re-materialises addresses and is 13 words over, but it
- * is CORRECT — it writes every field. Do not trade that away for a smaller
+ * DISPROVEN — the previous note claimed an mwccpsp store-elimination bug
+ * under -O4,p that silently dropped four byte stores once two pointers shared
+ * a base, and claimed a struct form reached 107 words / lui=5. Neither
+ * reproduces with the layout used here: under BOTH flags all 13 sb and 11 sh
+ * are emitted, and no source shape tried reached lui=5 at -O2+. If the old
+ * result was real it depended on some detail of that session's struct
+ * layout, not on the flag.
+ *
+ * THE DIAGNOSTIC THAT LOCATED IT. Written as a helper taking the blob as a
+ * parameter — `void init(Cfg *cfg)` — the identical body compiles to 103
+ * words with lui=4, all 13 sb / 11 sh, and a prologue matching the target
+ * exactly, including `addiu <rec>, <cfg>, 0x4C` scheduled into the
+ * func_00001D7C delay slot. A pointer PARAMETER cannot be re-materialised, so
+ * the base stays in a saved register. The target sits symmetrically between
+ * the two forms: direct = 129 (+13), parameter = 103 (-13), target = 116.
+ * This is diagnostic only — the target takes no arguments, so the parameter
+ * form is not itself a candidate.
+ *
+ * WHAT IS STILL OPEN. A no-argument source shape that denies MWCC the
+ * constant while still emitting %hi/%lo of D_000A3F0C. Worth noting that the
+ * target mixes two addressing modes in one function: &D_000A3F0C is a
+ * relocated symbol reference (%hi/%lo), while D_0009DB00, D_000A3F08 and
+ * D_000A4030 are raw absolute (`lui $v0, 0xA` / `lw $v0, -0x2500($v0)`).
+ * That split may be a clue about how the original source named these.
+ *
+ * DECOMP-PERMUTER, tried and exhausted (2026-08-17). 337,244 iterations at
+ * -j4 over 30 minutes. Best diff score 3875, down from the base 6830, but
+ * nowhere near 0. Its best candidate reaches 123 words (vs this version's 129,
+ * target 116) — but it gets there by emitting sb=12 / sh=12 against the
+ * target's 13/11, i.e. it dropped a byte store and widened another. That is
+ * semantically WRONG and was rejected. This is the expected outcome: the
+ * permuter reshapes C, and every reshape still leaves &D_000A3F0C a
+ * compile-time constant for the propagation pass to fold, so it cannot reach
+ * the cached-base form. Do not re-run it on this function without first
+ * changing something that denies the compiler that constant. The scaffold is
+ * reusable for other functions (base.c / target.o / compile.sh / settings.toml;
+ * note GNU `as` cannot assemble the Allegrex min/max, so target.o must emit
+ * those two as .word).
+ *
+ * The form committed here re-materialises addresses and is 13 words over, but
+ * it is CORRECT — it writes every field. Do not trade that away for a smaller
  * word count: an object missing four field writes is a worse result than a
  * NONMATCHING draft.
- *
- * FLAG UPDATE (same session): the store-elimination bug above is specific to
- * `-O4,p`. Under the project's corrected `-O4,s` it does not happen at all —
- * every source shape tried (struct members, volatile pointers, casts) emits
- * all 13 byte stores. But `-O4,s` also never caches the blob's base address
- * in a saved register here, so the count stays at 129 with lui=32. So the two
- * halves of the problem now sit on opposite sides of the flag: `-O4,p` gives
- * the target's five lui but drops four stores, `-O4,s` keeps every store but
- * re-materialises every address. The version below is the `-O4,s` one, which
- * is correct. Note the `volatile`+local-pointer trick that works elsewhere in
- * this file does NOT cache the base here, likely because the accesses cast
- * the pointer to a different type at each use rather than going through the
- * declared pointer type — worth attacking from that angle next.
  *
  * ALSO ESTABLISHED (reusable): +0xCC is a BITFIELD. The target truncates the
  * source value once (`andi $a2,$zero,1`) then per field does

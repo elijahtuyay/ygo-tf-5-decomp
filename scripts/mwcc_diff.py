@@ -70,7 +70,7 @@ def parse_target(path):
                     # any identifier, not just func_XXXXXXXX: since
                     # scripts/resolve_nids.py wired config/symbols/*.txt into the
                     # splat configs, the target's calls are named imports
-                    # (sceHttpInit, ehsys_B4471B5E, cardalbum_1A2B3C4D).
+                    # (sceHttpInit, ehsys_memset, cardalbum_1A2B3C4D).
                     sym, kind = operands.strip(), "26"
             funcs[cur].append((word, mnem, operands.strip(), sym, kind))
     return funcs
