@@ -1697,6 +1697,46 @@ void *func_00021ACC(void *arg0, void *arg1) {
     return arg0;
 }
 
+/* func_000222D0 — 14 words. MATCH 100% (verified). */
+typedef struct { f32 a, b; s32 c; f32 d, e, f; } S6_222D0;
+void *func_000222D0(S6_222D0 *arg0, S6_222D0 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    arg0->d = arg1->d;
+    arg0->e = arg1->e;
+    arg0->f = arg1->f;
+    return arg0;
+}
+
+/* func_00022DBC — 14 words. MATCH 100% (verified). */
+u8 func_00022DBC(void) {
+    extern s32 *func_00031974();
+    s32 *v0;
+    s32 val;
+    v0 = func_00031974();
+    if (v0 == 0) {
+        return 1;
+    }
+    val = v0[1];
+    return val >= 0x10;
+}
+
+/* func_000232A4 — 14 words. MATCH 100% (verified). */
+int func_000232A4(s32 arg0) {
+    extern s32 *func_00031974();
+    s32 *v0;
+    s32 val;
+    u8 r;
+    v0 = func_00031974(arg0);
+    if (v0 == 0) {
+        return 1;
+    }
+    val = v0[1];
+    r = val >= 0x3C;
+    return r;
+}
+
 /* func_0002EEC4 — 6 words. MATCH 100% (verified). */
 typedef struct { f32 a, b; } V2_EEC4;
 void *func_0002EEC4(V2_EEC4 *arg0, V2_EEC4 *arg1) {
@@ -2394,6 +2434,16 @@ void func_0004FDB4(void) {
 /* func_0004FDBC — 2 words. MATCH 100% (shape: m2c). */
 void func_0004FDBC(void) {
     func_00058B0C();
+}
+
+/* func_0004FDC4 — 14 words. MATCH 100% (verified). */
+extern s32 func_00055E28(void);
+u8 func_0004FDC4(void) {
+    s32 v0 = func_00055E28();
+    if (v0 == 5 || v0 == 8) {
+        return 1;
+    }
+    return 0;
 }
 
 /* func_0004FDFC — 17 words. MATCH 100% (shape: m2c). */
