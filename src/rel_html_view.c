@@ -47,21 +47,20 @@
  * Re-typing func_00000470's 30 stores against the real field layout is the
  * obvious next step.
  *
- * STATUS — the module has 16 functions (an earlier version of this header said
- * 17, which was a miscount). 14 are byte-identical to the target
- * (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0), verified with mwcc_diff.py:
+ * STATUS — 15 of the module's 16 functions are byte-identical to the target
+ * (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0), verified with mwcc_diff.py.
+ * Only func_00000470 is outstanding, and only by a 4-word instruction
+ * SCHEDULING permutation — every word is otherwise identical. See its comment.
  *
- *   MATCH 100%  func_00000000 func_00000034 func_00000084 func_0000008C
- *               func_00000134 func_00000178 func_00000244 func_00000278
- *               func_00000358 func_00000414 func_00000420 func_000005A0
- *               func_00000650 func_00000670
- *   MATCH,      func_0000039C  — every instruction and both relocation kinds
- *   modulo                       are identical; only the jump table's SECTION
- *   section                      differs (ours lands in .rodata, the shipped
- *                                module has no .rodata and keeps it in .data
- *                                as jtbl_00005E34). Not a source problem.
- *   NONMATCHING func_00000470  — 76/76 words, all identical except a 4-word
- *                                scheduling permutation; see its comment.
+ * func_0000039C's jump table is verified by CONTENTS, not by name: splat calls
+ * the shipped module's table jtbl_00005E34 (it sits in .data — the module has
+ * no general .rodata), while an unlinked .o has an anonymous local in .rodata
+ * whose entries are relocation addends off the function. mwcc_diff.py now
+ * checks that every target entry equals func_vram + the candidate's addend;
+ * all six do. That is a link-time placement difference, not a source one, and
+ * no compiler flag controls it (-strings readonly/noreadonly and
+ * -sdatathreshold make no difference). Every module with a switch will hit
+ * this, which is why the check lives in the differ.
  *
  * THREE LEVERS THIS MODULE ADDED (all reusable, all cost real time to find):
  *  1. A dead argument register can double as a switch's comparison constant.
@@ -411,15 +410,28 @@ void func_00000420(void *dst) {
 /* func_00000470 — build the 0xA8-byte browser config at D_00005EB0 and hand
  * it to sceUtilityHtmlViewerInitStart (the "start browser" import).
  *
- * NONMATCHING, but only just: 76/76 words, every word identical except a
- * 4-word permutation at the end. The target schedules the call's argument
- * setup (`addu $a0, $s0, $zero`) BEFORE the three `sw $zero` stores; MWCC puts
- * it immediately before the jal in every phrasing tried — shared return
- * variable, separate pointer variable for the call argument, char* casts on
- * the stores, chained assignment, an inner block, and passing &D_00005EB0
- * directly (that last one costs an extra lui, 77 words). The store ORDER is
- * already correct. Whatever moves that move is not reachable from the
- * statement-level shapes tried so far.
+ * NONMATCHING, but only just: 76/76 words, every word identical except WHERE
+ * the call's argument setup sits. The target emits `addu $a0, $s0, $zero`
+ * BEFORE the three trailing `sw $zero` stores; MWCC puts it immediately before
+ * the jal. The stores themselves are already in the target's exact order.
+ *
+ * Source shapes tried, none of which moves it: shared vs duplicated return
+ * variable; a separate pointer variable for the call argument; passing
+ * `&cfg->base`; `(char *)0` instead of `0` for the three pointer fields;
+ * chained assignment; an inner block; hoisting the argument into a local
+ * declared early; reordering the four trailing stores (putting
+ * `disconnectmode` first gets 3 diffs instead of 4, but only by moving the
+ * stores AWAY from the target's order, so it is not closer); and accessing the
+ * global directly instead of through a pointer — that last one is worth
+ * recording as a NEGATIVE result: it re-materialises &g_param at every access
+ * and explodes to 100 words, which is the func_00000294 trap from
+ * rel_movie_viewer reproducing here. The pointer-variable form is what keeps
+ * the base in $s0, and it is not negotiable.
+ *
+ * Next thing to try: decomp-permuter (the scaffold from func_00000294 is
+ * reusable, and unlike that case there is no compile-time constant blocking
+ * it — this is a pure scheduling tie-break, which is what the permuter is
+ * actually good at).
  *
  * The base register does NOT re-materialise here (unlike func_00000294 in
  * rel_movie_viewer) — see the file header for the int[]-indexing +
