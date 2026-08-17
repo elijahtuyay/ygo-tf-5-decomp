@@ -50,10 +50,14 @@ extern int ehsys_56D1651D();
 extern int ehsys_5DF04F49();
 extern int ehsys_60B55A50();
 extern int ehsys_942B03D0();
+extern int ehsys_5F00A362();
+extern int ehsys_97BB99A5();
 extern int ehsys_98E07D26();
 extern int ehsys_A4AFF8E6();
 extern int ehsys_B4471B5E();
+extern int ehsys_B89D38DC();
 extern int ehsys_B8AD96EA();
+extern int ehsys_BC8E65D7();
 extern int ehsys_C792FA38();
 extern int ehsys_C9D9E989();
 extern int ehsys_D853F15C();
@@ -67,7 +71,6 @@ extern int func_0000EF68();
 extern int func_00015D28();
 extern int func_00015E5C();
 extern int func_0001708C();
-extern int func_000186D4();
 extern int func_000196A8();
 extern int func_00019770();
 extern int func_000197EC();
@@ -87,16 +90,36 @@ extern int func_000236B8();
 
 /* ---- forward declarations ---- */
 s32 func_0000B440(s32 arg0);
+s32 func_0000C858(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_0000D6D0(s32 arg0, s32 arg1);
 s32 func_0000D734(s32 arg0, s32 arg1);
 s32 func_0000DA6C(s32 arg0, s32 arg1);
 s32 func_0000EB20(void);
+s32 func_0001187C(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_00012DC4(u16 *arg0);
 s32 func_00013060(void);
 s32 func_00013098(void);
+s32 func_00014E50(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_00015AEC(s32 *arg0, s32 arg1);
 s32 func_00015B04(u16 *arg0, u16 *arg1);
+s32 func_000186D4(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_00018C44(s32 arg0, s32 arg1, s32 arg2);
+s32 func_0001AE20(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_0001C134(s32 arg0);
+s32 func_0001D4CC(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_0001D7B4(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_0001F328(s32 arg0, s32 arg1, s32 arg2);
+s32 func_0001F890(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_0001FC98(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_00020B10(s32 arg0, s32 arg1);
+s32 func_00022134(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_00022188(void);
 s32 func_00022264(s32 arg0);
 s32 func_00022274(s32 arg0);
+s32 func_00022960(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_00023078(s32 arg0, s32 arg1, s32 arg2, int arg3);
+s32 func_000235EC(s32 arg0, s32 arg1);
+s32 func_00024214(s32 arg0, s32 arg1);
 u32 func_00013070(void);
 void func_00015D20(void);
 void func_00017290(void);
@@ -132,6 +155,11 @@ s32 func_0000B440(s32 arg0) {
     sp1C = arg0;
     ehsys_EF9B5D06(&sp1C, &D_0002CFE8);
     return sp1C;
+}
+
+/* func_0000C858 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0000C858(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
 /* func_0000D6D0 — 25 words. MATCH 100% (shape: m2c). */

@@ -22,6 +22,7 @@ verified.
 """
 import json
 import os
+from collections import Counter
 import re
 import subprocess
 import sys
@@ -51,23 +52,57 @@ def module_blurb(module):
 
 
 def build(module, entries, symtab):
-    """Assemble a source file from the given verified functions."""
+    """Assemble a source file from the given verified functions.
+
+    Each function was verified in a trial file that declared globals with ONE
+    flavour (char / void * / int — see DATA_FLAVOURS in auto_decomp.py). A
+    combined file can only declare each global once, so a function verified
+    against `extern int D_X;` regresses if a neighbour forced `extern char D_X;`.
+    Globals are therefore declared with the flavour the majority of their users
+    needed, and the minority users are dropped by the caller's verify loop."""
     defined = {e["func"] for e in entries}
     decls, fwd = set(), set()
+    want = {}
+    for e in entries:
+        fl = e.get("flavour", "char")
+        for n in re.findall(r"\b\w+\b", e["src"]):
+            if n not in defined and (n in symtab or re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n)):
+                want.setdefault(n, Counter())[fl] += 1
+    # A global can only be declared once, so a function verified against
+    # `extern void * D_X;` cannot coexist with neighbours that need
+    # `extern char D_X;`. Drop the minority users up front — letting the compile
+    # error decide blames whole regions of the file and throws away far more.
+    keep = []
+    for e in entries:
+        fl = e.get("flavour", "char")
+        conflict = any(want.get(n) and want[n].most_common(1)[0][0] != fl
+                       for n in re.findall(r"\b\w+\b", e["src"])
+                       if n not in defined and (n in symtab or
+                                                re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n)))
+        if not conflict:
+            keep.append(e)
+    entries = keep
+    defined = {e["func"] for e in entries}
+
     for e in entries:
         for n in re.findall(r"\b\w+\b", e["src"]):
             if n in defined:
                 continue
             if n in symtab:
                 decls.add(f"extern int {n}();" if symtab[n] == "func"
-                          else f"extern char {n};")
+                          else f"extern {want[n].most_common(1)[0][0]} {n};")
             elif re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n):
-                decls.add(f"extern char {n};")
+                decls.add(f"extern {want[n].most_common(1)[0][0]} {n};")
             elif re.match(r"^func_[0-9A-F]{8}$", n):
                 decls.add(f"extern int {n}();")
         m = re.match(r"\s*(\w[\w \*]*?)\s*\b" + e["func"] + r"\s*\(([^)]*)\)", e["src"])
         if m:
-            fwd.add(f"{m.group(1)} {e['func']}({m.group(2)});")
+            # K&R form, NO parameter list. Each function was verified in a trial
+            # file where its siblings were declared `extern int f();`; emitting a
+            # prototyped forward declaration here changes how calls to it compile
+            # (argument checking/promotion) and silently regresses functions that
+            # matched in isolation.
+            fwd.add(f"{m.group(1)} {e['func']}();")
 
     head = [
         "/*",

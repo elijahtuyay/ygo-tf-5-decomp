@@ -90,14 +90,20 @@ extern int ehsys_291D6262();
 extern int ehsys_47719795();
 extern int ehsys_4F22C9AA();
 extern int ehsys_60BA0722();
+extern int ehsys_53D7C1EE();
+extern int ehsys_65DA0419();
 extern int ehsys_9EA6989A();
 extern int ehsys_9EFDC9B9();
 extern int ehsys_B4471B5E();
 extern int ehsys_BFFBA174();
 extern int ehsys_E1139F1A();
+extern int ehsys_E47E40E4();
 extern int ehsys_EF9740B0();
+extern int ehsys_F292E199();
 extern int ehsys_F2BD0694();
 extern int ehsys_F8CDBCAB();
+extern int ehsys_strcat();
+extern int ehsys_strcpy();
 extern int func_0000003C();
 extern int func_000002E8();
 extern int func_00001778();
@@ -114,6 +120,7 @@ extern int func_00005DEC();
 extern int func_000062BC();
 extern int func_00006668();
 extern int func_00006D78();
+extern int func_0000766C();
 extern int func_000077DC();
 extern int func_0000789C();
 extern int func_00007BE4();
@@ -123,6 +130,7 @@ extern int func_0001B760();
 extern int func_0001B964();
 extern int func_0001BAF8();
 extern int func_0001BD1C();
+extern int func_0001C5D4();
 extern int func_0001C7FC();
 extern int D_00024D00;
 extern int D_000250FC;
@@ -137,6 +145,8 @@ extern int D_0002C1C4;
 extern int D_0002D1C4;
 extern int D_0002E1D0;
 extern int D_0002E1D4;
+extern int D_000258B8;
+extern int D_000259EC;
 extern int D_B2E6E0;
 extern int D_B2F4A0;
 extern int D_B31480;
@@ -175,10 +185,13 @@ s32 func_00003E8C(void);
 s32 func_00003E94(void);
 void func_0000450C(s32 arg0);
 s32 func_00004C50(void);
+void func_000056F0(int arg0, int arg1);
+void func_00005A60(int arg0, int arg1);
 s32 func_00005D64(void);
 void func_00005EEC(void);
 void func_0000647C(void);
 void func_00006778(s32 arg0, int arg1);
+s32 func_00006D50(s32 arg0);
 void func_00006DB8(s32 arg0);
 void func_000070D0(void);
 void func_000071A0(void);
@@ -189,11 +202,13 @@ void func_00007BD4(void);
 void func_00007BDC(void);
 void func_0000C578(void);
 void func_0000C580(void);
+s32 func_00013C00(int arg0);
 void func_00015AB0(s32 arg0);
 void func_00016E64(s32 arg0);
 void func_0001AF78(void);
 s32 func_0001B490(void);
 void func_0001BF10(void);
+s32 func_0001C54C(int arg0, int arg1, int arg2);
 void func_0001C5AC(s32 arg0);
 void func_0001C5B8(void);
 s32 func_0001C7E4(s32 *arg0, s32 *arg1);
@@ -361,6 +376,20 @@ s32 func_00004C50(void) {
     return *(s32 *)0xB2EEC8 != 0;
 }
 
+/* func_000056F0 — 15 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000056F0(int arg0, int arg1) {
+    ehsys_F292E199();
+    ehsys_65DA0419(0x94D5);
+    func_0001C5D4(arg1);
+    *(s32 *)0xB2EEC8 = 0;
+}
+
+/* func_00005A60 — 9 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00005A60(int arg0, int arg1) {
+    func_0001C5D4(arg1);
+    *(s32 *)0xB2EEC8 = 0;
+}
+
 /* func_00005D64 — 5 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 s32 func_00005D64(void) {
     *(s32 *)0xB2EF10 = 1;
@@ -387,6 +416,14 @@ void func_0000647C(void) {
 /* func_00006778 — 13 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00006778(s32 arg0, int arg1) {
     ehsys_9EA6989A(arg0, func_00006668(arg1));
+}
+
+/* func_00006D50 — 10 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_00006D50(s32 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = ehsys_E47E40E4();
+    return temp_v0 + arg0;
 }
 
 /* func_00006DB8 — 12 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
