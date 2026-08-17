@@ -313,6 +313,29 @@ times over. Recognise these before starting from m2c:
   `addiu $t1, $zero, N` in the delay slot. m2c drops both the forwarded
   register and the immediate.
 
+### A harder category than levers
+
+Everything numbered above is a rule: a source shape that reproducibly produces a
+particular codegen. There is a second category that no amount of source
+restructuring has moved, where MWCC has simply made a register-allocation or
+scheduling choice of its own:
+
+- **Scratch-register choice.** `func_00000A98` in `rel_story` reaches the exact
+  word count with eleven content diffs, every one of them our `$v0` against the
+  target's `$at` for the same comparison scratch, plus the ordering effects that
+  follow. Operand order, temporaries, compound conditions and loop-versus-flat
+  control flow all leave it unchanged.
+- **Two-step lookahead delay-slot filling.** `func_00011D70` reaches 49 of 53
+  words, semantically exact; the extra four are MWCC re-testing the previous
+  range threshold as delay-slot filler at some branch transitions but not
+  others. Thirteen compile iterations over `&&`/`||` shapes, early and late base
+  caching, and reordering did not reproduce it.
+
+Recognise this category early. A near-miss whose diff is "same instructions,
+different scratch register" or "extra redundant compare in a delay slot" is not
+waiting for a cleverer phrasing; it needs either the literal original source or
+a systematic search. Spend the time on a fresh function instead.
+
 ### A known limitation of the differ
 
 `scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
