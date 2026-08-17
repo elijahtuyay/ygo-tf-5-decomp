@@ -259,6 +259,39 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     `rel_story` near-misses die on this and it should be treated as a dead end,
     like lever 27's argument evaluation order.
 
+43. **Each comparison operator has exactly one right idiom.** Lever 19
+    generalises: `==`, `!=`, `<` and `>=` each need their own phrasing
+    (`x == 0`, `!x`, `(unsigned)x < 1`, `!(x < K)`), because MWCC picks a
+    different pair from `sltu`+`xori` / `slt`+`xori` / `slti`+`xori` /
+    `xor`+`sltiu` for each. Guessing wrong costs exactly one word, every time.
+44. **A frame bigger than its locals is not a free parameter.** Where a function
+    passes `&local` to a helper and reads a field back, MWCC's stack layout is
+    not a simple function of the declared array size; the frame offsets have to
+    be matched by trying sizes. Lever 34's `volatile int pad[N]` is the blunt
+    version of the same thing.
+
+### Function families worth recognising
+
+Several shapes recur dozens of times, so identifying one pays for itself many
+times over. Recognise these before starting from m2c:
+
+- **vec2f / vec2s struct copies** — float-pair and short-pair copy helpers
+  using `lwc1`/`swc1`. Seventeen-plus in `rel_duel_eng` alone.
+- **Ternary between two globals** (13 words) — `jal` a shared zero-argument
+  predicate, then `beql` selecting one of two globals:
+  `return pred() ? D_A : D_B;`.
+- **Call-then-store-forwarded-arg** (11 words) — saves the incoming `$a0`
+  across a call, forcing an `$s0` spill, then stores it to a global:
+  `f(a0); D_X = a0;`.
+- **Halfword-field predicates** — `!f(*(u16 *)(a0 + N), ...)` and friends. The
+  single richest seam in `rel_duel_eng`; it runs through most of the module's
+  per-struct-field accessors.
+- **Shared-object accessors** — call an accessor once into a local, then read or
+  write fixed offsets off it. Forty-one members in `rel_story`.
+- **Tail-jump thunks with a delay-slot constant** — `j callee` with
+  `addiu $t1, $zero, N` in the delay slot. m2c drops both the forwarded
+  register and the immediate.
+
 ### A known limitation of the differ
 
 `scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
