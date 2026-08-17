@@ -512,7 +512,7 @@ int func_0003FBEC(void) {
 int func_0003FEEC(int a0) {
     extern char D_0034DF44;
     extern int func_0003FEEC();
-    return (*((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C4) >> 1) & 0x1F;
+    return ((unsigned int)(*((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C4)) << 26) >> 27;
 }
 /* func_0003FBF8 — 3 words. MATCH 100% (shape: hand). */
 int func_0003FBF8(void) {
@@ -530,13 +530,13 @@ int func_0003FF0C(int a0) {
 int func_0003FF28(int a0) {
     extern char D_0034DF44;
     extern int func_0003FF28();
-    return (*((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C5) >> 7) & 1;
+    return ((unsigned int)(*((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C5)) << 24) >> 31;
 }
 /* func_00040358 — 8 words. MATCH 100% (shape: hand). */
 int func_00040358(int a0) {
     extern char D_0034DF44;
     extern int func_00040358();
-    return (*(unsigned short *)((char *)&D_0034DF44 + a0 * 2 + 0x4C4) >> 6) & 0x1FF;
+    return ((unsigned int)(*(unsigned short *)((char *)&D_0034DF44 + a0 * 2 + 0x4C4)) << 17) >> 23;
 }
 /* func_0004458C — 3 words. MATCH 100% (shape: hand). */
 int func_0004458C(void) {
@@ -2545,7 +2545,7 @@ int func_000D816C(void *a0) {
 int func_000DB028(void) {
     extern int D_00351724;
     extern int func_000DB028();
-    return (D_00351724 != 3) ? 2 : 0;
+    return (D_00351724 == 3) ? 0 : 2;
 }
 /* func_000DAFA8 — 11 words. MATCH 100% (shape: hand). */
 int func_000DAFA8(unsigned short *a0) {

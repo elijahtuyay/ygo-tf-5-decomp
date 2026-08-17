@@ -379,6 +379,39 @@ void func_00007EEC(u16 *a0, s32 a1, u8 *a2) {
         a2[a0[t0]] = 0xFF;
     }
 }
+/* func_00008C78 — 43 words. MATCH 100% (shape: m2c switch; case 0 needs an
+ * explicit goto to the shared return-0 landing — it does not fall through
+ * to it in the target). */
+s32 func_00008C78(void) {
+    extern int D_0001F980;
+    extern int func_00008E1C();
+    extern int func_00009080();
+    extern int func_000093E0();
+    extern int func_000095D8();
+    extern int func_000098B4();
+    u16 temp_v1;
+
+    temp_v1 = (*(int *)((char *)D_0001F980 + 0x2));
+    switch (temp_v1) {
+    case 0:
+        func_00008E1C();
+        goto block_11;
+    case 1:
+        func_000093E0();
+        goto block_11;
+    case 2:
+        func_000095D8();
+        goto block_11;
+    case 10:
+        return func_00009080();
+    case 3:
+        func_000098B4();
+block_11:
+    default:
+        return 0;
+    }
+}
+
 /* func_00008D24 — 19 words. MATCH 100% (shape: m2c). */
 s32 func_00008D24(s32 arg0) {
     extern int D_0001F980;
