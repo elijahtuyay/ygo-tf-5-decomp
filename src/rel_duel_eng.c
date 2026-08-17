@@ -9110,3 +9110,35 @@ int func_0023C47C(void *a0, int a1) {
     unsigned short field4 = *(unsigned short *)((char *)a0 + 4);
     return func_00205108(a0, a1, 1 << (field4 + (field2 << 4)), 0) != 0;
 }
+
+/* func_00271584 — 17 words. MATCH 100% (shape: hand). */
+int func_00271584(int a0, int a1) {
+    extern int func_00270D5C();
+    extern int func_00271584();
+    return func_00270D5C(a0, -1, a1, 0, 0xB, 0x10, 0, 0, 1, 1) > 0;
+}
+/* func_002715C8 — 17 words. MATCH 100% (shape: hand). */
+int func_002715C8(int a0, int a1) {
+    extern int func_00270D5C();
+    extern int func_002715C8();
+    return func_00270D5C(a0, -1, a1, 0, 0xB, 0x40, 0, 0, 1, 1) > 0;
+}
+
+/* func_001EED48 — 11 words. MATCH 100% (shape: hand). */
+int func_001EED48(int a0, int a1, int a2, int a3, int t0, int t1, int t2, int t3, int a9, int a10) {
+    extern int func_001EED74();
+    extern int func_001EED48();
+    return func_001EED74(a0, a1, a2, a3, t0, t1, t2, t3, a9, a10, 0);
+}
+/* func_00270D10 — 19 words. MATCH 100% (shape: hand). */
+int func_00270D10(int a0, int a1, int a2, int a3, int t0, int t1) {
+    extern int func_00270D5C();
+    extern int func_00270D10();
+    return func_00270D5C(a0, -1, a1, a2, a3, t0, t1, 0, 1, 1);
+}
+/* func_002714B4 — 18 words. MATCH 100% (shape: hand). */
+int func_002714B4(int a0, int a1, int a2, int a3) {
+    extern int func_00270D5C();
+    extern int func_002714B4();
+    return func_00270D5C(a0, -1, a1, a2, a3, 4, 0, 0, 1, 1) > 0;
+}

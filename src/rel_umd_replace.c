@@ -104,6 +104,21 @@ void func_000000DC(void) {
 
 }
 
+/* func_000000E4 — 13 words. Sets the current thread's attribute mask,
+ * starts func_000010A0, then marks D_000096EC true and returns 1 (the
+ * return value is unused by its caller but the store and the return share
+ * the literal 1, which is what pins the value into $v0 rather than a dead
+ * register). MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_000000E4(void) {
+    extern int D_000096EC;
+    extern void func_000010A0(void);
+    extern int sceKernelChangeCurrentThreadAttr();
+    sceKernelChangeCurrentThreadAttr(0, 0x4000);
+    func_000010A0();
+    D_000096EC = 1;
+    return 1;
+}
+
 /* func_0000017C — 2 words. MATCH 100% (shape: m2c). */
 void func_0000017C(void) {
     func_00001164();
@@ -326,6 +341,17 @@ s32 func_000036D4(void) {
         *p = 0;
     }
     return 1;
+}
+
+/* func_000037E4 — 8 words. Indexes a 0x24-byte record array at D_000094B4
+ * by arg0 and tail-calls func_00003804 with the record pointer and its
+ * field at offset 0x20. MATCH 100% (mwccpsp_3.0.1_219, -O4,s
+ * -sdatathreshold 0). */
+void func_000037E4(s32 arg0) {
+    extern char D_000094B4[];
+    extern void func_00003804(void *arg0, s32 arg1);
+    char *p = D_000094B4 + arg0 * 0x24;
+    func_00003804(p, *(s32 *) (p + 0x20));
 }
 
 /* func_00003714 — 2 words. MATCH 100% (shape: m2c). */
