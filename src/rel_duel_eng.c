@@ -9151,3 +9151,28 @@ int func_0027160C(int a0, int a1) {
     int r = func_0017CA90(a0, a1);
     return func_00270D5C(a0, a1, r, 0, a1, 0x20, 0, 0, 1, 1);
 }
+
+
+/* func_000E30E8 — 25 words. MATCH 100% (shape: hand). */
+struct s_000E30E8 { short pad; unsigned short field2; };
+int func_000E30E8(struct s_000E30E8 *a0) {
+    extern int func_0008BD40();
+    extern int func_000E30E8();
+    extern char D_0034E66C[];
+    int r = func_0008BD40(1 - a0->field2);
+    int idx = (1 - a0->field2) & 1;
+    int val = *(int *)(D_0034E66C + idx * 0xB3C);
+    return (val + r) > 0;
+}
+/* func_00218938 — 21 words. MATCH 100% (shape: hand). */
+struct s_00218938 { short pad; unsigned short field2; };
+int func_00218938(struct s_00218938 *a0) {
+    extern int func_0008BD40();
+    extern int func_00218938();
+    extern char D_0034E66C[];
+    int r = func_0008BD40(a0->field2);
+    int idx = a0->field2 & 1;
+    int val = *(int *)(D_0034E66C + idx * 0xB3C);
+    return (unsigned int)(val + r) < 6;
+}
+
