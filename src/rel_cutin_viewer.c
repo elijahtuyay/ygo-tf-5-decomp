@@ -15,7 +15,7 @@
  * codegen levers (switch-vs-if, goto-rotated loops, min/max intrinsics,
  * address rematerialization, etc.) this search draws on.
  *
- * STATUS: 71 function(s) matched via the automated pass so far.
+ * STATUS: 84 function(s) matched via the automated pass so far.
  *   func_00000000 (13 words)
  *   func_00000034 (2 words)
  *   func_000002E0 (2 words)
@@ -103,6 +103,8 @@ typedef double f64;
 /* externs: imports and sibling functions referenced by matched bodies. */
 extern int ehsys_13A4081A();
 extern int ehsys_2630B590();
+extern int ehsys_B89D38DC();
+extern int ehsys_memset();
 extern int ehsys_291D6262();
 extern int ehsys_41AABF28();
 extern int ehsys_47719795();
@@ -132,6 +134,9 @@ extern int func_00002590();
 extern int func_000002E8();
 extern int func_00001778();
 extern int func_00001A24();
+extern int func_00002A48();
+extern int func_00002A8C();
+extern int func_00002D1C();
 extern int func_0000260C();
 extern int func_00002EC8();
 extern int func_00002F3C();
@@ -145,7 +150,6 @@ extern int func_000062BC();
 extern int func_00006590();
 extern int func_00006668();
 extern int func_00006D78();
-extern int func_0000766C();
 extern int func_000077DC();
 extern int func_0000789C();
 extern int func_00007BE4();
@@ -198,22 +202,32 @@ void func_0000066C(void);
 void func_000007EC(void);
 void func_00000A98(void);
 void func_00000B44(void);
+s32 func_00000C18(s32 arg0, s32 arg1, s32 arg2);
 void func_00000CC0(void);
+s32 func_00000CFC(void);
 void func_00000D04(void);
 void func_00000E78(void);
 void func_0000130C(void);
 s32 func_000014F4(s32 arg0);
 void func_00001830(void);
+void func_000019BC(void *arg0);
+s32 func_000019D8(void *arg0);
 void func_000019E4(void);
 void func_00001C00(void);
 s32 func_00001C0C(void);
+void func_00001DB8(s32 arg0);
+void func_00001E54(s32 arg0, s32 arg1);
+void func_00001E68(s32 arg0, s32 arg1);
 s32 func_00001E7C(void);
 s32 func_00001E8C(void);
 s32 func_00001E9C(void);
 s32 func_00001EAC(void);
+void func_00001EB8(s32 arg0);
 s32 (*func_00001EC8(void))();
 void func_00002544(s32 arg0);
 void func_00002550(s32 arg0, int arg1);
+void func_00002EB0(void *arg0);
+void func_00002EBC(void *arg0);
 void func_000044D0(void);
 void func_000044E4(void);
 void func_0000461C(void);
@@ -236,9 +250,12 @@ void func_000070D0(void);
 void func_000071A0(void);
 void func_00007224(void);
 f32 func_000072A8(s32 arg0, s32 arg1);
+void func_0000766C(s32 arg0, s32 *arg1, s32 *arg2);
+void func_00007BB4(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 void func_00007BCC(void);
 void func_00007BD4(void);
 void func_00007BDC(void);
+void func_00007D10(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 void func_0000C56C(int arg0);
 void func_0000C578(void);
 void func_0000C580(void);
@@ -307,11 +324,21 @@ void func_00000B44(void) {
     func_0000066C();
 }
 
+/* func_00000C18 — 8 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_00000C18(s32 arg0, s32 arg1, s32 arg2) {
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
 /* func_00000CC0 — 15 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00000CC0(void) {
     ehsys_13A4081A(1);
     func_0001B760(&D_0002E1D0, &D_0002E1D4, 1);
     func_0001B964();
+}
+
+/* func_00000CFC — 2 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_00000CFC(void) {
+    return ehsys_13A4081A(0);
 }
 
 /* func_00000D04 — 16 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -351,6 +378,18 @@ void func_00001830(void) {
 
 }
 
+/* func_000019BC — 7 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000019BC(void *arg0) {
+    *(s32 *)((char *)arg0 + 0xFC) = 0;
+    *(s32 *)((char *)arg0 + 0xF8) = -1;
+    ehsys_memset((char *)arg0 + 0x78, 0xFF, 0x40);
+}
+
+/* func_000019D8 — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_000019D8(void *arg0) {
+    return *(s32 *)((char *)arg0 + 0xFC) != 0;
+}
+
 /* func_000019E4 — 16 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_000019E4(void) {
     ehsys_memset(&D_B2E6E0, 0, 0x7B0);
@@ -368,6 +407,25 @@ void func_00001C00(void) {
 s32 func_00001C0C(void) {
     func_0000260C(*(s32 *)0xB2E6E8);
     return 0;
+}
+
+/* func_00001DB8 — 7 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001DB8(s32 arg0) {
+    int *base = &D_B2E6E0;
+    if (arg0 == 0) {
+        arg0 = -1;
+    }
+    *(s32 *)(*(s32 *)((char *)base + 8) + 0x1B0) = arg0;
+}
+
+/* func_00001E54 — 5 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001E54(s32 arg0, s32 arg1) {
+    func_00002A48(*(s32 *)0xB2E6E8, arg0, arg1);
+}
+
+/* func_00001E68 — 5 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001E68(s32 arg0, s32 arg1) {
+    func_00002A8C(*(s32 *)0xB2E6E8, arg0, arg1);
 }
 
 /* func_00001E7C — 4 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -390,6 +448,11 @@ s32 func_00001EAC(void) {
     return *(s32 *)0xB2E6F0;
 }
 
+/* func_00001EB8 — 4 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001EB8(s32 arg0) {
+    func_00002D1C(*(s32 *)0xB2E6E8, arg0);
+}
+
 /* func_00001EC8 — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 s32 (*func_00001EC8(void))() {
     return func_0001C7FC;
@@ -404,6 +467,20 @@ void func_00002544(s32 arg0) {
 void func_00002550(s32 arg0, int arg1) {
     func_00002EC8(arg1);
     func_00002F3C(arg0, arg1);
+}
+
+/* func_00002EB0 — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00002EB0(void *arg0) {
+    void (*fn)(void *);
+    fn = *(void (**)(void *))((char *)arg0 + 0x24);
+    fn(arg0);
+}
+
+/* func_00002EBC — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00002EBC(void *arg0) {
+    void (*fn)(void *);
+    fn = *(void (**)(void *))((char *)arg0 + 0x28);
+    fn(arg0);
 }
 
 /* func_00003920 — 2 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -576,6 +653,22 @@ f32 func_000072A8(s32 arg0, s32 arg1) {
     return (f32) var_a0 / (f32) arg1;
 }
 
+/* func_0000766C — 5 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000766C(s32 arg0, s32 *arg1, s32 *arg2) {
+    s32 *p = (s32 *)arg0;
+    *arg1 = p[0];
+    *arg2 = p[1];
+}
+
+/* func_00007BB4 — 6 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0;
+ * arg4 is the 5th integer arg, passed in $t0 per the 8-register convention). */
+void func_00007BB4(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    s32 *p = *(s32 **)((char *)arg0 + 0x108);
+    if (p != 0) {
+        *(s32 *)((char *)p + 4) = arg4;
+    }
+}
+
 /* func_00007BCC — 2 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00007BCC(void) {
 
@@ -589,6 +682,15 @@ void func_00007BD4(void) {
 /* func_00007BDC — 2 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00007BDC(void) {
 
+}
+
+/* func_00007D10 — 6 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0;
+ * arg4 is the 5th integer arg, passed in $t0 per the 8-register convention). */
+void func_00007D10(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    s32 *p = *(s32 **)((char *)arg0 + 0x110);
+    if (p != 0) {
+        *(s32 *)((char *)p + 4) = arg4;
+    }
 }
 
 /* func_0000C56C — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

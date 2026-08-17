@@ -52,6 +52,8 @@ extern char D_0001DBA8;
 extern char D_0001DBC0;
 extern char D_0001DF48;
 extern char D_0001E450;
+extern char D_0001E494;
+extern void *D_0001FC68;
 extern char D_0001E5E0;
 extern char D_0001EB90;
 extern char D_0001F310;
@@ -61,7 +63,9 @@ extern unsigned short D_0001EB54;
 extern int D_0001EB58;
 extern int D_0001EB7C;
 extern int ehsys_20E340D9(int, void *);
+extern int ehsys_2012884C(int);
 extern int ehsys_3BB2BAC6(int, int, int, int, int, int, int);
+extern int ehsys_41AABF28(int, int);
 extern int ehsys_5F00A362(int);
 extern int ehsys_60B55A50();
 extern int ehsys_942B03D0();
@@ -79,6 +83,7 @@ extern int ehsys_EF9B5D06();
 extern int ehsys_FE91A2EC();
 extern int func_000012A8();
 extern int func_000029A0(void *, int);
+extern int func_0000A768(int, int, int, void *);
 extern int func_0000956C(int);
 extern int func_00014D7C(int);
 extern int func_0000FDBC();
@@ -95,6 +100,7 @@ extern int func_000154EC();
 extern int func_000155AC();
 extern int func_0001565C();
 extern unsigned char *D_0001FC50;
+extern void *D_0001FC4C;
 
 /* ============================================================
  * Matched functions, in address order (required for linking).
@@ -157,6 +163,15 @@ int func_00001F54(void) {
     }
     D_0001E5E4 = 0xB;
     return 1;
+}
+
+/* func_00001F84 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001F84(void *a0, int a1) {
+    int s0 = a1 & 0xFFFF;
+    void *s1 = a0;
+
+    *(int *) ((char *) s1 + 4) = ehsys_41AABF28(D_0001EB7C, s0 * 6);
+    *(int *) ((char *) s1 + 0x10) = ehsys_41AABF28(D_0001EB7C, s0 * 2);
 }
 
 /* func_00006B30 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -239,6 +254,28 @@ int func_00009E20(int a0) {
         v0 += 2;
     }
     return v0;
+}
+
+/* func_0000A2E4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000A2E4(int a0) {
+    int sp1C = a0;
+    int a1 = *(int *) ((char *) D_0001FC4C + 0x10);
+
+    ehsys_EF9B5D06(&sp1C, a1);
+    a1 = *(int *) ((char *) D_0001FC4C + 0x14);
+    if (a1 != 0) {
+        ehsys_EF9B5D06(&sp1C, a1);
+    }
+    return sp1C;
+}
+
+/* func_0000AB9C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000AB9C(void) {
+    extern int func_0000BCEC(int, unsigned short, int, int);
+    int v0 = func_0000A768(0x9C, 0, 1, func_0000BCEC);
+    if (v0 != 0) {
+        ehsys_2012884C(*(int *) ((char *) D_0001FC4C + 0x14));
+    }
 }
 
 /* func_0000BCC0 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -342,6 +379,12 @@ void *func_0000FC64(int a0) {
 /* func_00010A18 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00010A18(int a0, unsigned short a1, int a2, int a3) {
     return func_00011968(a0, &D_0001E450 + (a1 + 1) * 6, a2, a3 + 1, 0x88, 0);
+}
+
+/* func_00010A48 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00010A48(int a0, unsigned short a1, int a2, int a3) {
+    int t0 = *(u16 *) (*(char **) ((char *) D_0001FC68 + 0x14) + 0xF4);
+    return func_00011968(a0, &D_0001E494 + a1 * 6, a2, a3 + 1, t0, 0);
 }
 
 /* func_000111A0 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

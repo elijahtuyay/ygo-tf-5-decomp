@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 25 functions matched here. The rest of the module is not
+ * STATUS: 34 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -43,6 +43,8 @@ extern int duel_eng_9FBBA3CF();
 extern int duel_eng_AFF0389D();
 extern int ehsys_1460C6FD();
 extern int ehsys_1EC5342B();
+extern void ehsys_20E340D9(s32, s32);
+extern int ehsys_3BB2BAC6();
 extern int ehsys_558B2DCB();
 extern int ehsys_5F00A362();
 extern int ehsys_6E42DDCD();
@@ -51,8 +53,10 @@ extern int ehsys_88B6C7F0();
 extern int ehsys_97BB99A5();
 extern int ehsys_B8770B92();
 extern int ehsys_B89D38DC();
+extern int ehsys_BC8E65D7();
 extern int ehsys_C859D5FE();
 extern int ehsys_E4867425();
+extern int ehsys_memset();
 extern int ehsys_sceGuFinish();
 extern int func_0000663C();
 extern int func_0000C054();
@@ -60,6 +64,7 @@ extern int func_00010E10();
 extern int func_000119AC();
 extern int func_00011C08();
 extern int func_000126D0();
+extern int D_0001F328;
 
 /* ---- forward declarations ---- */
 s32 func_00004B44(void);
@@ -162,6 +167,11 @@ void func_0000500C(void) {
 
 }
 
+/* func_00006198 — 5 words. MATCH 100% (verified). */
+int func_00006198(s32 a0, s32 a1, s32 a2, s32 a3) {
+    return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
 /* func_000065D0 — 27 words. MATCH 100% (shape: m2c). */
 s32 func_000065D0(void) {
     int sp1C;
@@ -178,6 +188,20 @@ s32 func_000065D0(void) {
         }
     }
     return 0;
+}
+
+/* func_0000B044 — 20 words. MATCH 100% (verified). */
+void func_0000B044(void) {
+    s32 temp_a1;
+    s32 temp_s0;
+
+    temp_a1 = (*(int *)((char *)D_0001F328 + 0x194));
+    temp_s0 = (*(int *)((char *)D_0001F328 + 0x64));
+    if (temp_a1 != 0) {
+        ehsys_20E340D9(temp_s0, temp_a1);
+    }
+    ehsys_20E340D9(temp_s0, D_0001F328);
+    D_0001F328 = 0;
 }
 
 /* func_0000B144 — 28 words. MATCH 100% (shape: m2c). */
@@ -208,6 +232,21 @@ void func_0000C888(s32 arg0) {
     ehsys_5F00A362(arg0 << 6);
 }
 
+/* func_0000C890 — 5 words. MATCH 100% (verified). */
+int func_0000C890(s32 a0, s32 a1, s32 a2, s32 a3) {
+    return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
+/* func_0000D2E8 — 8 words. MATCH 100% (verified). */
+int func_0000D2E8(s32 a0, s32 a1, s32 a2) {
+    return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
+}
+
+/* func_0000D710 — 7 words. MATCH 100% (verified). */
+int func_0000D710(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) {
+    return ehsys_3BB2BAC6(a0 << 6, a1 << 6, a2 << 6, a3 << 6, a4, -1, 0);
+}
+
 /* func_00010DC0 — 4 words. MATCH 100% (shape: hand). */
 void func_00010DC0(s32 arg0, s32 arg1, s32 arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
@@ -219,6 +258,12 @@ s32 func_00010DD0(void) {
         return 1;
     }
     return 0;
+}
+
+/* func_00010E6C — 4 words. MATCH 100% (verified). */
+extern s32 D_0001E92C;
+int func_00010E6C(void) {
+    return D_0001E92C = 1;
 }
 
 /* func_00010E7C — if D_0001E930 (a pending value) is set, forwards it plus
@@ -248,6 +293,12 @@ void func_00011A30(void) {
     func_00011C08();
 }
 
+/* func_000126D0 — 5 words. MATCH 100% (verified). */
+extern s32 D_0001E7A8;
+int func_000126D0(void) {
+    return ehsys_memset(&D_0001E7A8, 0, 0x104);
+}
+
 /* func_00012850 — D_0001F32C holds a pointer value; loads that value and
  * also dereferences it, forwarding both to ehsys_20E340D9 (same pattern as
  * func_00010E7C above, seen also in rel_charalist/rel_tutorial).
@@ -257,9 +308,19 @@ void func_00012850(void) {
     ehsys_20E340D9(*(s32 *)D_0001F32C, D_0001F32C);
 }
 
+/* func_000150CC — 8 words. MATCH 100% (verified). */
+int func_000150CC(s32 a0, s32 a1, s32 a2) {
+    return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
+}
+
 /* func_000150EC — 2 words. MATCH 100% (shape: hand). */
 void func_000150EC(s32 arg0) {
     ehsys_5F00A362(arg0 << 6);
+}
+
+/* func_00016E70 — 5 words. MATCH 100% (verified). */
+int func_00016E70(s32 a0, s32 a1, s32 a2, s32 a3) {
+    return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
 }
 
 /* func_00016EE8 — 4 words. MATCH 100% (shape: hand). */

@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 4 functions matched here. The rest of the module is not
+ * STATUS: 5 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -42,6 +42,7 @@ extern char D_00006A4C;
 extern char D_00006A50;
 extern int ehsys_20E340D9();
 extern int ehsys_6E42DDCD();
+extern int ehsys_BC8E65D7();
 extern int ehsys_ED1410E0();
 extern int ehsys_F6414A71();
 extern int func_00000908();
@@ -50,6 +51,7 @@ extern int func_00000908();
 s32 func_00000000(void);
 void func_00000234(void);
 void func_0000023C(void);
+s32 func_000013FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 void func_000015B8(void);
 
 /* func_00000000 — 2 words. MATCH 100% (shape: m2c). */
@@ -71,9 +73,13 @@ void func_0000023C(void) {
     }
 }
 
+/* func_000013FC — 5 words. MATCH 100% (shape: hand). */
+s32 func_000013FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
 /* func_000015B8 — 12 words. MATCH 100% (shape: hand). */
 void func_000015B8(void) {
     ehsys_6E42DDCD();
     ehsys_20E340D9(*(int *) &D_00006A48, *(int *) &D_00006A2C);
 }
-

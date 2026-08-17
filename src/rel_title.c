@@ -18,7 +18,7 @@
  * file-scope declaration would change the load/store width and break the
  * match. See scripts/assemble_module.py.
  *
- * STATUS: 16 functions matched. build/auto/rel_title.json has the
+ * STATUS: 20 functions matched. build/auto/rel_title.json has the
  * status of every attempt, including what the rest of the module still needs.
  *
  * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,
@@ -66,6 +66,14 @@ void func_0001A2E4(int a, int b, int c, int d) {
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
+/* func_0001A2F8 — 8 words. MATCH 100% (shape: thunk+2; computes (0x1E0-a0)<<6
+ * for the third arg). */
+int func_0001A2F8(int a0, int a1, int a2) {
+    extern int ehsys_B89D38DC();
+    extern int func_0001A2F8();
+    return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
+}
+
 /* func_0001A318 — 2 words. MATCH 100% (shape: thunk+1). */
 int func_0001A318(int a) {
     extern int ehsys_5F00A362();
@@ -92,11 +100,27 @@ void func_0001D650(void) {
 
 }
 
+/* func_000226C0 — 7 words. MATCH 100% (shape: thunk, tail call; e passes
+ * through untouched, fixed trailing args -1 and 0). */
+int func_000226C0(int a, int b, int c, int d, int e) {
+    extern int ehsys_3BB2BAC6();
+    extern int func_000226C0();
+    return ehsys_3BB2BAC6(a << 6, b << 6, c << 6, d << 6, e, -1, 0);
+}
+
 /* func_000268A0 — 2 words. MATCH 100% (shape: thunk+1). */
 int func_000268A0(int a) {
     extern int ehsys_5F00A362();
     extern int func_000268A0();
     return ehsys_5F00A362(a << 6);
+}
+
+/* func_00026880 — 8 words. MATCH 100% (shape: thunk+2; computes (0x1E0-a0)<<6
+ * for the third arg). */
+int func_00026880(int a0, int a1, int a2) {
+    extern int ehsys_B89D38DC();
+    extern int func_00026880();
+    return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
 }
 
 /* func_00029470 — 5 words. MATCH 100% (shape: thunk+1). */
@@ -111,6 +135,14 @@ int func_00029574(int a, int b, int c) {
     extern int ehsys_B89D38DC();
     extern int func_00029574();
     return ehsys_B89D38DC(a << 6, b << 6, c << 6);
+}
+
+/* func_000294F4 — 7 words. MATCH 100% (shape: thunk, tail call; e passes
+ * through untouched, fixed trailing args -1 and 0). */
+int func_000294F4(int a, int b, int c, int d, int e) {
+    extern int ehsys_3BB2BAC6();
+    extern int func_000294F4();
+    return ehsys_3BB2BAC6(a << 6, b << 6, c << 6, d << 6, e, -1, 0);
 }
 
 /* func_0002B944 — 5 words. MATCH 100% (shape: thunk+1). */
