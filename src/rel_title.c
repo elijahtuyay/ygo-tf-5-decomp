@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 7 functions matched here. The rest of the module is not
+ * STATUS: 12 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -36,19 +36,40 @@ typedef double f64;
 #define NULL 0
 
 /* ---- imports and globals ---- */
+extern int ehsys_BC8E65D7();
 
 /* ---- forward declarations ---- */
+void func_0000D420(int a, int b, int c, int d);
+void func_0000F028(int a, int b, int c, int d);
 void func_00017374(void);
+void func_0001A2E4(int a, int b, int c, int d);
 void func_0001D46C(void);
 void func_0001D650(void);
+void func_00029470(int a, int b, int c, int d);
+void func_0002B944(int a, int b, int c, int d);
 void func_00040C30(void);
 void func_00040C38(void);
 void func_00040C40(void);
 void func_00040C48(void);
 
+/* func_0000D420 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+void func_0000D420(int a, int b, int c, int d) {
+    ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
+}
+
+/* func_0000F028 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+void func_0000F028(int a, int b, int c, int d) {
+    ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
+}
+
 /* func_00017374 — 2 words. MATCH 100% (shape: m2c). */
 void func_00017374(void) {
 
+}
+
+/* func_0001A2E4 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+void func_0001A2E4(int a, int b, int c, int d) {
+    ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
 /* func_0001D46C — 2 words. MATCH 100% (shape: m2c). */
@@ -59,6 +80,16 @@ void func_0001D46C(void) {
 /* func_0001D650 — 2 words. MATCH 100% (shape: m2c). */
 void func_0001D650(void) {
 
+}
+
+/* func_00029470 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+void func_00029470(int a, int b, int c, int d) {
+    ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
+}
+
+/* func_0002B944 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+void func_0002B944(int a, int b, int c, int d) {
+    ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
 /* func_00040C30 — 2 words. MATCH 100% (shape: m2c). */
