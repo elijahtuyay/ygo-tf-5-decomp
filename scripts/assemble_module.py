@@ -122,6 +122,20 @@ def build(module, entries, symtab):
     return "\n".join(head + sorted(decls) + body) + "\n", owner
 
 
+def verify_count(module, path):
+    """How many functions the file already on disk matches."""
+    r = subprocess.run([os.path.join(ROOT, "scripts/mwcc_build.sh"), path],
+                       capture_output=True, text=True, cwd=ROOT)
+    if r.returncode != 0:
+        return -1
+    d = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
+                        os.path.join(ROOT, "asm", module, "text.s"),
+                        os.path.join(ROOT, "build/mwcc", module + ".o")],
+                       capture_output=True, text=True, cwd=ROOT)
+    return sum(1 for l in d.stdout.splitlines()
+               if re.match(r"^func_[0-9A-F]+: MATCH", l))
+
+
 def verify(module, names):
     """-> set of OUR functions that do not match in the assembled file.
 
@@ -150,6 +164,15 @@ def verify(module, names):
 def main():
     module = sys.argv[1]
     entries = json.load(open(os.path.join(ROOT, f"build/auto/{module}.matched.json")))
+    # Never clobber a better file. A human (or an agent) may have hand-fixed
+    # functions that are not in matched.json; if what is already on disk verifies
+    # to at least as many matches as we could produce, leave it alone.
+    existing = os.path.join(ROOT, "src", module + ".c")
+    if os.path.exists(existing) and "--force" not in sys.argv:
+        have = verify_count(module, existing)
+        if have >= len(entries):
+            print(f"{module}: keeping existing src ({have} MATCH >= {len(entries)} available)")
+            return
     symtab = symbols(module)
     out = os.path.join(ROOT, "src", module + ".c")
 

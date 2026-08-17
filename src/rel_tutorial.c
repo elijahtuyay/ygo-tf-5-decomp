@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 49 functions matched here. The rest of the module is not
+ * STATUS: 63 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -37,34 +37,48 @@ typedef double f64;
 
 /* ---- imports and globals ---- */
 extern char D_0000CAF0;
-extern char D_00010048;
+extern s32 D_00010048;
 extern char D_000101A4;
-extern char D_000101D4;
+extern s32 D_000101D4;
+extern char D_15A14;
+extern char D_15A2C;
+extern char D_15A30;
+extern char D_15A34;
+extern char D_15A38;
+extern char D_15A3C;
+extern char D_15A40;
+extern char D_15A50;
 extern int duel_draw_048AF0E1();
 extern int duel_draw_4CDAED11();
 extern int duel_draw_6214421F();
 extern int duel_draw_6D200A3F();
 extern int duel_draw_C04933FF();
 extern int duel_draw_C7776D2B();
+extern int duel_draw_D755977D();
+extern int duel_draw_DB788046();
 extern int duel_eng_3865EBDA();
 extern int ehsys_06380DFA();
 extern int ehsys_1EC5342B();
+extern int ehsys_20E340D9();
+extern int ehsys_3BB2BAC6();
 extern int ehsys_4175E3DB();
+extern int ehsys_41AABF28();
 extern int ehsys_450CD6C5();
 extern int ehsys_878EE1D3();
+extern int ehsys_97BB99A5();
 extern int ehsys_AB962AE7();
+extern int ehsys_BC8E65D7();
 extern int ehsys_DFCA450B();
 extern int ehsys_memset();
+extern int ehsys_strncpy();
 extern int func_00000F4C();
 extern int func_000014D8();
 extern int func_000017D4();
-extern int func_00002690();
-extern int func_00004BE0();
+extern int func_00002310();
 extern int func_00005170();
 extern int func_00005544();
 extern int func_00005BB4();
 extern int func_00005E98();
-extern int func_000062DC();
 
 /* ---- forward declarations ---- */
 s32 func_00001B0C(void);
@@ -73,11 +87,24 @@ s32 func_000026A0(void);
 s32 func_00002EBC(void);
 s32 func_00003054(void);
 s32 func_00003E6C(s32 *arg0);
+void *func_00003E74(void);
+void *func_00004BB0(void);
+void *func_00004BBC(void);
+void *func_00004BC8(void);
+void *func_00004BD4(void);
+void *func_00004BE0(void);
+void *func_00004BEC(void);
+void *func_00004E28(void);
+s32 func_00005250(s32 *arg0);
+s32 func_000052F0(s32 arg0, s32 arg1);
+void func_00005BA0(void);
+void func_000062DC(void);
 s32 func_00004764(void);
 s32 func_00005444(void);
 s32 func_00005844(void);
 s32 func_0000584C(void);
 s32 func_00005854(void);
+s32 func_00005A4C(void *arg0, void *arg1);
 s32 func_00005A6C(void);
 s32 func_00005B18(void);
 s32 func_00005BD4(void);
@@ -86,17 +113,23 @@ s32 func_000067B0(void);
 u16 func_00002378(void);
 u8 func_00002358(s32 arg0);
 void * func_000003EC(s32 arg0);
+void func_000005F4(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+void func_00000608(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 void func_00000B24(void);
+void func_00001B00(s32 arg0, s32 arg1);
 void func_00001B20(s32 arg0);
 void func_00001B2C(void);
 void func_00001B68(void);
-void func_00001C30(void);
+void func_00001C30(s32 arg0);
 void func_00002048(s32 arg0);
 void func_00002384(void);
 void func_0000238C(void);
 void func_00002394(void);
 void func_00002650(void);
 void func_00002674(void);
+void func_00002680(s32 arg0);
+void func_00002690();
+void func_00002EA0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 void func_00002EC8(s32 arg0);
 void func_00002EE8(s32 arg0);
 void func_00002F7C(void);
@@ -104,13 +137,20 @@ void func_00002F8C(void);
 void func_00003688(void);
 void func_00004680(void);
 void func_00004F28(void);
+void func_000051E4(s32 *arg0);
 void func_00005224(s32 *arg0, s32 arg1);
 void func_0000522C(void);
 void func_0000531C(s32 *arg0, s32 arg1);
 void func_000054E8(void);
+void func_00005834(void);
+void func_0000583C(void);
+void func_0000585C(s32 arg0, s32 arg1);
 void func_00005970(void);
-void func_00005BA0(void);
+void func_00005A34(void);
+void func_00005A40(void *arg0);
+void func_00005BA8(void *arg0, s32 arg1);
 void func_00005BF8(void);
+void func_00005E24(void);
 void func_00005F7C(void);
 void func_00005FE8(void);
 void func_000062B4(s32 arg0);
@@ -122,9 +162,24 @@ void *func_000003EC(s32 arg0) {
     return &D_0000CAF0 + (arg0 * 0x428);
 }
 
+/* func_000005F4 — 5 words. MATCH 100% (shape: hand). */
+void func_000005F4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_00000608 — 7 words. MATCH 100% (shape: hand). */
+void func_00000608(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
+}
+
 /* func_00000B24 — 2 words. MATCH 100% (shape: m2c). */
 void func_00000B24(void) {
 
+}
+
+/* func_00001B00 — 3 words. MATCH 100% (shape: hand). */
+void func_00001B00(s32 arg0, s32 arg1) {
+    ehsys_97BB99A5(arg0, arg1, 0, 0);
 }
 
 /* func_00001B0C — 2 words. MATCH 100% (shape: m2c). */
@@ -154,7 +209,7 @@ void func_00001B68(void) {
 }
 
 /* func_00001C30 — 9 words. MATCH 100% (shape: m2c). */
-void func_00001C30(void) {
+void func_00001C30(s32 arg0) {
     ehsys_1EC5342B();
     D_000101D4 = 0;
 }
@@ -201,9 +256,28 @@ void func_00002674(void) {
     *(s32 *)0x1504C = 0;
 }
 
+/* func_00002680 — 4 words. MATCH 100% (shape: hand). */
+void func_00002680(s32 arg0) {
+    ehsys_41AABF28(*(s32 *)0x1504C, arg0);
+}
+
+/* func_00002690 — 4 words. MATCH 100% (shape: hand). K&R-style definition
+ * so func_00005BA0's argument-less call below stays legal C: the target's
+ * jal there has no $a0 setup at all. */
+void func_00002690(arg0)
+s32 arg0;
+{
+    ehsys_20E340D9(*(s32 *)0x1504C, arg0);
+}
+
 /* func_000026A0 — 3 words. MATCH 100% (shape: m2c). */
 s32 func_000026A0(void) {
     return *(s32 *)0x1504C;
+}
+
+/* func_00002EA0 — 7 words. MATCH 100% (shape: hand). */
+void func_00002EA0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
 }
 
 /* func_00002EBC — 3 words. MATCH 100% (shape: m2c). */
@@ -253,6 +327,11 @@ s32 func_00003E6C(s32 *arg0) {
     return *arg0;
 }
 
+/* func_00003E74 — address-of D_15A14. MATCH 100% (shape: hand). */
+void *func_00003E74(void) {
+    return &D_15A14;
+}
+
 /* func_00004680 — 11 words. MATCH 100% (shape: m2c). */
 void func_00004680(void) {
     s16 temp_v1;
@@ -271,10 +350,50 @@ s32 func_00004764(void) {
     return 0;
 }
 
+/* func_00004BB0 — address-of D_15A40. MATCH 100% (shape: hand). */
+void *func_00004BB0(void) {
+    return &D_15A40;
+}
+
+/* func_00004BBC — address-of D_15A3C. MATCH 100% (shape: hand). */
+void *func_00004BBC(void) {
+    return &D_15A3C;
+}
+
+/* func_00004BC8 — address-of D_15A38. MATCH 100% (shape: hand). */
+void *func_00004BC8(void) {
+    return &D_15A38;
+}
+
+/* func_00004BD4 — address-of D_15A34. MATCH 100% (shape: hand). */
+void *func_00004BD4(void) {
+    return &D_15A34;
+}
+
+/* func_00004BE0 — address-of D_15A30. MATCH 100% (shape: hand). */
+void *func_00004BE0(void) {
+    return &D_15A30;
+}
+
+/* func_00004BEC — address-of D_15A2C. MATCH 100% (shape: hand). */
+void *func_00004BEC(void) {
+    return &D_15A2C;
+}
+
+/* func_00004E28 — address-of D_15A50. MATCH 100% (shape: hand). */
+void *func_00004E28(void) {
+    return &D_15A50;
+}
+
 /* func_00004F28 — 12 words. MATCH 100% (shape: m2c). */
 void func_00004F28(void) {
     func_00005544(func_00004BE0());
     *(s16 *)0x151F8 = -1;
+}
+
+/* func_000051E4 — 2 words. MATCH 100% (shape: hand). */
+void func_000051E4(s32 *arg0) {
+    duel_draw_DB788046(*arg0);
 }
 
 /* func_00005224 — 2 words. MATCH 100% (shape: m2c). */
@@ -286,6 +405,22 @@ void func_00005224(s32 *arg0, s32 arg1) {
 void func_0000522C(void) {
     duel_draw_C7776D2B(0);
     duel_draw_4CDAED11(1);
+}
+
+/* func_00005250 — forwards duel_draw_239DFC05()'s result through
+ * func_00005224 into *arg0, then returns arg0 unchanged.
+ * MATCH 100% (shape: hand). */
+extern s32 duel_draw_239DFC05(void);
+s32 func_00005250(s32 *arg0) {
+    func_00005224(arg0, duel_draw_239DFC05());
+    return (s32)arg0;
+}
+
+/* func_000052F0 — stores arg1 through func_0000531C at arg0+0x10, returns
+ * arg0+0x10. MATCH 100% (shape: hand). */
+s32 func_000052F0(s32 arg0, s32 arg1) {
+    func_0000531C((s32 *)(arg0 + 0x10), arg1);
+    return arg0 + 0x10;
 }
 
 /* func_0000531C — 2 words. MATCH 100% (shape: m2c). */
@@ -306,6 +441,16 @@ void func_000054E8(void) {
 
 }
 
+/* func_00005834 — 2 words. MATCH 100% (shape: hand). */
+void func_00005834(void) {
+    func_00002310(0);
+}
+
+/* func_0000583C — 2 words. MATCH 100% (shape: hand). */
+void func_0000583C(void) {
+    func_00002358(0);
+}
+
 /* func_00005844 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_00005844(void) {
     return 1;
@@ -321,9 +466,30 @@ s32 func_00005854(void) {
     return 0;
 }
 
+/* func_0000585C — 2 words. MATCH 100% (shape: hand). */
+void func_0000585C(s32 arg0, s32 arg1) {
+    duel_draw_D755977D(arg1);
+}
+
 /* func_00005970 — 2 words. MATCH 100% (shape: m2c). */
 void func_00005970(void) {
 
+}
+
+/* func_00005A34 — 3 words. MATCH 100% (shape: hand). */
+void func_00005A34(void) {
+    func_00002690(*(s32 *)0x15A58);
+}
+
+/* func_00005A40 — 3 words. MATCH 100% (shape: hand). */
+void func_00005A40(void *arg0) {
+    ehsys_memset(arg0, 0, 0x84);
+}
+
+/* func_00005A4C — 8 words. MATCH 100% (shape: hand). */
+s32 func_00005A4C(void *arg0, void *arg1) {
+    ehsys_strncpy(arg0, arg1, 0x80);
+    return 1;
 }
 
 /* func_00005A6C — 2 words. MATCH 100% (shape: m2c). */
@@ -336,9 +502,16 @@ s32 func_00005B18(void) {
     return 0;
 }
 
-/* func_00005BA0 — 2 words. MATCH 100% (shape: m2c). */
+/* func_00005BA0 — tail-calls func_00002690 without setting up $a0 (target's
+ * jal has no argument setup at all, relying on the K&R-style declaration of
+ * func_00002690 above). MATCH 100% (shape: hand). */
 void func_00005BA0(void) {
     func_00002690();
+}
+
+/* func_00005BA8 — 3 words. MATCH 100% (shape: hand). */
+void func_00005BA8(void *arg0, s32 arg1) {
+    ehsys_memset(arg0, 0, arg1);
 }
 
 /* func_00005BD4 — 9 words. MATCH 100% (shape: m2c). */
@@ -349,6 +522,11 @@ s32 func_00005BD4(void) {
 /* func_00005BF8 — 2 words. MATCH 100% (shape: m2c). */
 void func_00005BF8(void) {
 
+}
+
+/* func_00005E24 — 5 words. MATCH 100% (shape: hand). */
+void func_00005E24(void) {
+    ehsys_memset(&D_15A14, 0, 0x18);
 }
 
 /* func_00005F7C — 27 words. MATCH 100% (shape: m2c). */
@@ -397,6 +575,15 @@ void func_000062B4(s32 arg0) {
     if (temp_a0 == 7) {
         duel_draw_6214421F(temp_a0);
     }
+}
+
+/* func_000062DC — chains func_00001B70 -> func_0000228C -> func_00001C30,
+ * threading each result into the next call as its (unused, by
+ * func_00001C30's body) argument. MATCH 100% (shape: hand). */
+extern s32 func_00001B70(void);
+extern s32 func_0000228C(s32);
+void func_000062DC(void) {
+    func_00001C30(func_0000228C(func_00001B70()));
 }
 
 /* func_00006308 — 2 words. MATCH 100% (shape: m2c). */

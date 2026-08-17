@@ -1,10 +1,10 @@
 /*
- * rel_soundtest.prx — reconstructed code (matching decompilation)
+ * rel_title.prx — reconstructed code (matching decompilation)
  *
  * Compiler:     Metrowerks CodeWarrior for PSP — MWCC 1.3 SP7 (mwccpsp_3.0.1_219)
  * Flags:        -O4,s -sdatathreshold 0
- * Verification: scripts/mwcc_build.sh src/rel_soundtest.c
- *               scripts/mwcc_diff.py asm/rel_soundtest/text.s build/mwcc/rel_soundtest.o
+ * Verification: scripts/mwcc_build.sh src/rel_title.c
+ *               scripts/mwcc_diff.py asm/rel_title/text.s build/mwcc/rel_title.o
  *
  * Every function below is byte-identical to the shipped module — each was
  * accepted only on a MATCH verdict from scripts/mwcc_diff.py, and the whole
@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 4 functions matched here. The rest of the module is not
+ * STATUS: 7 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -36,44 +36,48 @@ typedef double f64;
 #define NULL 0
 
 /* ---- imports and globals ---- */
-extern char D_00006A2C;
-extern char D_00006A48;
-extern char D_00006A4C;
-extern char D_00006A50;
-extern int ehsys_20E340D9();
-extern int ehsys_6E42DDCD();
-extern int ehsys_ED1410E0();
-extern int ehsys_F6414A71();
-extern int func_00000908();
 
 /* ---- forward declarations ---- */
-s32 func_00000000(void);
-void func_00000234(void);
-void func_0000023C(void);
-void func_000015B8(void);
+void func_00017374(void);
+void func_0001D46C(void);
+void func_0001D650(void);
+void func_00040C30(void);
+void func_00040C38(void);
+void func_00040C40(void);
+void func_00040C48(void);
 
-/* func_00000000 — 2 words. MATCH 100% (shape: m2c). */
-s32 func_00000000(void) {
-    return 0;
+/* func_00017374 — 2 words. MATCH 100% (shape: m2c). */
+void func_00017374(void) {
+
 }
 
-/* func_00000234 — 2 words. MATCH 100% (shape: m2c). */
-void func_00000234(void) {
-    func_00000908();
+/* func_0001D46C — 2 words. MATCH 100% (shape: m2c). */
+void func_0001D46C(void) {
+
 }
 
-/* func_0000023C — 17 words. MATCH 100% (shape: hand). */
-void func_0000023C(void) {
-    func_000015B8();
-    if (*(int *) &D_00006A4C > 0) {
-        ehsys_F6414A71(*(int *) &D_00006A4C, *(int *) &D_00006A50);
-        ehsys_ED1410E0(*(int *) &D_00006A4C);
-    }
+/* func_0001D650 — 2 words. MATCH 100% (shape: m2c). */
+void func_0001D650(void) {
+
 }
 
-/* func_000015B8 — 12 words. MATCH 100% (shape: hand). */
-void func_000015B8(void) {
-    ehsys_6E42DDCD();
-    ehsys_20E340D9(*(int *) &D_00006A48, *(int *) &D_00006A2C);
+/* func_00040C30 — 2 words. MATCH 100% (shape: m2c). */
+void func_00040C30(void) {
+
+}
+
+/* func_00040C38 — 2 words. MATCH 100% (shape: m2c). */
+void func_00040C38(void) {
+
+}
+
+/* func_00040C40 — 2 words. MATCH 100% (shape: m2c). */
+void func_00040C40(void) {
+
+}
+
+/* func_00040C48 — 2 words. MATCH 100% (shape: m2c). */
+void func_00040C48(void) {
+
 }
 

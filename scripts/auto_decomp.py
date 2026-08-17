@@ -205,8 +205,22 @@ def shape_baked_address(src):
     return out if out != src else None
 
 
+def shape_tail_return(src):
+    """m2c often ends a function with a bare call where the original wrote
+    `return f(...);`. MWCC turns the latter into a real tail call (`j f` with the
+    last argument in the delay slot) and the former into jal+return, so the two
+    differ by a word or more. 280 functions across the project were exactly one
+    word short of their target — this is the shape that closes them."""
+    m = re.search(r"\n([ \t]*)([A-Za-z_]\w*\([^;{}]*\));\n\}\s*$", src)
+    if not m:
+        return None
+    out = src[:m.start()] + f"\n{m.group(1)}return {m.group(2)};\n}}\n"
+    return re.sub(r"^void(\s+\w+\s*\()", r"int\1", out, count=1, flags=re.M)
+
+
 SHAPES = [
     ("m2c", shape_identity),
+    ("tail-return", shape_tail_return),
     ("baked-address", shape_baked_address),
     ("goto-loop", shape_while_to_goto),
     ("dup-return", shape_dup_return),
@@ -236,6 +250,9 @@ def main():
     ap.add_argument("--max-words", type=int, default=10**9)
     ap.add_argument("--only")
     ap.add_argument("--limit", type=int, default=10**9)
+    ap.add_argument("--shard", default="1/1",
+                    help="i/N — process every Nth function, so N processes can run "
+                         "in parallel on one module (results merge by filename)")
     args = ap.parse_args()
 
     mod = args.module
@@ -247,6 +264,10 @@ def main():
     funcs = load_functions(mod)
     todo = [f for f in funcs if f[2] <= args.max_words and
             (not args.only or f[0] == args.only)][:args.limit]
+    si, sn = (int(x) for x in args.shard.split("/"))
+    tag = "" if sn == 1 else f".{si}of{sn}"
+    if sn > 1:
+        todo = todo[si - 1::sn]
     print(f"{mod}: {len(funcs)} functions, trying {len(todo)}", flush=True)
 
     for i, (fn, lines, words) in enumerate(todo):
@@ -258,11 +279,14 @@ def main():
             draft = m2c_draft(mod, fn, ctx, slice_path(mod, fn, lines, workdir))
             if not draft:
                 continue
+            compiled = False
             for name, shape in SHAPES:
                 body = shape(draft)
                 if not body:
                     continue
                 ok, verdict = try_candidate(mod, fn, decls, body, workdir)
+                if verdict != "compile-error":
+                    compiled = True
                 if ok:
                     matched.append({"func": fn, "words": words, "shape": name,
                                     "flavour": flavour, "src": body})
@@ -272,7 +296,9 @@ def main():
                     break
                 if best is None or (best == "compile-error" and verdict != "compile-error"):
                     best = verdict
-            if hit:
+            # the declaration flavour exists only to make the draft COMPILE; once
+            # it does, the other flavours would just recompile the same code
+            if hit or compiled:
                 break
         if not draft and not hit and best is None:
             results.append({"func": fn, "words": words, "status": "m2c-failed"})
@@ -282,11 +308,19 @@ def main():
         if (i + 1) % 25 == 0:
             n = sum(1 for r in results if r["status"] == "MATCH")
             print(f"  {i+1}/{len(todo)} tried, {n} matched", flush=True)
+            # checkpoint: a long run must never lose its results to a kill
+            json.dump({"module": mod, "tried": i + 1, "matched": n, "results": results},
+                      open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
+            json.dump(matched,
+                      open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
 
     n = sum(1 for r in results if r["status"] == "MATCH")
+    if args.only:      # a single-function probe must never clobber the module's results
+        print(f"{mod} {args.only}: {'MATCH' if n else 'no match'}")
+        return
     out = {"module": mod, "tried": len(todo), "matched": n, "results": results}
-    json.dump(out, open(os.path.join(ROOT, f"build/auto/{mod}.json"), "w"), indent=1)
-    json.dump(matched, open(os.path.join(ROOT, f"build/auto/{mod}.matched.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
+    json.dump(matched, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
     print(f"{mod}: MATCHED {n}/{len(todo)}  -> build/auto/{mod}.matched.json")
 
 

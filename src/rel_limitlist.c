@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 6 functions matched here. The rest of the module is not
+ * STATUS: 11 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -39,7 +39,14 @@ typedef double f64;
 extern char D_0000B0D5;
 extern char D_0000B134;
 extern char D_0000B540;
+extern u16 D_0000AB00[];
+extern int ehsys_60B55A50();
 extern int ehsys_831C5769();
+extern int ehsys_942B03D0();
+extern int ehsys_A4AFF8E6();
+extern int ehsys_B8AD96EA();
+extern int ehsys_B89D38DC();
+extern int ehsys_E58C0FDC();
 extern int ehsys_EF9B5D06();
 extern int ehsys_F843E20A();
 extern int func_00000B94();
@@ -51,13 +58,24 @@ extern int func_000039D4();
 s32 func_00000000(void);
 s32 func_00001CC8(s32 arg0);
 s32 func_000034C8(u16 *arg0, u16 *arg1);
+void func_00000B30(s32 arg0, s32 arg1, int arg2);
 void func_00000B50(void);
+void func_00001484(s32 arg0, s32 arg1, s32 arg2);
+void func_00001D14(s32 arg0, s32 arg1, int arg2, s32 arg3);
+void func_00001DB4(s32 arg0, s32 arg1, int arg2);
 void func_00002BC8(s32 arg0);
 void func_000037F0(void);
+void func_00003DC0(s32 arg0, s32 arg1, int arg2);
 
 /* func_00000000 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_00000000(void) {
     return 0;
+}
+
+/* func_00000B30 — 8 words. Draws a 0x1E0-flipped rect: scales coords by 64
+ * and forwards to the draw primitive. MATCH 100% (shape: tail-call). */
+void func_00000B30(s32 arg0, s32 arg1, int arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 
 /* func_00000B50 — 17 words. MATCH 100% (shape: m2c). */
@@ -67,6 +85,12 @@ void func_00000B50(void) {
         return;
     }
     func_00000CA8();
+}
+
+/* func_00001484 — 4 words. Scales 3 coords by 64, tail-calls the draw
+ * primitive. MATCH 100%. */
+void func_00001484(s32 arg0, s32 arg1, s32 arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
 }
 
 /* func_00001CC8 — 19 words. MATCH 100% (shape: m2c). */
@@ -80,6 +104,22 @@ s32 func_00001CC8(s32 arg0) {
         ehsys_EF9B5D06(&sp1C, &D_0000B540);
     }
     return sp1C;
+}
+
+/* func_00001D14 — 40 words. Sets up a full-screen clear then draws via
+ * func_00001DB4, looking up a per-value u16 from D_0000AB00[]. MATCH 100%. */
+void func_00001D14(s32 arg0, s32 arg1, int arg2, s32 arg3) {
+    ehsys_942B03D0(0xC, 0xC);
+    ehsys_60B55A50(0xFF000000);
+    ehsys_B8AD96EA(arg0);
+    func_00001DB4(arg2, arg3 + 2,
+                  ehsys_E58C0FDC(func_000039D4(0x1020), D_0000AB00[arg1 & 0xFFFF]));
+    ehsys_A4AFF8E6();
+}
+
+/* func_00001DB4 — 8 words. Same shape as func_00000B30/func_00003DC0. MATCH 100%. */
+void func_00001DB4(s32 arg0, s32 arg1, int arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 
 /* func_00002BC8 — 16 words. MATCH 100% (shape: m2c). */
@@ -100,5 +140,10 @@ s32 func_000034C8(u16 *arg0, u16 *arg1) {
 /* func_000037F0 — 2 words. MATCH 100% (shape: m2c). */
 void func_000037F0(void) {
     func_000037F8();
+}
+
+/* func_00003DC0 — 8 words. Same shape as func_00000B30/func_00001DB4. MATCH 100%. */
+void func_00003DC0(s32 arg0, s32 arg1, int arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 

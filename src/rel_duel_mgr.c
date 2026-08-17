@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 19 functions matched here. The rest of the module is not
+ * STATUS: 17 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -36,14 +36,6 @@ typedef double f64;
 #define NULL 0
 
 /* ---- imports and globals ---- */
-extern char D_0001E778;
-extern char D_0001E77C;
-extern char D_0001E92C;
-extern char D_0001E930;
-extern char D_0001F300;
-extern char D_0001F304;
-extern char D_0001F314;
-extern char D_0001F318;
 extern int duel_draw_35284271();
 extern int duel_draw_48A690B3();
 extern int duel_draw_A50043BA();
@@ -51,58 +43,48 @@ extern int duel_eng_9FBBA3CF();
 extern int duel_eng_AFF0389D();
 extern int ehsys_1460C6FD();
 extern int ehsys_1EC5342B();
-extern int ehsys_20E340D9();
 extern int ehsys_558B2DCB();
+extern int ehsys_5F00A362();
 extern int ehsys_6E42DDCD();
 extern int ehsys_6F0D36D3();
 extern int ehsys_88B6C7F0();
-extern int ehsys_B4471B5E();
+extern int ehsys_97BB99A5();
 extern int ehsys_B8770B92();
+extern int ehsys_B89D38DC();
 extern int ehsys_C859D5FE();
 extern int ehsys_E4867425();
-extern int ehsys_frame_sync();
 extern int ehsys_sceGuFinish();
-extern int func_00003E80();
-extern int func_00004C60();
 extern int func_0000663C();
 extern int func_0000C054();
 extern int func_00010E10();
 extern int func_000119AC();
 extern int func_00011C08();
-extern int func_00012660();
 extern int func_000126D0();
 
 /* ---- forward declarations ---- */
-s32 func_00003E44(void);
 s32 func_00004B44(void);
 s32 func_000065D0(void);
 s32 func_0000B144(void);
 s32 func_00010DD0(void);
-s32 func_00016F70(void);
 u16 * func_00001DEC(u16 *arg0, u16 *arg1);
 void func_00000948(s32 arg0);
-void func_0000149C(void);
 void func_0000344C(void);
-void func_0000463C(void);
 void func_00004688(void);
 void func_00004F98(void);
 void func_0000500C(void);
-void func_00010E7C(void);
+void func_0000BB8C(s32 arg0, s32 arg1);
+void func_0000C888(s32 arg0);
+void func_00010DC0(s32 arg0, s32 arg1, s32 arg2);
 void func_00011814(void);
 void func_00011A30(void);
-void func_00016F64(void);
-void func_00016F7C(void);
+void func_000150EC(s32 arg0);
+void func_00016EE8(s32 arg0, s32 arg1, s32 arg2);
 
 /* func_00000948 — 13 words. MATCH 100% (shape: m2c). */
 void func_00000948(s32 arg0) {
     if (arg0 != duel_draw_48A690B3()) {
         duel_draw_35284271(arg0);
     }
-}
-
-/* func_0000149C — 3 words. MATCH 100% (shape: m2c). */
-void func_0000149C(void) {
-    D_0001E778 = 0;
 }
 
 /* func_00001DEC — 4 words. MATCH 100% (shape: m2c). */
@@ -114,21 +96,6 @@ u16 *func_00001DEC(u16 *arg0, u16 *arg1) {
 /* func_0000344C — 2 words. MATCH 100% (shape: m2c). */
 void func_0000344C(void) {
 
-}
-
-/* func_00003E44 — 15 words. MATCH 100% (shape: m2c). */
-s32 func_00003E44(void) {
-    D_0001F314 = 0;
-    ehsys_B4471B5E(func_00003E80, func_00004C60, &D_0001F318);
-    return 0;
-}
-
-/* func_0000463C — 19 words. MATCH 100% (shape: m2c). */
-void func_0000463C(void) {
-    if (((s32) D_0001E77C < 0x14) && (func_00012660() != 0)) {
-        D_0001E77C = 0x14;
-    }
-    ehsys_frame_sync();
 }
 
 /* func_00004688 — 13 words. MATCH 100% (shape: m2c). */
@@ -198,21 +165,27 @@ s32 func_0000B144(void) {
     return 0;
 }
 
+/* func_0000BB8C — 3 words. MATCH 100% (shape: hand). */
+void func_0000BB8C(s32 arg0, s32 arg1) {
+    ehsys_97BB99A5(arg0, arg1, 0, 0);
+}
+
+/* func_0000C888 — 2 words. MATCH 100% (shape: hand). */
+void func_0000C888(s32 arg0) {
+    ehsys_5F00A362(arg0 << 6);
+}
+
+/* func_00010DC0 — 4 words. MATCH 100% (shape: hand). */
+void func_00010DC0(s32 arg0, s32 arg1, s32 arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
+}
+
 /* func_00010DD0 — 16 words. MATCH 100% (shape: m2c). */
 s32 func_00010DD0(void) {
     if ((ehsys_1460C6FD() == 0) && (func_00010E10() != 0)) {
         return 1;
     }
     return 0;
-}
-
-/* func_00010E7C — 16 words. MATCH 100% (shape: m2c). */
-void func_00010E7C(void) {
-    if (D_0001E930 != 0) {
-        ehsys_20E340D9(D_0001F300, D_0001E930);
-        D_0001E930 = 0;
-    }
-    D_0001E92C = 0;
 }
 
 /* func_00011814 — 9 words. MATCH 100% (shape: m2c). */
@@ -227,18 +200,13 @@ void func_00011A30(void) {
     func_00011C08();
 }
 
-/* func_00016F64 — 3 words. MATCH 100% (shape: m2c). */
-void func_00016F64(void) {
-    D_0001F304 = 0;
+/* func_000150EC — 2 words. MATCH 100% (shape: hand). */
+void func_000150EC(s32 arg0) {
+    ehsys_5F00A362(arg0 << 6);
 }
 
-/* func_00016F70 — 3 words. MATCH 100% (shape: m2c). */
-s32 func_00016F70(void) {
-    return D_0001F304;
-}
-
-/* func_00016F7C — 6 words. MATCH 100% (shape: m2c). */
-void func_00016F7C(void) {
-    D_0001F304 += 1;
+/* func_00016EE8 — 4 words. MATCH 100% (shape: hand). */
+void func_00016EE8(s32 arg0, s32 arg1, s32 arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
 }
 

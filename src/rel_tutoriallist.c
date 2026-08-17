@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 5 functions matched here. The rest of the module is not
+ * STATUS: 8 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -41,6 +41,8 @@ extern char D_00007D0C;
 extern char D_00007D10;
 extern char D_00007D14;
 extern int ehsys_20E340D9();
+extern int ehsys_97BB99A5();
+extern int ehsys_B89D38DC();
 extern int ehsys_ED1410E0();
 extern int ehsys_F6414A71();
 
@@ -48,19 +50,37 @@ extern int ehsys_F6414A71();
 s32 func_00002630(u16 *arg0, u16 *arg1);
 s32 func_000026B8(void);
 s32 func_00002908(void);
+void func_00000658(s32 arg0, s32 arg1, int arg2);
+void func_00000B8C(s32 arg0, s32 arg1, s32 arg2);
+void func_00001C5C(s32 arg0, s32 arg1);
 void func_000023C4(void);
 void func_000023CC(void);
+
+/* func_00000658 — 8 words. MATCH 100% (shape: hand). */
+void func_00000658(s32 arg0, s32 arg1, int arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
+/* func_00000B8C — 4 words. MATCH 100% (shape: hand). */
+void func_00000B8C(s32 arg0, s32 arg1, s32 arg2) {
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
+}
+
+/* func_00001C5C — 3 words. MATCH 100% (shape: hand). */
+void func_00001C5C(s32 arg0, s32 arg1) {
+    ehsys_97BB99A5(arg0, arg1, 0, 0);
+}
 
 /* func_000023C4 — 2 words. MATCH 100% (shape: m2c). */
 void func_000023C4(void) {
     func_000023CC();
 }
 
-/* func_000023CC — 14 words. MATCH 100% (shape: m2c). */
+/* func_000023CC — 14 words. MATCH 100% (shape: hand). */
 void func_000023CC(void) {
-    if (D_00007C04 != 0) {
-        ehsys_20E340D9(D_00007D0C, D_00007C04);
-        D_00007C04 = 0;
+    if (*(int *) &D_00007C04 != 0) {
+        ehsys_20E340D9(*(int *) &D_00007D0C, *(int *) &D_00007C04);
+        *(int *) &D_00007C04 = 0;
     }
 }
 
@@ -74,12 +94,12 @@ s32 func_000026B8(void) {
     return 0;
 }
 
-/* func_00002908 — 18 words. MATCH 100% (shape: m2c). */
+/* func_00002908 — 18 words. MATCH 100% (shape: hand). */
 s32 func_00002908(void) {
     func_000023C4();
-    if (D_00007D10 > 0) {
-        ehsys_F6414A71(D_00007D10, D_00007D14);
-        ehsys_ED1410E0(D_00007D10);
+    if (*(int *) &D_00007D10 > 0) {
+        ehsys_F6414A71(*(int *) &D_00007D10, *(int *) &D_00007D14);
+        ehsys_ED1410E0(*(int *) &D_00007D10);
     }
     return 1;
 }

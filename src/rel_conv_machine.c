@@ -56,7 +56,7 @@
  *    this compiler passes up to 8 integer/pointer arguments in registers —
  *    $a0-$a3 for args 1-4, then $t0-$t3 for args 5-8 — before spilling to the
  *    stack for a 9th+. m2c does not know this convention and reports
- *    "M2C_ERROR(/* Read from unset register $t0 */)" for any function that
+ *    "M2C_ERROR(-- Read from unset register $t0 --)" for any function that
  *    receives more than 4 arguments; the fix is simply to declare the extra
  *    C parameters (arg4.. use s32, matching whatever the target treats them
  *    as) — MWCC places them in $t0-$t3 on its own. Confirmed by isolated
@@ -158,8 +158,9 @@ typedef struct {
 } D47D460_t;
 extern D47D460_t D_47D460;
 
-/* forward decls for callbacks registered by func_00001854 before their own
- * definitions appear (address order requires func_00001854 before them) */
+/* forward decls: address order puts these definitions after their first
+ * caller/use in this file. */
+void func_00001840(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 void func_000018B8(s32 arg0);
 void func_000018C8(s32 arg0);
 

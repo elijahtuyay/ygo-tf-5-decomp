@@ -114,6 +114,16 @@ def compare(tgt, cand, name):
         tsym, csym = norm_sym(tsym), norm_sym(csym)
         if tsym is not None or csym is not None:
             if tsym is not None and csym is not None:
+                # Same symbol and kind is NOT enough: everything outside the
+                # relocated immediate must agree too, or `lb` vs `lw` (and even a
+                # different destination register) would pass as a match. Mask out
+                # only the bits the relocation supplies.
+                mask = {"HI16": 0xFFFF0000, "LO16": 0xFFFF0000, "26": 0xFC000000}.get(tkind, 0xFFFFFFFF)
+                if tsym == csym and tkind == ckind and (tword & mask) != (cword & mask):
+                    diffs.append(f"  [{i}] SAME RELOC but different instruction: "
+                                 f"target={tmnem} {top} (0x{tword:08x}) vs "
+                                 f"candidate={cmnem} {cop} (0x{cword:08x})")
+                    continue
                 if tsym != csym or tkind != ckind:
                     diffs.append(f"  [{i}] RELOC MISMATCH target={tmnem} {top} ({tkind} {tsym}) "
                                  f"vs candidate={cmnem} {cop} ({ckind} {csym})")
