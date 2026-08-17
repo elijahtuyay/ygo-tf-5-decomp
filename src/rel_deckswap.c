@@ -317,6 +317,14 @@ s32 func_00007B70(s32 arg0, s32 arg1) {
     return (arg1 & (1 << ehsys_FE91A2EC(arg0 & 0xFFFF))) != 0;
 }
 
+/* func_00007EEC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00007EEC(u16 *a0, s32 a1, u8 *a2) {
+    s32 t0;
+    for (t0 = 0; t0 < a1 - 1; t0++) {
+        a2[a0[t0]] = 0xFF;
+    }
+}
+
 /* func_0000A1B8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000A1B8(int a0, unsigned short a1, int a2, int a3) {
     return func_0001283C(a0, &D_0001D930 + a1 * 6, a2, a3 + 1, 0xE8, 0);

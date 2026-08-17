@@ -62,6 +62,10 @@ extern u16 D_0001EA2C;
 extern unsigned short D_0001EB54;
 extern int D_0001EB58;
 extern int D_0001EB7C;
+extern int D_0001E5D0;
+extern void ehsys_39ADDA9F(s32);
+extern void ehsys_B0F320E6(s32);
+extern void ehsys_E1139F1A(s32);
 extern int ehsys_20E340D9(int, void *);
 extern int ehsys_2012884C(int);
 extern int ehsys_3BB2BAC6(int, int, int, int, int, int, int);
@@ -106,6 +110,42 @@ extern void *D_0001FC4C;
 /* ============================================================
  * Matched functions, in address order (required for linking).
  * ============================================================ */
+
+/* func_00001058 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001058(void) {
+    s32 i;
+    s32 v;
+    for (i = 0; i < 2; i++) {
+        v = *(int *)((char *)D_0001E5D0 + i * 4 + 0x98);
+        if (v != 0) {
+            ehsys_39ADDA9F(v);
+        }
+    }
+}
+
+/* func_0000110C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000110C(void) {
+    s32 i;
+    s32 v;
+    for (i = 0; i < 2; i++) {
+        v = *(int *)((char *)D_0001E5D0 + i * 4 + 0x98);
+        if (v != 0) {
+            ehsys_B0F320E6(v);
+        }
+    }
+}
+
+/* func_00001160 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00001160(void) {
+    s32 i;
+    s32 v;
+    for (i = 0; i < 2; i++) {
+        v = *(int *)((char *)D_0001E5D0 + i * 4 + 0x98);
+        if (v != 0) {
+            ehsys_E1139F1A(v);
+        }
+    }
+}
 
 /* func_0000120C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0000120C(s32 arg0, int arg1, int arg2, int arg3) {
@@ -241,6 +281,14 @@ s32 func_00008E20(s32 arg0, s32 arg1) {
 /* func_0000910C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 s32 func_0000910C(s32 arg0, s32 arg1) {
     return (arg1 & (1 << ehsys_FE91A2EC(arg0 & 0xFFFF))) != 0;
+}
+
+/* func_00009488 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00009488(u16 *a0, s32 a1, u8 *a2) {
+    s32 t0;
+    for (t0 = 0; t0 < a1 - 1; t0++) {
+        a2[a0[t0]] = 0xFF;
+    }
 }
 
 /* func_00009E20 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
