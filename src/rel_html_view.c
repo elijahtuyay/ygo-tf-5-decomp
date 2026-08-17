@@ -1,5 +1,3 @@
-
-
 /*
  * rel_html_view.prx — reconstructed code (matching decompilation)
  *
@@ -232,51 +230,208 @@ int  func_00000670(void);
 /* func_00000000 — module entry point: registers the browser's main routine
  * (func_00000034) and its (empty) teardown hook (func_00000084).
  * Same shape as rel_movie_viewer's func_00000000. */
-int func_00000000(void);
+int func_00000000(void) {
+    ehsys_B4471B5E(func_00000034, func_00000084, (void *) &g_module_reg);
+    return 0;
+}
 
 /* func_00000034 — the module's main routine: init, then pump func_00000670
  * (the state machine) once per frame until it reports "done". */
-void func_00000034(void);
+void func_00000034(void) {
+    ehsys_sceKernelChangeCurrentThreadAttr(0, 0x4000);
+    func_00000650();
+loop:
+    if (func_00000670() != 0) {
+        goto done;
+    }
+    ehsys_frame_sync();
+    goto loop;
+done:
+    ehsys_08813E19(0xD, 0);
+}
 
 /* func_00000084 — empty teardown callback registered by func_00000000. */
-void func_00000084(void);
+void func_00000084(void) {
+}
 
 /* func_0000008C — acquire six resources/handles (ids 0x100, 0x102..0x106);
  * on the first failure release everything already taken (func_00000134) and
  * return that negative result. The success path returns the LAST acquire's
  * value, which is why one variable carries both. */
-int func_0000008C(void);
+int func_0000008C(void) {
+    int r;
+
+    r = sceUtilityLoadModule(0x100);
+    if (r < 0) {
+        goto fail;
+    }
+    r = sceUtilityLoadModule(0x102);
+    if (r < 0) {
+        goto fail;
+    }
+    r = sceUtilityLoadModule(0x103);
+    if (r < 0) {
+        goto fail;
+    }
+    r = sceUtilityLoadModule(0x104);
+    if (r < 0) {
+        goto fail;
+    }
+    r = sceUtilityLoadModule(0x105);
+    if (r < 0) {
+        goto fail;
+    }
+    r = sceUtilityLoadModule(0x106);
+    if (r < 0) {
+        goto fail;
+    }
+    return r;
+fail:
+    func_00000134();
+    return r;
+}
 
 /* func_00000134 — release the six resources acquired by func_0000008C, in
  * reverse order. */
-void func_00000134(void);
+void func_00000134(void) {
+    sceUtilityUnloadModule(0x106);
+    sceUtilityUnloadModule(0x105);
+    sceUtilityUnloadModule(0x104);
+    sceUtilityUnloadModule(0x103);
+    sceUtilityUnloadModule(0x102);
+    sceUtilityUnloadModule(0x100);
+}
 
 /* func_00000178 — bring up the network/browser stack (0x28000 = 160 KB of
  * working memory). Every step after the first unwinds via func_00000244. */
-int func_00000178(void);
+int func_00000178(void) {
+    int r;
+
+    r = sceSslInit(0x28000);
+    if (r < 0) {
+        return r;
+    }
+    r = sceHttpInit(0x28000);
+    if (r < 0) {
+        func_00000244();
+        return r;
+    }
+    r = sceHttpsInit(0, 0, 0, 0);
+    if (r < 0) {
+        func_00000244();
+        return r;
+    }
+    r = sceHttpsLoadDefaultCert(0, 0);
+    if (r < 0) {
+        func_00000244();
+        return r;
+    }
+    /* the LAST check must carry its own `return r;` INSIDE the if-body, with a
+     * second `return r;` after it. Phrased as one shared return (either
+     * `if (r < 0) { cleanup(); } return r;` or a `goto` past the cleanup) MWCC
+     * emits the branch-LIKELY form and schedules the return-value move into
+     * the delay slot; the duplicated return gives the target's plain `bgez` +
+     * `nop`. The earlier checks are unaffected — they already return inside
+     * their bodies. */
+    r = sceHttpLoadSystemCookie();
+    if (r < 0) {
+        func_00000244();
+        return r;
+    }
+    return r;
+}
 
 /* func_00000244 — tear down what func_00000178 brought up. */
-void func_00000244(void);
+void func_00000244(void) {
+    sceHttpSaveSystemCookie();
+    sceHttpsEnd();
+    sceHttpEnd();
+    sceSslEnd();
+}
 
 /* func_00000278 — full startup sequence: resources, then a 0x20000-byte
  * subsystem, then the network stack. Any failure unwinds via func_00000358. */
-int func_00000278(void);
+int func_00000278(void) {
+    int r;
+
+    r = func_0000008C();
+    if (r < 0) {
+        return r;
+    }
+    r = sceNetInit(0x20000, 0x2A, 0, 0x2A, 0);
+    if (r < 0) {
+        return r;
+    }
+    r = sceNetInetInit();
+    if (r < 0) {
+        func_00000358();
+        return r;
+    }
+    r = sceNetResolverInit();
+    if (r < 0) {
+        func_00000358();
+        return r;
+    }
+    r = sceNetApctlInit(0x5400, 0x30);
+    if (r < 0) {
+        func_00000358();
+        return r;
+    }
+    /* same duplicated-return shape as func_00000178's last check. */
+    r = func_00000178();
+    if (r < 0) {
+        func_00000358();
+        return r;
+    }
+    return r;
+}
 
 /* func_00000358 — the module's full teardown path. */
-void func_00000358(void);
+void func_00000358(void) {
+    func_00000244();
+    sceNetApctlTerm();
+    sceNetResolverTerm();
+    sceNetInetTerm();
+    sceNetTerm();
+    func_00000134();
+}
 
 /* func_0000039C — maps the system language (ehsys_get_language) onto the browser's
  * own language id. Compiled with a jump table (jtbl_00005E34, in .data). */
-int func_0000039C(void);
+int func_0000039C(void) {
+    switch (ehsys_get_language()) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 6;
+    case 3:
+        return 2;
+    case 4:
+        return 5;
+    case 5:
+        return 3;
+    default:
+        return 1;
+    }
+}
 
 /* func_00000414 — append the Konami TF5 download URL to dst. */
-void func_00000414(void *dst);
+void func_00000414(void *dst) {
+    ehsys_strcat(dst, &s_download_url);
+}
 
 /* func_00000420 — build the savedata path into dst: copy "/PSP/SAVEDATA/",
  * then append the game's own id (ehsys_57018B7C fills the 0x20-byte buffer). */
-void func_00000420(void *dst);
+void func_00000420(void *dst) {
+    char buf[0x20];
 
-
+    ehsys_strcpy(dst, &s_savedata_dir);
+    ehsys_memset(buf, 0, 0x20);
+    ehsys_57018B7C(buf);
+    ehsys_strcat(dst, buf);
+}
 
 /* func_00000470 — build the 0xA8-byte browser config at g_html_param and hand
  * it to sceUtilityHtmlViewerInitStart (the "start browser" import).
@@ -349,19 +504,68 @@ int func_00000470(void *arg0) {
     return sceUtilityHtmlViewerInitStart(cfg);
 }
 
-
-
-
-
 /* func_000005A0 — per-frame poll while the browser runs. sceUtilityHtmlViewerGetStatus
  * reports the browser's exit reason: 0 = still running (in which case the
  * config's +0x1C field selects the return code), otherwise dispatch the
  * reason and report 0. */
-int func_000005A0(void);
+int func_000005A0(void) {
+    char *cfg = &g_html_param;
+    int reason;
+
+    ehsys_sceGuSync(0, 0);
+    reason = sceUtilityHtmlViewerGetStatus();
+    if (reason != 0) {
+        /* MWCC emits the case TESTS in reverse source order (the target tests
+         * 3, 2, 4, 1), while laying the case BODIES out in source order — so
+         * the source order below is 1, 4, 2, 3. */
+        switch (reason) {
+        case 1:
+            break;
+        case 4:
+            break;
+        case 2:
+            sceUtilityHtmlViewerUpdate(2);
+            break;
+        case 3:
+            sceUtilityHtmlViewerShutdownStart();
+            break;
+        }
+    } else {
+        return (*(int *) (cfg + 0x1C) == 0) ? 1 : 2;
+    }
+    return 0;
+}
 
 /* func_00000650 — enter state 1 and point the state machine at its buffer. */
-void func_00000650(void);
+void func_00000650(void) {
+    g_state = 1;
+    g_heap_ptr = &g_heap;
+}
 
 /* func_00000670 — the state machine, pumped once per frame by func_00000034.
  * Returns nonzero once state 4 (done) is reached. */
-int func_00000670(void);
+int func_00000670(void) {
+    switch (g_state) {
+    case 1:
+        if (func_00000278() < 0) {
+            g_state = 3;
+        } else if (func_00000470(g_heap_ptr) < 0) {
+            g_state = 3;
+        } else {
+            g_state = g_state + 1;
+        }
+        break;
+    case 2:
+        if (func_000005A0() != 0) {
+            g_state = g_state + 1;
+        }
+        break;
+    case 3:
+        func_00000358();
+        g_state = g_state + 1;
+        break;
+    case 4:
+        return 1;
+    }
+    return 0;
+}
