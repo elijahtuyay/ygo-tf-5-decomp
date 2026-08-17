@@ -22,18 +22,65 @@
  * most of .data here is packed/compressed layout data rather than readable
  * strings, unlike rel_deckswap/rel_select_card.
  *
- * STATUS -- MECHANICAL first pass: 39 of 254 functions are byte-identical to
- * the target, verified with mwcc_diff.py. As with the other two modules,
- * every match here is a small leaf thunk; the large stateful functions are
- * unmatched. Every function present is tagged "MATCH 100%".
+ * STATUS -- MECHANICAL sweep: 68 of 254 functions are byte-identical to
+ * the target, verified with mwcc_diff.py (up from an initial 39-function
+ * pass). Most matches are small leaf thunks and simple loops; the large
+ * stateful functions remain unmatched. Every function present is tagged
+ * "MATCH 100%".
  *
- * func_00015210 (a two-word MMIO-style store to raw addresses 0x8E73B4 /
- * 0x8E735C) is NONMATCHING and NOT included below: the target uses two
- * separate `lui` computations for the same %hi(0x8E....) even though the
- * upper 16 bits are identical, while every portable-C phrasing tried here
- * (including two independent `volatile int *` locals) gets CSE'd by MWCC
- * into one shared `lui`. Left as a lead for whoever picks this module back
- * up; decomp-permuter or inline asm are the next things to try.
+ * func_00015210 and func_00016400 (two-word/small MMIO-style stores to raw
+ * addresses under 0x8E7xxx) are NONMATCHING and NOT included below: the
+ * target computes the base address ONCE (lui+addiu into a register) and
+ * reuses it for multiple stores at plain immediate offsets, while every
+ * portable-C phrasing tried here (repeated `&Global`, a cached `char *`
+ * local, struct member access) gets rematerialized by MWCC into a fresh
+ * lui/addiu (or a fresh lui+reloc-baked-offset) at each store. This is the
+ * general "MWCC address rematerialization" trap described in this project's
+ * decomp notes (see docs/10-func_00000294-investigation.md) -- it recurs
+ * throughout this module and the other two sibling modules. Left as a lead;
+ * decomp-permuter or inline asm are the next things to try.
+ *
+ * ADDITIONAL LEVERS found in this sweep (beyond rel_movie_viewer/rel_deckswap):
+ *
+ *   - Fixed-offset "index into an array, but the element base pointer is
+ *     shifted by a constant" idiom: write it as `arr[idx + N]` (pointer
+ *     arithmetic folded into ONE index expression), not as a separately
+ *     precomputed `(char *)arr + N` pointer used across iterations -- the
+ *     latter gets its constant folded into the relocation addend, which
+ *     mismatches when the target keeps the offset as a bare immediate on
+ *     the load/store instruction (see func_0000B55C / func_00004CF4).
+ *
+ *   - A local pointer/address value that must survive a `jal` (i.e. is used
+ *     again after a call) needs to be a real local variable computed BEFORE
+ *     the call, not recomputed after -- otherwise MWCC computes it fresh
+ *     post-call (fewer instructions, no register save) instead of caching it
+ *     in a saved register across the call like the target does (see
+ *     func_000166C8's `char *p = &D_8E73B8;` fix).
+ *
+ *   - `x == SMALL_CONST` sometimes compiles through a bare `xori`+`sltiu`
+ *     idiom (`(x ^ SMALL_CONST) < 1`) rather than `beq`/`bne` -- when a
+ *     candidate is 1 word oversized on an equality check, try writing the
+ *     xor/sltiu form explicitly instead of `==`.
+ *
+ *   - Loop trip counts get compared with `sltiu` (unsigned) vs `slti`
+ *     (signed) depending on the loop variable's declared signedness --
+ *     match it by declaring the loop counter `unsigned` when the target
+ *     shows `sltiu`.
+ *
+ *   - Register-editing bitfield/mask sequences that look algebraically
+ *     redundant (e.g. `(x & ~1) | 1`) can get constant-folded away by MWCC
+ *     when written as plain arithmetic -- if the target keeps the
+ *     redundant AND+OR pair, model it as an actual C bitfield write
+ *     (`struct { unsigned bit0:1; ... } *p; p->bit0 = 1;`) instead, which
+ *     forces the read-modify-write shape even when the result is provably
+ *     constant.
+ *
+ *   - Multi-argument ehsys/thunk calls: don't assume a single-arg call from
+ *     a "looks like one value is used" reading -- check the delay slot of
+ *     the FOLLOWING jal too, since a value computed just before a call is
+ *     often the affected function's own return value, e.g.
+ *     `func_0000B140`/`func_0000B188` are `ehsys_E58C0FDC(func_0000FCD4(x),
+ *     lookup)`, not `ehsys_E58C0FDC(lookup)`.
  *
  * CAUTION (see rel_deckswap.c header for the full writeup): mwcc_diff.py's
  * relocation leniency does not check load/store WIDTH, so `char`/`short`

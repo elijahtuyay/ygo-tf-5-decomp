@@ -261,6 +261,24 @@ int func_0000BE8C(int a0) {
     return func_0000956C(a0 & 0xFFFF);
 }
 
+/* func_0000C6D8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000C6D8(void *a0) {
+    int s1 = D_0001EA2C;
+    void *s2 = a0;
+
+    if (s1 >= 8) {
+        int i;
+        for (i = 0; i < 7; i++) {
+            ehsys_memcpy((int) (&D_0001E5E0 + i * 10 + 0x44E),
+                         &D_0001E5E0 + (i + 1) * 10 + 0x44E, 0xA);
+        }
+        s1 = s1 - 1;
+    } else {
+        D_0001EA2C = s1 + 1;
+    }
+    ehsys_memcpy((int) (&D_0001E5E0 + s1 * 10 + 0x44E), s2, 0xA);
+}
+
 /* func_0000C7A4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000C7A4(int a0) {
     if (D_0001EA2C == 0) {
@@ -379,6 +397,42 @@ int func_000130A4(int a0, int a1, int a2, int a3) {
 /* func_0001479C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0001479C(int a0, int a1, int a2) {
     return ehsys_B89D38DC(a0 << 6, a1 << 6, a2 << 6);
+}
+
+/* func_00014C6C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00014C6C(int a0, void *a1) {
+    int v0 = 0;
+
+    if (a1 == 0) {
+        return v0;
+    }
+    {
+        int count = *(u16 *) a1;
+        u16 *arr = (u16 *) ((char *) a1 + 2);
+        int key = a0 & 0xFFFF;
+        int lo = 0;
+        int hi = count - 1;
+
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            u16 v = arr[mid];
+            if (key == v) {
+                v0 = mid & 0xFFFF;
+                break;
+            }
+            if (v < key) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+    }
+    return v0;
+}
+
+/* func_00015074 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00015074(int a0, int a1, int a2) {
+    return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
 }
 
 /* func_00016A6C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

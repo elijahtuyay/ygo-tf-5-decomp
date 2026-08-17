@@ -195,12 +195,111 @@ extern int func_000687E0();
 extern int func_00069304();
 extern int func_00069F28();
 extern int func_0006A3C0();
+extern int func_0006E0DC();
+extern char D_39881C;
+extern char D_398834;
+extern char D_398868;
+extern char D_398940;
+extern char D_39898C;
+extern int duel_eng_0534CBA5();
+extern int duel_eng_0796FC63();
+extern int duel_eng_0EB5F782();
+extern int duel_eng_12943036();
+extern int duel_eng_1837FC74();
+extern int duel_eng_1A4C5817();
+extern int duel_eng_1DE65CD9();
+extern int duel_eng_20FA1976();
+extern int duel_eng_302F0BDC();
+extern int duel_eng_3B0C99E7();
+extern int duel_eng_3EF59AD0();
+extern int duel_eng_4BC82DF2();
+extern int duel_eng_4E22C77E();
+extern int duel_eng_50FDA3A6();
+extern int duel_eng_564492D2();
+extern int duel_eng_575C7FF3();
+extern int duel_eng_5A2E1D22();
+extern int duel_eng_65CABB3B();
+extern int duel_eng_6C7BDC7D();
+extern int duel_eng_6E78EB9B();
+extern int duel_eng_70D96DE6();
+extern int duel_eng_70F7713B();
+extern int duel_eng_7214A584();
+extern int duel_eng_77689943();
+extern int duel_eng_780289AD();
+extern int duel_eng_878654F9();
+extern int duel_eng_8ACE7469();
+extern int duel_eng_8B100126();
+extern int duel_eng_8CE718D2();
+extern int duel_eng_8FEC3AF9();
+extern int duel_eng_94B1D599();
+extern int duel_eng_95531E08();
+extern int duel_eng_962F6809();
+extern int duel_eng_9ADAC01D();
+extern int duel_eng_A47EF27C();
+extern int duel_eng_A7D6360C();
+extern int duel_eng_A99B16A1();
+extern int duel_eng_AEDF1F0D();
+extern int duel_eng_B1CA7A57();
+extern int duel_eng_B5DAA640();
+extern int duel_eng_B774881F();
+extern int duel_eng_B8A3FF78();
+extern int duel_eng_C4B3FEFE();
+extern int duel_eng_CD086A4E();
+extern int duel_eng_CFCDD509();
+extern int duel_eng_DE8F840C();
+extern int duel_eng_E8754761();
+extern int duel_eng_ED3B1B4B();
+extern int duel_eng_EDED5379();
+extern int duel_eng_EE219051();
+extern int ehsys_2AE3C0AD();
+extern int func_0000246C();
+extern int func_00004EFC();
+extern int func_0000568C();
+extern int func_0000B3E8();
+extern int func_000119B0();
+extern int func_00011A00();
+extern int func_00011A2C();
+extern int func_00019C38();
+extern int func_0001B2E8();
+extern int func_0001BD44();
+extern int func_0001BF28();
+extern int func_0001C1DC();
+extern int func_00051648();
+extern int func_00051770();
+extern int func_00053B3C();
+extern int func_000564C8();
+extern int func_00058A68();
+extern int func_00058B0C();
+extern int func_000590DC();
+extern int func_000592B4();
+extern int func_0005B77C();
+extern int func_0005D078();
+extern int func_0005D0B8();
+extern int func_000633C8();
+extern int func_000696A0();
+extern int func_000696A8();
+extern int func_000696B0();
+extern int func_000696B8();
 extern int func_0006DD28();
+extern int func_0006DD70();
 extern int func_0006DE5C();
 extern int func_0006DE64();
 extern int func_0006DE7C();
+extern int func_0006DE84();
+extern int func_0006DE9C();
 extern int func_0006DF74();
-extern int func_0006E0DC();
+extern void * D_00077BE0;
+extern void * D_00078210;
+extern void * D_00078220;
+extern void * D_000909E0;
+extern void * D_00090CB0;
+extern void * D_00090CE4;
+extern void * D_00093B0C;
+extern void * D_0009410C;
+extern void * D_00094124;
+extern void * D_395A6C;
+extern void * D_3A13A8;
+extern void * D_3A13B0;
 
 /* ---- structs (local, for pointer-arg thunks) ---- */
 struct S1B70C { int pad0; int pad1; int pad2; int f0C; };
@@ -257,7 +356,6 @@ s32 func_00059078(void);
 s32 func_00059960(void);
 s32 func_000599C4(void);
 s32 func_00059D20(void);
-s32 func_0005B77C(s32 arg0);
 s32 func_0005B7E4(void);
 s32 func_0005BBA0(s32 arg0);
 s32 func_0005E144(s32 arg0);
@@ -295,7 +393,6 @@ void func_00019630(void);
 void func_00019CF8(void);
 void func_0001A1F4(void);
 void func_0001A8A8(void);
-void func_0001BD44(void);
 void func_0001C500(void);
 void func_0001D2E8(void);
 void func_0003159C(void);
@@ -337,7 +434,6 @@ void func_00053930(void);
 void func_0005399C(void);
 void func_000539AC(void);
 void func_00053B10(void);
-void func_00053B3C(s32 arg0);
 void func_00053B58(void);
 void func_00053BE4(void);
 void func_00054F54(void);
@@ -350,7 +446,6 @@ void func_000557F8(void);
 void func_00055BAC(void);
 void func_00055BE0(void);
 void func_00055C10(void);
-void func_000564C8(s32 arg0);
 void func_0005666C(void);
 void func_00056C4C(s32 arg0);
 void func_00056C58(void);
@@ -364,13 +459,11 @@ void func_00056E54(void);
 void func_00056E78(s32 arg0);
 void func_00057128(void);
 void func_00057B34(void);
-void func_00058B0C(s32 arg0);
 void func_00058E34(void);
 void func_0005906C(void);
 void func_00059290(void);
 void func_0005929C(s32 arg0);
 void func_000592A8(s32 arg0);
-void func_000592B4(s32 arg0);
 void func_000592C0(s32 arg0);
 void func_00059328(s32 arg0);
 void func_00059434(s32 arg0);
@@ -378,7 +471,6 @@ void func_0005999C(s32 arg0);
 void func_000599D0(void);
 void func_0005B770(void);
 void func_0005C8D4(void);
-void func_0005D0B8(void);
 void func_0005D964(void);
 void func_0005D970(void);
 void func_0005DB6C(void);
@@ -396,7 +488,6 @@ void func_00062428(void);
 void func_00063020(void);
 void func_00063050(void);
 void func_000633C0(void);
-void func_000633C8(s32 arg0);
 void func_00066B3C(void);
 void func_00066CCC(void);
 void func_00066E7C(void);
@@ -408,10 +499,6 @@ void func_00068D3C(void);
 void func_00069244(void);
 void func_00069278(void);
 void func_000692A8(void);
-void func_000696A0(void);
-void func_000696A8(void);
-void func_000696B0(void);
-void func_000696B8(void);
 void func_000698C8(void);
 void func_00069E6C(void);
 void func_00069EF4(void);
@@ -419,7 +506,6 @@ void func_0006A6A8(void);
 void func_0006A6B0(void);
 void func_0006CD0C(void);
 void func_0006CD14(void);
-void func_0006DE9C(void);
 void func_0006E174(void);
 void func_0006E204(void);
 void func_0006E3E0(void);
@@ -532,14 +618,36 @@ u16 *func_00008DF4(u16 *arg0, u16 *arg1) {
     return arg0;
 }
 
+/* func_0000B464 — 6 words. MATCH 100% (shape: m2c). */
+void func_0000B464(s32 arg0, void *arg1) {
+    (&D_000909E0)[arg0] = arg1;
+}
+
+/* func_00010FC0 — 12 words. MATCH 100% (shape: m2c). */
+void *func_00010FC0(void) {
+    return (&D_00077BE0)[func_00051770()];
+}
+
 /* func_00011074 — 2 words. MATCH 100% (shape: m2c). */
 void func_00011074(void) {
 
 }
 
+/* func_000119B0 — 6 words. MATCH 100% (shape: m2c). */
+int func_000119B0(arg0) s32 arg0;
+{
+    return (s32)((&D_00090CB0)[arg0]);
+}
+
+/* func_00011C20 — 12 words. MATCH 100% (shape: m2c). */
+void func_00011C20(s32 arg0, void **arg1, void **arg2) {
+    *arg1 = (&D_00090CE4)[arg0];
+    *arg2 = *(void **)(&D_00090CF4 + arg0 * 4);
+}
+
 /* func_00011C50 — 15 words. MATCH 100% (shape: m2c). */
 s32 func_00011C50(void) {
-    return ((s32) (&D_00090CF4)[func_00051210()] >= 0xF) & 0xFF;
+    return ((*(s32 *)(&D_00090CF4 + func_00051210() * 4)) >= 0xF) & 0xFF;
 }
 
 /* func_0001388C — 17 words. MATCH 100% (shape: m2c). */
@@ -581,6 +689,16 @@ void func_000154DC(void) {
 /* func_00016050 — 2 words. MATCH 100% (shape: hand). */
 void func_00016050(s32 arg0, s32 arg1) {
     func_0005369C(arg1);
+}
+
+/* func_000167CC — 12 words. MATCH 100% (shape: m2c). */
+void *func_000167CC(void) {
+    return (&D_00078210)[func_00051770()];
+}
+
+/* func_000167FC — 12 words. MATCH 100% (shape: m2c). */
+void *func_000167FC(void) {
+    return (&D_00078220)[func_00051770()];
 }
 
 /* func_00017C40 — 9 words. MATCH 100% (shape: m2c). */
@@ -642,8 +760,14 @@ void func_0001BD3C(s32 arg0, struct S1BD3C *arg1) {
 }
 
 /* func_0001BD44 — 2 words. MATCH 100% (shape: m2c). */
-void func_0001BD44(void) {
+int func_0001BD44() {
     func_00019500();
+}
+
+/* func_0001C2C8 — 12 words. MATCH 100% (shape: m2c). */
+void func_0001C2C8(s32 arg0) {
+    func_00051648(-1);
+    func_0001BD44(arg0);
 }
 
 /* func_0001C500 — 2 words. MATCH 100% (shape: m2c). */
@@ -783,6 +907,14 @@ s32 func_0004D000(void) {
     return 1;
 }
 
+/* func_0004D008 — 14 words. MATCH 100% (shape: m2c). */
+s32 func_0004D008(void) {
+    func_00004EFC(func_0006DE5C());
+    func_0001557C();
+    func_0000568C(0);
+    return 1;
+}
+
 /* func_0004D040 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_0004D040(void) {
     return 1;
@@ -805,6 +937,18 @@ s32 func_0004D480(void) {
 
 /* func_0004D56C — 2 words. MATCH 100% (shape: m2c). */
 s32 func_0004D56C(void) {
+    return 1;
+}
+
+/* func_0004D574 — 10 words. MATCH 100% (shape: m2c). */
+s32 func_0004D574(void) {
+    func_0001B2E8(func_0006DE5C());
+    return 1;
+}
+
+/* func_0004D670 — 10 words. MATCH 100% (shape: m2c). */
+s32 func_0004D670(void) {
+    func_0001C1DC(func_0006DE5C());
     return 1;
 }
 
@@ -917,6 +1061,12 @@ s32 func_0004F4B8(void) {
     return 1;
 }
 
+/* func_0004F534 — 10 words. MATCH 100% (shape: m2c). */
+s32 func_0004F534(void) {
+    func_0001BF28(func_0006DE5C());
+    return 1;
+}
+
 /* func_0004F61C — 16 words. MATCH 100% (shape: m2c). */
 void func_0004F61C(void) {
     func_0005FBE8();
@@ -942,6 +1092,21 @@ void func_0004FCC0(void) {
     func_00051678();
 }
 
+/* func_0004FD5C — 2 words. MATCH 100% (shape: m2c). */
+void func_0004FD5C(void) {
+    func_00053B3C();
+}
+
+/* func_0004FDB4 — 2 words. MATCH 100% (shape: m2c). */
+void func_0004FDB4(void) {
+    func_000633C8();
+}
+
+/* func_0004FDBC — 2 words. MATCH 100% (shape: m2c). */
+void func_0004FDBC(void) {
+    func_00058B0C();
+}
+
 /* func_0004FF90 — 2 words. MATCH 100% (shape: m2c). */
 void func_0004FF90(void) {
     func_000054B4();
@@ -950,6 +1115,12 @@ void func_0004FF90(void) {
 /* func_0004FF98 — 2 words. MATCH 100% (shape: hand). */
 void func_0004FF98(s32 arg0) {
     func_00005460(arg0, 0);
+}
+
+/* func_0004FFA0 — 15 words. MATCH 100% (shape: m2c). */
+void func_0004FFA0(void) {
+    func_00011A00(func_0006DE9C(), 1);
+    func_00011A2C(duel_eng_3B0C99E7(), 1);
 }
 
 /* func_0004FFDC — 2 words. MATCH 100% (shape: m2c). */
@@ -965,6 +1136,11 @@ void func_0004FFE4(void) {
 /* func_00050018 — 2 words. MATCH 100% (shape: m2c). */
 void func_00050018(void) {
     func_00058FDC();
+}
+
+/* func_000502C4 — 2 words. MATCH 100% (shape: m2c). */
+void func_000502C4(void) {
+    func_0000B3E8();
 }
 
 /* func_000502CC — 2 words. MATCH 100% (shape: m2c). */
@@ -997,6 +1173,11 @@ void func_000502F4(void) {
     func_00050E34();
 }
 
+/* func_000502FC — 2 words. MATCH 100% (shape: m2c). */
+void func_000502FC(void) {
+    func_00019C38();
+}
+
 /* func_0005034C — 8 words. MATCH 100% (shape: m2c). */
 void *func_0005034C(s32 arg0) {
     return &D_00093AF8 + (arg0 * 0x60) + 0x3A0;
@@ -1025,6 +1206,11 @@ void func_0005086C(void) {
     ehsys_F5E3080C();
 }
 
+/* func_00050918 — 6 words. MATCH 100% (shape: m2c). */
+void *func_00050918(s32 arg0) {
+    return (&D_00093B0C)[arg0];
+}
+
 /* func_00050BB8 — 2 words. MATCH 100% (shape: m2c). */
 void func_00050BB8(void) {
 
@@ -1040,6 +1226,11 @@ void func_00050C60(void) {
     func_00002354();
 }
 
+/* func_00050C68 — 2 words. MATCH 100% (shape: m2c). */
+void func_00050C68(void) {
+    func_0000246C();
+}
+
 /* func_00050C70 — 2 words. MATCH 100% (shape: m2c). */
 void func_00050C70(void) {
     func_00002478();
@@ -1050,9 +1241,27 @@ void func_00050D60(void) {
 
 }
 
+/* func_00050F20 — 14 words. MATCH 100% (shape: m2c). */
+s32 func_00050F20(void) {
+    if (func_00050E34() != 0) {
+        return 0;
+    }
+    return func_0006DE9C() != 0;
+}
+
+/* func_00050F58 — 2 words. MATCH 100% (shape: m2c). */
+void func_00050F58(void) {
+    func_000119B0();
+}
+
 /* func_00050F98 — 8 words. MATCH 100% (shape: m2c). */
 s32 func_00050F98(void) {
     return duel_eng_0F848AB5() + 1;
+}
+
+/* func_00051660 — 6 words. MATCH 100% (shape: m2c). */
+void *func_00051660(s32 arg0) {
+    return (&D_0009410C)[arg0];
 }
 
 /* func_00051760 — 2 words. MATCH 100% (shape: m2c). */
@@ -1063,6 +1272,21 @@ s32 func_00051760(void) {
 /* func_00051768 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_00051768(void) {
     return 0;
+}
+
+/* func_000517F4 — 12 words. MATCH 100% (shape: m2c). */
+void *func_000517F4(void) {
+    return (&D_00094124)[func_0006DE7C()];
+}
+
+/* func_0005185C — 9 words. MATCH 100% (shape: m2c). */
+void func_0005185C(void) {
+    duel_eng_70F7713B(func_0006DE7C());
+}
+
+/* func_00051880 — 9 words. MATCH 100% (shape: m2c). */
+void func_00051880(void) {
+    duel_eng_E8754761(func_0006DE7C());
 }
 
 /* func_000518A4 — 12 words. MATCH 100% (shape: hand). */
@@ -1108,7 +1332,8 @@ void func_00053B10(void) {
 }
 
 /* func_00053B3C — 3 words. MATCH 100% (shape: m2c). */
-void func_00053B3C(s32 arg0) {
+int func_00053B3C(arg0) s32 arg0;
+{
     *(s32 *)0x395648 = arg0;
 }
 
@@ -1240,7 +1465,8 @@ s32 func_00055E28(void) {
 }
 
 /* func_000564C8 — 10 words. MATCH 100% (shape: m2c). */
-void func_000564C8(s32 arg0) {
+int func_000564C8(arg0) s32 arg0;
+{
     *(s32 *)0x3956E4 = arg0;
     if (arg0 >= 0) {
         ehsys_4BF558F1();
@@ -1286,6 +1512,11 @@ void func_00056D18(void) {
 /* func_00056D20 — 2 words. MATCH 100% (shape: m2c). */
 void func_00056D20(void) {
 
+}
+
+/* func_00056D28 — 2 words. MATCH 100% (shape: m2c). */
+void func_00056D28(void) {
+    func_0005B77C();
 }
 
 /* func_00056D84 — 2 words. MATCH 100% (shape: m2c). */
@@ -1343,7 +1574,8 @@ void func_00057B34(void) {
 }
 
 /* func_00058B0C — 3 words. MATCH 100% (shape: m2c). */
-void func_00058B0C(s32 arg0) {
+int func_00058B0C(arg0) s32 arg0;
+{
     *(s32 *)0x3958D4 = arg0;
 }
 
@@ -1378,6 +1610,11 @@ s32 func_00059078(void) {
     return *(s32 *)0x395A18;
 }
 
+/* func_000590D0 — 3 words. MATCH 100% (shape: m2c). */
+void **func_000590D0(void) {
+    return (void **)&D_3958D8;
+}
+
 /* func_00059290 — 3 words. MATCH 100% (shape: m2c). */
 void func_00059290(void) {
     ehsys_E1139F1A(&D_3958D8);
@@ -1394,7 +1631,8 @@ void func_000592A8(s32 arg0) {
 }
 
 /* func_000592B4 — 3 words. MATCH 100% (shape: m2c). */
-void func_000592B4(s32 arg0) {
+int func_000592B4(arg0) s32 arg0;
+{
     *(s32 *)0x3959FC = arg0;
 }
 
@@ -1422,6 +1660,11 @@ s32 func_00059960(void) {
         return 0;
     }
     return 1;
+}
+
+/* func_00059990 — 3 words. MATCH 100% (shape: m2c). */
+void **func_00059990(void) {
+    return &D_395A6C;
 }
 
 /* func_0005999C — 3 words. MATCH 100% (shape: m2c). */
@@ -1452,12 +1695,13 @@ void func_0005B770(void) {
 }
 
 /* func_0005B77C — 11 words. MATCH 100% (shape: m2c). */
-s32 func_0005B77C(s32 arg0) {
+int func_0005B77C(arg0) s32 arg0;
+{
     s32 sp1C;
 
     sp1C = arg0;
     ehsys_EF9B5D06(&sp1C, &D_395D7C);
-    return sp1C;
+    return (s32)(sp1C);
 }
 
 /* func_0005B7E4 — 15 words. MATCH 100% (shape: m2c). */
@@ -1487,8 +1731,17 @@ void func_0005C8D4(void) {
     duel_eng_3865EBDA(func_0005846C(*(s32 *)0x3964C4));
 }
 
+/* func_0005D028 — 20 words. MATCH 100% (shape: m2c). */
+void func_0005D028(s32 arg0) {
+    func_000590DC(0, arg0, 0x30, func_0005D078);
+    func_00055E34(4);
+    func_000564C8(0x36);
+    func_000592B4(func_0005D0B8);
+    ehsys_2AE3C0AD(0x94CB);
+}
+
 /* func_0005D0B8 — 9 words. MATCH 100% (shape: m2c). */
-void func_0005D0B8(void) {
+int func_0005D0B8() {
     duel_eng_3865EBDA(func_000592CC());
 }
 
@@ -1645,7 +1898,8 @@ void func_000633C0(void) {
 }
 
 /* func_000633C8 — 3 words. MATCH 100% (shape: m2c). */
-void func_000633C8(s32 arg0) {
+int func_000633C8(arg0) s32 arg0;
+{
     *(s32 *)0x39851C = arg0;
 }
 
@@ -1721,9 +1975,21 @@ void func_000687B4(void) {
 
 }
 
+/* func_00068CD8 — 16 words. MATCH 100% (shape: m2c). */
+void func_00068CD8(void) {
+    func_000696A0(&D_398834);
+    ehsys_5DF04F49(&D_398868);
+    ehsys_memset(&D_39881C, 0, 0x124);
+}
+
 /* func_00068D3C — 4 words. MATCH 100% (shape: m2c). */
 void func_00068D3C(void) {
     *(s32 *)0x39881C = 1;
+}
+
+/* func_00068D4C — 3 words. MATCH 100% (shape: m2c). */
+void func_00068D4C(void) {
+    func_000696B0(&D_398834);
 }
 
 /* func_00069244 — 13 words. MATCH 100% (shape: m2c). */
@@ -1749,28 +2015,50 @@ void func_000692A8(void) {
 }
 
 /* func_000696A0 — 2 words. MATCH 100% (shape: m2c). */
-void func_000696A0(void) {
+int func_000696A0() {
     func_000687B4();
 }
 
 /* func_000696A8 — 2 words. MATCH 100% (shape: m2c). */
-void func_000696A8(void) {
+int func_000696A8() {
     func_000687BC();
 }
 
 /* func_000696B0 — 2 words. MATCH 100% (shape: m2c). */
-void func_000696B0(void) {
+int func_000696B0() {
     func_000687D8();
 }
 
 /* func_000696B8 — 2 words. MATCH 100% (shape: m2c). */
-void func_000696B8(void) {
+int func_000696B8() {
     func_000687E0();
 }
 
 /* func_000698C8 — 3 words. MATCH 100% (shape: m2c). */
 void func_000698C8(void) {
     func_00069304(&D_398958);
+}
+
+/* func_000698E0 — 16 words. MATCH 100% (shape: m2c). */
+void func_000698E0(void) {
+    func_000696A0(&D_398958);
+    ehsys_5DF04F49(&D_39898C);
+    ehsys_memset(&D_398940, 0, 0x11C);
+}
+
+/* func_00069920 — 4 words. MATCH 100% (shape: m2c). */
+void func_00069920(s32 arg0) {
+    func_000696A8(&D_398958, arg0);
+}
+
+/* func_00069930 — 3 words. MATCH 100% (shape: m2c). */
+void func_00069930(void) {
+    func_000696B0(&D_398958);
+}
+
+/* func_0006993C — 4 words. MATCH 100% (shape: m2c). */
+void func_0006993C(s32 arg0) {
+    func_000696B8(&D_398958, arg0);
 }
 
 /* func_00069E6C — 18 words. MATCH 100% (shape: m2c). */
@@ -1848,9 +2136,128 @@ s32 func_0006DD1C(void) {
     return *(s32 *)0x3A13A4;
 }
 
+/* func_0006DD28 — 18 words. MATCH 100% (shape: m2c). */
+int func_0006DD28() {
+    func_00058A68(func_000536B8(4), 2, 1, 0);
+    func_000592B4(func_0006DD70);
+    *(s32 *)0x3A13A4 = 1;
+}
+
+/* func_0006DE5C — 2 words. MATCH 100% (shape: m2c). */
+int func_0006DE5C() {
+    func_0006DE64();
+}
+
+/* func_0006DE64 — 6 words. MATCH 100% (shape: m2c). */
+int func_0006DE64(arg0) s32 arg0;
+{
+    return (s32)((&D_3A13A8)[arg0]);
+}
+
+/* func_0006DE7C — 2 words. MATCH 100% (shape: m2c). */
+int func_0006DE7C() {
+    func_0006DE84();
+}
+
+/* func_0006DE84 — 6 words. MATCH 100% (shape: m2c). */
+int func_0006DE84(arg0) s32 arg0;
+{
+    return (s32)((&D_3A13B0)[arg0]);
+}
+
 /* func_0006DE9C — 9 words. MATCH 100% (shape: m2c). */
-void func_0006DE9C(void) {
+int func_0006DE9C() {
     func_0006DE64(duel_eng_4F664B71());
+}
+
+/* func_0006DEC0 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DEC0(void) {
+    duel_eng_EDED5379(func_0006DE84());
+}
+
+/* func_0006DEE4 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DEE4(void) {
+    duel_eng_9ADAC01D(func_0006DE84());
+}
+
+/* func_0006DF08 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DF08(void) {
+    duel_eng_8ACE7469(func_0006DE84());
+}
+
+/* func_0006DF2C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DF2C(void) {
+    duel_eng_962F6809(func_0006DE84());
+}
+
+/* func_0006DF50 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DF50(void) {
+    duel_eng_3EF59AD0(func_0006DE84());
+}
+
+/* func_0006DF74 — 9 words. MATCH 100% (shape: m2c). */
+int func_0006DF74() {
+    duel_eng_95531E08(func_0006DE84());
+}
+
+/* func_0006DF98 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DF98(void) {
+    duel_eng_0EB5F782(func_0006DE84());
+}
+
+/* func_0006DFBC — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DFBC(void) {
+    duel_eng_302F0BDC(func_0006DE84());
+}
+
+/* func_0006DFE0 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006DFE0(void) {
+    duel_eng_ED3B1B4B(func_0006DE84());
+}
+
+/* func_0006E004 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E004(void) {
+    duel_eng_1A4C5817(func_0006DE84());
+}
+
+/* func_0006E028 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E028(void) {
+    duel_eng_4E22C77E(func_0006DE84());
+}
+
+/* func_0006E04C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E04C(void) {
+    duel_eng_8FEC3AF9(func_0006DE84());
+}
+
+/* func_0006E070 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E070(void) {
+    duel_eng_780289AD(func_0006DE84());
+}
+
+/* func_0006E094 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E094(void) {
+    duel_eng_878654F9(func_0006DE84());
+}
+
+/* func_0006E0B8 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E0B8(void) {
+    duel_eng_CD086A4E(func_0006DE84());
+}
+
+/* func_0006E108 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E108(void) {
+    duel_eng_A7D6360C(func_0006DE84());
+}
+
+/* func_0006E12C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E12C(void) {
+    duel_eng_1DE65CD9(func_0006DE84());
+}
+
+/* func_0006E150 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E150(void) {
+    duel_eng_8CE718D2(func_0006DE84());
 }
 
 /* func_0006E174 — 9 words. MATCH 100% (shape: m2c). */
@@ -1858,9 +2265,74 @@ void func_0006E174(void) {
     func_0006DE64(duel_eng_F2783CB1());
 }
 
+/* func_0006E198 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E198(void) {
+    duel_eng_575C7FF3(func_0006DE84());
+}
+
+/* func_0006E1BC — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E1BC(void) {
+    duel_eng_5A2E1D22(func_0006DE84());
+}
+
+/* func_0006E1E0 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E1E0(void) {
+    duel_eng_8B100126(func_0006DE84());
+}
+
 /* func_0006E204 — 9 words. MATCH 100% (shape: m2c). */
 void func_0006E204(void) {
     func_0006DE64(duel_eng_BAF46839());
+}
+
+/* func_0006E228 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E228(void) {
+    duel_eng_6C7BDC7D(func_0006DE84());
+}
+
+/* func_0006E29C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E29C(void) {
+    duel_eng_6E78EB9B(func_0006DE84());
+}
+
+/* func_0006E2C0 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E2C0(void) {
+    duel_eng_94B1D599(func_0006DE84());
+}
+
+/* func_0006E2E4 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E2E4(void) {
+    duel_eng_A47EF27C(func_0006DE84());
+}
+
+/* func_0006E308 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E308(void) {
+    duel_eng_C4B3FEFE(func_0006DE84());
+}
+
+/* func_0006E32C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E32C(void) {
+    duel_eng_B8A3FF78(func_0006DE84());
+}
+
+/* func_0006E350 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E350(void) {
+    duel_eng_B5DAA640(func_0006DE84());
+}
+
+/* func_0006E374 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E374(void) {
+    duel_eng_AEDF1F0D(func_0006DE84());
+}
+
+/* func_0006E398 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E398(void) {
+    duel_eng_1837FC74(func_0006DE84());
+}
+
+/* func_0006E3BC — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E3BC(void) {
+    duel_eng_0534CBA5(func_0006DE84());
 }
 
 /* func_0006E3E0 — 2 words. MATCH 100% (shape: m2c). */
@@ -1871,5 +2343,85 @@ void func_0006E3E0(void) {
 /* func_0006E3E8 — 2 words. MATCH 100% (shape: m2c). */
 void func_0006E3E8(void) {
     duel_eng_66155499();
+}
+
+/* func_0006E3F0 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E3F0(void) {
+    duel_eng_0796FC63(func_0006DE84());
+}
+
+/* func_0006E414 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E414(void) {
+    duel_eng_70D96DE6(func_0006DE84());
+}
+
+/* func_0006E438 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E438(void) {
+    duel_eng_20FA1976(func_0006DE84());
+}
+
+/* func_0006E45C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E45C(void) {
+    duel_eng_564492D2(func_0006DE84());
+}
+
+/* func_0006E480 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E480(void) {
+    duel_eng_CFCDD509(func_0006DE84());
+}
+
+/* func_0006E4A4 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E4A4(void) {
+    duel_eng_12943036(func_0006DE84());
+}
+
+/* func_0006E4C8 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E4C8(void) {
+    duel_eng_B1CA7A57(func_0006DE84());
+}
+
+/* func_0006E4EC — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E4EC(void) {
+    duel_eng_DE8F840C(func_0006DE84());
+}
+
+/* func_0006E510 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E510(void) {
+    duel_eng_7214A584(func_0006DE84());
+}
+
+/* func_0006E5D4 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E5D4(void) {
+    duel_eng_65CABB3B(func_0006DE84());
+}
+
+/* func_0006E5F8 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E5F8(void) {
+    duel_eng_4BC82DF2(func_0006DE84());
+}
+
+/* func_0006E61C — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E61C(void) {
+    duel_eng_EE219051(func_0006DE84());
+}
+
+/* func_0006E674 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E674(void) {
+    duel_eng_B774881F(func_0006DE84());
+}
+
+/* func_0006E698 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E698(void) {
+    duel_eng_A99B16A1(func_0006DE84());
+}
+
+/* func_0006E6BC — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E6BC(void) {
+    duel_eng_50FDA3A6(func_0006DE84());
+}
+
+/* func_0006E6E0 — 9 words. MATCH 100% (shape: m2c). */
+void func_0006E6E0(void) {
+    duel_eng_77689943(func_0006DE84());
 }
 
