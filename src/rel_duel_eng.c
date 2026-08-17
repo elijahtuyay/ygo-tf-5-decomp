@@ -124,6 +124,16 @@ int func_00004370(void) {
     extern int D_00325DEC;
     return D_00325DEC;
 }
+/* func_00004698 — 7 words. MATCH 100% (shape: hand). */
+void func_00004698(int a0, int a1) {
+    extern int D_00325DFC;
+    extern int D_00325E00;
+    extern int D_00325E04;
+    extern int func_00004698();
+    D_00325DFC = a0;
+    D_00325E00 = 0;
+    D_00325E04 = a1;
+}
 
 
 /* func_000046E8 — 2 words. MATCH 100% (shape: m2c). */
@@ -410,7 +420,7 @@ s32 func_00031424(void) {
 extern int func_00033320();
 /* func_00031A28 — 5 words. MATCH 100% (shape: m2c). */
 s32 func_00031A28(void) {
-    extern char D_00351768;
+    extern int D_00351768;
     extern int func_00031A28();
     return D_00351768 == 6;
 }
@@ -433,6 +443,14 @@ void *func_00035F78(s32 arg0) {
     extern char D_0034C6F8;
     extern int func_00035F78();
     return &D_0034C6C8 + ((arg0 == (s32) &D_0034C6F8) * 0x4C) + 0x30;
+}
+/* func_0003DC20 — 7 words. MATCH 100% (shape: hand). */
+int func_0003DC20(int a0) {
+    extern int D_00351784;
+    extern int func_00040550();
+    extern int func_0003DC20();
+    D_00351784 = a0;
+    return func_00040550(0x36, 0xC, 0, 0);
 }
 /* func_0003CB10 — 2 words. MATCH 100% (shape: hand). */
 extern int func_0003B4A0();
@@ -482,6 +500,12 @@ int func_0003FBF8(void) {
     extern int func_0003FBF8();
     return D_0034DF50;
 }
+/* func_0003FF0C — 7 words. MATCH 100% (shape: hand). */
+int func_0003FF0C(int a0) {
+    extern char D_0034DF44;
+    extern int func_0003FF0C();
+    return *((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C4) & 1;
+}
 /* func_0004458C — 3 words. MATCH 100% (shape: hand). */
 int func_0004458C(void) {
     extern int D_00351740;
@@ -506,6 +530,13 @@ extern int func_00045388();
 int func_000452BC(int a0, int a1, int a2, int a3) {
     extern int func_000452BC();
     extern int func_00045388(); return func_00045388(a0, a1, 0x1, 0); }
+/* func_0004EADC — 4 words. MATCH 100% (shape: hand). */
+int func_0004EADC(void) {
+    extern u16 D_0034D6D8;
+    extern int func_0004EADC();
+    D_0034D6D8 = 0;
+    return 1;
+}
 /* func_0005AA80 — 3 words. MATCH 100% (shape: hand). */
 extern int func_0005A860();
 /* func_00050600 — 14 words. MATCH 100% (shape: bool-fold). */
@@ -639,7 +670,14 @@ int func_000609F4(int a0, int a1, int a2) {
     int v0 = a0 ? 0x8000 : 0;
     return func_000135F0((v0 | 0x42) & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, 0);
 }
-
+/* func_0006B27C — 7 words. MATCH 100% (shape: hand). */
+void func_0006B27C(void) {
+    extern int D_0035182C;
+    extern int D_003517EC;
+    extern int func_0006B27C();
+    D_0035182C = 4;
+    D_003517EC = 1;
+}
 
 
 
@@ -855,6 +893,13 @@ void func_000832E4(s32 unused0, s32 unused1, int arg2) {
     extern int func_000832E4();
     extern int func_0009412C();
     ehsys_6F2C8118(func_0009412C(), arg2);
+}
+/* func_00088198 — 4 words. MATCH 100% (shape: hand). */
+int func_00088198(int a0) {
+    extern int func_002EED24();
+    extern int func_00088198();
+    extern int D_002FF6A0;
+    return func_002EED24(a0, ((int)&D_002FF6A0), 0x32);
 }
 
 /* func_00089398 — 45 words. MATCH 100% (shape: m2c). */
@@ -2580,6 +2625,12 @@ s32 func_000E51E8(void) {
     }
     return 2;
 }
+/* func_000E5750 — 6 words. MATCH 100% (shape: hand). */
+int func_000E5750(void *a0) {
+    extern int D_00351714;
+    extern int func_000E5750();
+    return (D_00351714 ^ *(unsigned short *)((char *)a0 + 2)) != 0;
+}
 /* func_000E6130 — 11 words. MATCH 100% (shape: hand). */
 int func_000E6130(unsigned short *a0, int a1, int a2, int a3) {
     extern int func_00078AAC();
@@ -2606,6 +2657,12 @@ s32 func_000E7A8C(void) {
         return 0;
     }
     return 2;
+}
+/* func_000E8A80 — 5 words. MATCH 100% (shape: hand). */
+int func_000E8A80(void) {
+    extern int D_0034C6D0;
+    extern int func_000E8A80();
+    return !D_0034C6D0;
 }
 /* func_000E95E0 — 16 words. MATCH 100% (shape: bool-fold). */
 s32 func_000E95E0(void *arg0) {
@@ -2700,6 +2757,12 @@ int func_000F3164(unsigned short *a0, int a1, int a2, int a3) {
     extern int func_0008110C();
     int r = func_0008110C(a0[1], a0[2], a2, a3);
     return (r + 1) == 2;
+}
+/* func_000F3844 — 6 words. MATCH 100% (shape: hand). */
+int func_000F3844(void) {
+    extern int D_0034FCD8;
+    extern int func_000F3844();
+    return !(D_0034FCD8 & 1);
 }
 
 /* func_000F45A8 — 10 words. MATCH 100% (shape: bool-fold). */
@@ -2910,6 +2973,11 @@ void func_00126EAC(short *a0, unsigned short *a1) {
     *a0 = *a1;
     func_0017C328(a0, a1);
     *a0 = 0x183E;
+}
+/* func_0012BB70 — 4 words. MATCH 100% (shape: hand). */
+int func_0012BB70(void *a0, unsigned short *a1) {
+    a1[0xD] = 1;
+    return 0;
 }
 /* func_00129CBC — 17 words. MATCH 100% (shape: bool-fold). */
 s32 func_00129CBC(s32 arg0, int arg1) {
@@ -3182,6 +3250,12 @@ int func_0015F408(void) {
 
     extern int D_0034D558;
     return D_0034D558;
+}
+/* func_00162DD0 — 4 words. MATCH 100% (shape: hand). */
+int func_00162DD0(int a0, int a1, int a2, int a3, unsigned short *t0, int *t1) {
+    extern int ehsys_D83FB4E8();
+    extern int func_00162DD0();
+    return ehsys_D83FB4E8(*t0 & 0x3FFF, *t1);
 }
 /* func_00162F70 — 7 words. MATCH 100% (shape: bulk). */
 int func_00162F70(int a0, int a1, int a2, int a3) {
@@ -3710,6 +3784,11 @@ int func_0016CEF8(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
     extern int func_00161DF0();
     extern int func_0016CDD4();
     return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_0016CDD4), 0, (*(int *)((char *)(a0) + 8)), 17);
+}
+/* func_0016D6E8 — 6 words. MATCH 100% (shape: hand). */
+int func_0016D6E8(int a0, int a1, int a2, int a3, void *t0) {
+    extern int func_0016D6E8();
+    return !(((unsigned int)(*(unsigned char *)((char *)t0 + 2)) << 29) >> 31);
 }
 /* func_0016D700 — 9 words. MATCH 100% (shape: bulk). */
 int func_0016D700(int a0, int a1, int a2, int a3, int t0, int t1) {
@@ -4296,6 +4375,11 @@ s32 func_001A1270(void) {
     extern int func_001A1270();
     return 1;
 }
+/* func_001A5180 — 7 words. MATCH 100% (shape: hand). */
+int func_001A5180(void *a0, int a1) {
+    extern int func_001A5180();
+    return *((unsigned char *)a0 + a1 * 20 + 8) & 7;
+}
 /* func_001A369C — 21 words. MATCH 100% (shape: m2c). */
 s32 func_001A369C(s32 arg0, int arg1) {
     extern int ehsys_EED9C836();
@@ -4735,6 +4819,17 @@ s32 func_00210BD0(s32 arg0, u16 *arg1) {
     }
     return func_00205108(arg0, arg1, 0, 0) != 0;
 }
+/* func_00212048 — 5 words. MATCH 100% (shape: hand). */
+int func_00212048(void *a0) {
+    extern int func_00212048();
+    return (*(unsigned short *)((char *)a0 + 2) ^ *(unsigned char *)((char *)a0 + 0x30)) != 0;
+}
+/* func_00212EA4 — 5 words. MATCH 100% (shape: hand). */
+int func_00212EA4(void) {
+    extern int D_00351724;
+    extern int func_00212EA4();
+    return !((unsigned int)D_00351724 < 2);
+}
 /* func_002126E8 — 21 words. MATCH 100% (shape: bool-fold). */
 s32 func_002126E8(s32 arg0, u16 *arg1) {
     extern int ehsys_EED9C836();
@@ -4851,6 +4946,10 @@ s32 func_0022999C(s32 arg0) {
     return var_v0;
 }
 
+/* func_00229EA0 — 4 words. MATCH 100% (shape: hand). */
+int func_00229EA0(void *a0) {
+    return (unsigned int)(*(unsigned short *)((char *)a0 + 6) ^ 3) < 1;
+}
 /* func_00229EB0 — 7 words. MATCH 100% (shape: bulk). */
 int func_00229EB0(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7) {
     extern int func_00201F7C();
@@ -5677,6 +5776,13 @@ void func_002EECF8(void) {
     func_002CEA6C(0xC);
     func_002CDC30();
 }
+/* func_002EEBB0 — 5 words. MATCH 100% (shape: hand). */
+int func_002EEBB0(void) {
+    extern int D_00326F5C;
+    extern int func_002F6B08();
+    extern int func_002EEBB0();
+    return func_002F6B08((int)&D_00326F5C, 0x256DC);
+}
 
 /* func_002EED1C — 2 words. MATCH 100% (shape: bulk). */
 int func_002EED1C(int arg1) {
@@ -5939,6 +6045,27 @@ int func_002EF7B4(void) {
     extern int func_002EF7B4();
     return D_00351884;
 }
+/* func_002EF9FC — 5 words. MATCH 100% (shape: hand). */
+void func_002EF9FC(void) {
+    extern int D_003518A8;
+    extern int D_003518A4;
+    extern int func_002EF9FC();
+    D_003518A4 = D_003518A8;
+}
+/* func_002EFA48 — 7 words. MATCH 100% (shape: hand). */
+void func_002EFA48(void) {
+    extern int D_003268E4;
+    extern int D_003518B0;
+    extern int func_002EFA48();
+    D_003518B0 = (D_003268E4 & 1) ^ 1;
+}
+/* func_002EF9E4 — 6 words. MATCH 100% (shape: hand). */
+void func_002EF9E4(void) {
+    extern int D_003268E4;
+    extern int D_003518A8;
+    extern int func_002EF9E4();
+    D_003518A8 = D_003268E4 & 1;
+}
 /* func_002EFA64 — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFA64(int arg1, int arg2) {
 
@@ -5961,6 +6088,13 @@ int func_002EFB08(int arg1, int arg2) {
     extern char D_003518BC;
     return func_002EFB1C(((int)&D_003518B4), ((int)&D_003518BC));
 }
+/* func_002EFB1C — 6 words. MATCH 100% (shape: hand). */
+void *func_002EFB1C(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002EFB1C();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002EFBD0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFBD0(int arg1, int arg2) {
 
@@ -5968,6 +6102,13 @@ int func_002EFBD0(int arg1, int arg2) {
     extern char D_003518C4;
     extern char D_003518CC;
     return func_002EFBE4(((int)&D_003518C4), ((int)&D_003518CC));
+}
+/* func_002EFBE4 — 6 words. MATCH 100% (shape: hand). */
+void *func_002EFBE4(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002EFBE4();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002EFC9C — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFC9C(int arg1, int arg2) {
@@ -5977,6 +6118,13 @@ int func_002EFC9C(int arg1, int arg2) {
     extern char D_003518DC;
     return func_002EFCB0(((int)&D_003518D4), ((int)&D_003518DC));
 }
+/* func_002EFCB0 — 6 words. MATCH 100% (shape: hand). */
+void *func_002EFCB0(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002EFCB0();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002EFD6C — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFD6C(int arg1, int arg2) {
 
@@ -5984,6 +6132,13 @@ int func_002EFD6C(int arg1, int arg2) {
     extern char D_003518E4;
     extern char D_003518EC;
     return func_002EFD80(((int)&D_003518E4), ((int)&D_003518EC));
+}
+/* func_002EFD80 — 6 words. MATCH 100% (shape: hand). */
+void *func_002EFD80(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002EFD80();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002EFE3C — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFE3C(int arg1, int arg2) {
@@ -6007,6 +6162,20 @@ s32 *func_002EFEF4(s32 *arg0, s32 *arg1) {
     *arg0 = *arg1;
     return arg0;
 }
+/* func_002EFEC4 — 7 words. MATCH 100% (shape: hand). */
+void func_002EFEC4(void) {
+    extern int D_003268E8;
+    extern int D_00351908;
+    extern int func_002EFEC4();
+    D_00351908 = (unsigned int)(D_003268E8 ^ 3) < 1;
+}
+/* func_002EFF40 — 5 words. MATCH 100% (shape: hand). */
+void func_002EFF40(void) {
+    extern int D_00351724;
+    extern int D_00351910;
+    extern int func_002EFF40();
+    D_00351910 = D_00351724;
+}
 /* func_002EFF54 — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFF54(int arg1, int arg2) {
 
@@ -6020,6 +6189,13 @@ s32 *func_002EFF68(s32 *arg0, s32 *arg1) {
     extern int func_002EFF68();
     *arg0 = *arg1;
     return arg0;
+}
+/* func_002EFFAC — 5 words. MATCH 100% (shape: hand). */
+void func_002EFFAC(void) {
+    extern int D_00351714;
+    extern int D_00351918;
+    extern int func_002EFFAC();
+    D_00351918 = D_00351714;
 }
 /* func_002EFFC0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFFC0(int arg1, int arg2) {
@@ -6035,6 +6211,13 @@ s32 *func_002EFFD4(s32 *arg0, s32 *arg1) {
     *arg0 = *arg1;
     return arg0;
 }
+/* func_002F0018 — 5 words. MATCH 100% (shape: hand). */
+void func_002F0018(void) {
+    extern int D_0035171C;
+    extern int D_00351920;
+    extern int func_002F0018();
+    D_00351920 = D_0035171C;
+}
 /* func_002F002C — 5 words. MATCH 100% (shape: bulk). */
 int func_002F002C(int arg1, int arg2) {
 
@@ -6048,6 +6231,13 @@ s32 *func_002F0040(s32 *arg0, s32 *arg1) {
     extern int func_002F0040();
     *arg0 = *arg1;
     return arg0;
+}
+/* func_002F0084 — 5 words. MATCH 100% (shape: hand). */
+void func_002F0084(void) {
+    extern int D_00351738;
+    extern int D_00351928;
+    extern int func_002F0084();
+    D_00351928 = D_00351738;
 }
 /* func_002F0098 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0098(int arg1, int arg2) {
@@ -6437,6 +6627,13 @@ int func_002F4664(int arg1, int arg2) {
     extern char D_00358114;
     return func_002F4678(((int)&D_003580D4), ((int)&D_00358114));
 }
+/* func_002F47E0 — 5 words. MATCH 100% (shape: hand). */
+void func_002F47E0(void) {
+    extern int D_00326908;
+    extern int D_00358158;
+    extern int func_002F47E0();
+    D_00358158 = D_00326908;
+}
 /* func_002F47F4 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F47F4(int arg1, int arg2) {
 
@@ -6451,6 +6648,13 @@ s32 *func_002F4808(s32 *arg0, s32 *arg1) {
     *arg0 = *arg1;
     return arg0;
 }
+/* func_002F484C — 5 words. MATCH 100% (shape: hand). */
+void func_002F484C(void) {
+    extern int D_00326C10;
+    extern int D_00358160;
+    extern int func_002F484C();
+    D_00358160 = D_00326C10;
+}
 /* func_002F4860 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4860(int arg1, int arg2) {
 
@@ -6464,6 +6668,13 @@ s32 *func_002F4874(s32 *arg0, s32 *arg1) {
     extern int func_002F4874();
     *arg0 = *arg1;
     return arg0;
+}
+/* func_002F48B8 — 5 words. MATCH 100% (shape: hand). */
+void func_002F48B8(void) {
+    extern int D_00326C14;
+    extern int D_00358168;
+    extern int func_002F48B8();
+    D_00358168 = D_00326C14;
 }
 /* func_002F48CC — 5 words. MATCH 100% (shape: bulk). */
 int func_002F48CC(int arg1, int arg2) {
@@ -6737,6 +6948,13 @@ s16 *func_002F5D4C(s16 *arg0, s16 *arg1) {
     extern int func_002F5D4C();
     *arg0 = *arg1;
     return arg0;
+}
+/* func_002F5DA0 — 5 words. MATCH 100% (shape: hand). */
+void func_002F5DA0(void) {
+    extern int D_00351788;
+    extern int D_003593E8;
+    extern int func_002F5DA0();
+    D_003593E8 = D_00351788;
 }
 /* func_002F5DB4 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F5DB4(int arg1, int arg2) {
