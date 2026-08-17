@@ -171,17 +171,32 @@ def trace_registers(pre, delay):
         if not parts or not parts[0].startswith("$"):
             return
         dst = parts[0]
-        if mn == "addu" and len(parts) == 3 and parts[2] == "$zero":
+        if mn == "addu" and len(parts) == 3 and parts[1] == "$zero" and parts[2] == "$zero":
+            regs[dst] = ("imm", "0")            # `addu $reg, $zero, $zero` zeroes it
+        elif mn == "addu" and len(parts) == 3 and parts[2] == "$zero":
             regs[dst] = regs.get(parts[1], ("unknown",))
         elif mn == "addu" and len(parts) == 3 and parts[1] == "$zero":
             regs[dst] = regs.get(parts[2], ("unknown",))
         elif mn == "addiu" and len(parts) == 3 and parts[1] == "$zero":
             regs[dst] = ("imm", parts[2])
         elif mn in ("lhu", "lh", "lbu", "lb", "lw") and len(parts) == 2:
+            # struct field: `lhu $reg, OFF($srcreg)` where $srcreg traces to a
+            # parameter — read straight off one of our own pointer arguments.
             m2 = re.match(r"(-?0x[0-9A-Fa-f]+|-?\d+)\((\$\w+)\)", parts[1])
-            src = regs.get(m2.group(2), ("unknown",)) if m2 else ("unknown",)
-            if m2 and src[0] == "param":
-                regs[dst] = ("field", src[1], m2.group(1), WIDTHS[mn])
+            # global value: `lhu $reg, %lo(D_X)($basereg)` where $basereg was
+            # just set to %hi(D_X) of that SAME symbol two lines up — this is
+            # the second half of the usual lui/lhu pair that reads a global,
+            # as distinct from the lui/addiu pair that takes ITS ADDRESS.
+            m3 = re.match(r"%lo\((\w+)\)\((\$\w+)\)", parts[1])
+            if m2:
+                src = regs.get(m2.group(2), ("unknown",))
+                regs[dst] = (("field", src[1], m2.group(1), WIDTHS[mn])
+                             if src[0] == "param" else ("unknown",))
+            elif m3:
+                base = regs.get(m3.group(2), (None,))
+                regs[dst] = (("global", m3.group(1), WIDTHS[mn])
+                             if base[0] == "addr_hi" and base[1] == m3.group(1)
+                             else ("unknown",))
             else:
                 regs[dst] = ("unknown",)
         elif mn == "lui" and len(parts) == 2:
@@ -324,6 +339,8 @@ def render_arg(a):
         return f"(*({width} *)((char *)({param}) + {off}))"
     if kind == "addr":
         return f"((int)&{a[1]})"
+    if kind == "global":
+        return a[1]
     raise Fail(f"cannot render argument {a}")
 
 
@@ -334,6 +351,11 @@ def render_source(r):
     # (a callback, or another global) that also needs its own declaration
     extra_syms = sorted({a[1] for a in r["args"] if a[0] == "addr"})
     decls = "".join(f"    extern int {s}();\n" for s in extra_syms)
+    # A global read (as opposed to &global) must be declared at the width it
+    # was actually loaded at — `char` gives lb, `int` gives lw, and so on;
+    # see merge_matches.py's DATA_FLAVOURS comment for the same lever.
+    for _, sym, width in {a for a in r["args"] if a[0] == "global"}:
+        decls += f"    extern {width} {sym};\n"
 
     if r["ret_mode"] == "constant":
         body = f"    {call};\n    return {r['ret_expr']};"

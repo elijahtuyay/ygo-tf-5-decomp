@@ -8879,3 +8879,94 @@ int func_0023A71C(int a0, int a1, int a2) {
     return !((func_002CC9C4((*(unsigned short *)((char *)(a0) + 0x2)), (*(unsigned short *)((char *)(a0) + 0x0)), ((int)&func_00140FEC))) < 0);
 }
 
+
+/* func_0005FAE4 — 11 words. MATCH 100% (shape: trampoline). */
+int func_0005FAE4(int a0, int a1, int a2, int a3, int t0, int t1) {
+    extern int func_0005F51C();
+    extern int func_0005FAE4();
+    return (func_0005F51C(a0, a1, a2, 0xE, 0, 0)) == 0xE;
+}
+/* func_000C6CF0 — 13 words. MATCH 100% (shape: trampoline). */
+int func_000C6CF0(int a0, int a1, int a2, int a3, int t0, int t1) {
+    extern int func_0005BA60();
+    extern int func_000C6CF0();
+    func_0005BA60((*(unsigned short *)((char *)(a0) + 0x2)), (*(unsigned short *)((char *)(a0) + 0x4)), 0xFB6, 0x3, 0, t1);
+    return 0x1;
+}
+/* func_000C9004 — 13 words. MATCH 100% (shape: trampoline). */
+int func_000C9004(int a0, int a1, int a2, int a3, int t0, int t1) {
+    extern int func_0005BA60();
+    extern int func_000C9004();
+    func_0005BA60((*(unsigned short *)((char *)(a0) + 0x2)), (*(unsigned short *)((char *)(a0) + 0x4)), 0xFB6, 0x4, 0, t1);
+    return 0x1;
+}
+/* func_000CDC24 — 11 words. MATCH 100% (shape: trampoline). */
+int func_000CDC24(int a0, int a1, int a2) {
+    extern int func_0006DC44();
+    extern int func_000CDC24();
+    func_0006DC44((*(unsigned short *)((char *)(a0) + 0x2)), (*(unsigned short *)((char *)(a0) + 0x4)), 0);
+    return 0x1;
+}
+/* func_000CF670 — 13 words. MATCH 100% (shape: trampoline). */
+int func_000CF670(int a0, int a1, int a2, int a3, int t0, int t1) {
+    extern int func_0005BA60();
+    extern int func_000CF670();
+    func_0005BA60((*(unsigned short *)((char *)(a0) + 0x2)), (*(unsigned short *)((char *)(a0) + 0x4)), 0x14D6, 0x2, 0, t1);
+    return 0x1;
+}
+/* func_00116E84 — 12 words. MATCH 100% (shape: trampoline). */
+int func_00116E84(int a0, int a1, int a2, int a3, int t0, int t1) {
+    extern int func_00074230();
+    extern int D_00351714;
+    extern int func_00116E84();
+    func_00074230(D_00351714, (*(unsigned short *)((char *)(a0) + 0x0)), 0x1, 0, t0, t1);
+    return 0;
+}
+/* func_001FEE54 — 11 words. MATCH 100% (shape: trampoline). */
+int func_001FEE54(int a0, int a1, int a2, int a3) {
+    extern int func_001FEC10();
+    extern int func_001FEE54();
+    return !((func_001FEC10(a0, (*(unsigned short *)((char *)(a0) + 0x2)), 0, 0)) < 0);
+}
+/* func_001FEE80 — 11 words. MATCH 100% (shape: trampoline). */
+int func_001FEE80(int a0, int a1, int a2, int a3) {
+    extern int func_001FEC10();
+    extern int func_001FEE80();
+    return !((func_001FEC10(a0, (*(unsigned short *)((char *)(a0) + 0x2)), 0, 0x1)) < 0);
+}
+/* func_001FEEAC — 11 words. MATCH 100% (shape: trampoline). */
+int func_001FEEAC(int a0, int a1, int a2, int a3) {
+    extern int func_001FEC10();
+    extern int func_001FEEAC();
+    return !((func_001FEC10(a0, (*(unsigned short *)((char *)(a0) + 0x2)), 0x1, 0)) < 0);
+}
+/* func_002254E4 — 11 words. MATCH 100% (shape: trampoline). */
+int func_002254E4(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_001A0D94();
+    extern int func_002254E4();
+    return !((func_001A0D94((*(unsigned short *)((char *)(a0) + 0x2)), 0x1844, 0, a3, t0, t1, t2)) > 0);
+}
+
+/* func_000DAFFC — 11 words. MATCH 100% (shape: hand). */
+int func_000DAFFC(void) {
+    extern int func_0017B9C4();
+    extern int func_000DAFFC();
+    return (func_0017B9C4() < 2) ? 0 : 2;
+}
+/* func_002BB704 — 11 words. MATCH 100% (shape: hand). */
+int func_002BB704(void) {
+    extern int func_0017CA90();
+    extern int func_002BB704();
+    return (func_0017CA90() != 0x1FC7) ? 1 : 0xA;
+}
+/* func_002DC1E0 — 11 words. MATCH 100% (shape: hand). */
+int func_002DC1E0(void) {
+    extern int func_002DBF3C();
+    extern int D_0034BFAC;
+    extern int func_002DC1E0();
+    int v = func_002DBF3C();
+    if (v > 0) {
+        D_0034BFAC = 0;
+    }
+    return v;
+}
