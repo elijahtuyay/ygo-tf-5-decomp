@@ -91,6 +91,38 @@ def insert(text, entry, decls):
     return text.rstrip("\n") + "\n" + chunk
 
 
+def harvest_objects(module):
+    """Trial objects in build/auto/<module>/ that MATCH but were never recorded.
+
+    auto_decomp only records the first shape that matches, and agents leave
+    behind trials they verified by hand; one agent found 87 already-matching
+    functions in rel_duel_draw this way. Re-diff every object and recover them."""
+    d = os.path.join(ROOT, "build/auto", module)
+    found = []
+    if not os.path.isdir(d):
+        return found
+    for obj in sorted(os.listdir(d)):
+        if not obj.endswith(".o"):
+            continue
+        fn = obj[:-2]
+        if not re.match(r"^func_[0-9A-F]+$", fn):
+            continue
+        csrc = os.path.join(d, fn + ".c")
+        if not os.path.exists(csrc):
+            continue
+        r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
+                            os.path.join(ROOT, "asm", module, "text.s"),
+                            os.path.join(d, obj), fn], capture_output=True, text=True, cwd=ROOT)
+        if not re.match(rf"^{fn}: MATCH", r.stdout.strip()):
+            continue
+        text = open(csrc).read()
+        m = re.search(rf"^[A-Za-z_][\w \*]*?\b{fn}\s*\(", text, re.M)
+        if m:
+            found.append({"func": fn, "words": 0, "shape": "harvested",
+                          "src": text[m.start():].strip()})
+    return found
+
+
 def main():
     module = sys.argv[1]
     path = os.path.join(ROOT, "src", module + ".c")
@@ -99,6 +131,11 @@ def main():
         print(f"{module}: nothing to do")
         return
     entries = json.load(open(mj))
+    if "--scan-objects" in sys.argv:
+        known = {e["func"] for e in entries}
+        extra = [e for e in harvest_objects(module) if e["func"] not in known]
+        print(f"{module}: harvested {len(extra)} matching trial objects")
+        entries += extra
     symtab = symbols(module)
     have = defined_in(open(path).read())
     todo = [e for e in entries if e["func"] not in have]
