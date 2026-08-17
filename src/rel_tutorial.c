@@ -221,6 +221,20 @@ void func_00002048(s32 arg0) {
     }
 }
 
+/* func_000022C4 — 19 words. MATCH 100% (shape: manual, lever: t0-t3 5th arg). */
+void func_000022C4(s32 arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4) {
+    char *temp_a0;
+
+    if ((arg0 >= 0) && (arg0 < 3)) {
+        temp_a0 = &D_000101A4 + arg0 * 0xC;
+        *(unsigned char *)(temp_a0 + 0) = 1;
+        *(s16 *)(temp_a0 + 2) = arg1;
+        *(s16 *)(temp_a0 + 4) = arg2;
+        *(s16 *)(temp_a0 + 6) = arg3;
+        *(s16 *)(temp_a0 + 8) = arg4;
+    }
+}
+
 /* func_00002358 — 8 words. MATCH 100% (shape: m2c). */
 u8 func_00002358(s32 arg0) {
     return *(&D_000101A4 + (arg0 * 0xC));
@@ -400,6 +414,14 @@ void *func_00004E28(void) {
     return &D_15A50;
 }
 
+/* func_00004E84 — 12 words. MATCH 100% (shape: manual). */
+extern int *duel_eng_D0E0848C();
+void func_00004E84(void) {
+    int *p = duel_eng_D0E0848C();
+    *(int *)((char *)p + 0x30B0) = 1;
+    *(s16 *)0x151DC = 8;
+}
+
 /* func_00004F28 — 12 words. MATCH 100% (shape: m2c). */
 void func_00004F28(void) {
     func_00005544(func_00004BE0());
@@ -491,6 +513,15 @@ void func_00005970(void) {
 
 }
 
+/* func_00005A14 — 8 words. MATCH 100% (shape: manual, lever: duplicated return). */
+s32 func_00005A14(s32 unused0, s32 arg1) {
+    if (arg1 <= 0) {
+        return 0;
+    }
+    *(s32 *)0x15A5C = 1;
+    return 1;
+}
+
 /* func_00005A34 — 3 words. MATCH 100% (shape: hand). */
 void func_00005A34(void) {
     func_00002690(*(s32 *)0x15A58);
@@ -516,6 +547,18 @@ s32 func_00005A74(void *arg0, s32 arg1) {
     extern int func_00005A74();
     (*(int *)((char *)arg0 + 0x80)) = arg1;
     return 1;
+}
+
+/* func_00005AE8 — 12 words. MATCH 100% (shape: manual, lever: if not switch). */
+s8 *func_00005AE8(s8 *arg0) {
+    s8 *v0 = arg0;
+    while (*arg0 != 0) {
+        if (*arg0 == 0x2F) {
+            v0 = arg0 + 1;
+        }
+        arg0++;
+    }
+    return v0;
 }
 
 /* func_00005B18 — 2 words. MATCH 100% (shape: m2c). */
@@ -605,6 +648,16 @@ extern s32 func_00001B70(void);
 extern s32 func_0000228C(s32);
 void func_000062DC(void) {
     func_00001C30(func_0000228C(func_00001B70()));
+}
+
+/* func_00006194 — 8 words. MATCH 100% (shape: manual, lever: volatile pad to
+ * force 0x20 stack frame without a store). */
+extern int func_00004430();
+s32 func_00006194(void) {
+    volatile int pad[4];
+    (void)pad;
+    func_00004430();
+    return 0;
 }
 
 /* func_00006308 — 2 words. MATCH 100% (shape: m2c). */

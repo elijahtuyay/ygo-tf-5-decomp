@@ -40,16 +40,27 @@ extern char D_00007C04;
 extern char D_00007D0C;
 extern char D_00007D10;
 extern char D_00007D14;
+extern char D_00007B90;
+extern char D_00007BC0;
+extern char D_00007C00;
 extern int ehsys_20E340D9();
+extern int ehsys_41AABF28();
+extern int ehsys_8288EEBC();
 extern int ehsys_97BB99A5();
 extern int ehsys_B89D38DC();
+extern int ehsys_D2A768F4();
 extern int ehsys_ED1410E0();
 extern int ehsys_F6414A71();
+extern int ehsys_memset();
+extern int ehsys_qsort();
 
 /* ---- forward declarations ---- */
+s32 func_00002404(void);
 s32 func_00002630(u16 *arg0, u16 *arg1);
+s32 func_000025A0(s32 arg0, s32 arg1);
 s32 func_000026B8(void);
 s32 func_00002908(void);
+void func_000022B8(void);
 void func_00000658(s32 arg0, s32 arg1, int arg2);
 void func_00000B8C(s32 arg0, s32 arg1, s32 arg2);
 void func_00001C5C(s32 arg0, s32 arg1);
@@ -71,6 +82,21 @@ void func_00001C5C(s32 arg0, s32 arg1) {
     ehsys_97BB99A5(arg0, arg1, 0, 0);
 }
 
+/* func_000022B8 — 25 words. Clears D_00007C00, sets its low bit via a
+ * bitfield write (see rel_shop.c header / func_00003540 in rel_limitlist
+ * for the (x & ~1) | 1 lever), then qsorts a tutorial-step list. MATCH
+ * 100%. */
+void func_000022B8(void) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned rest : 7;
+    } Flags_C00;
+
+    ehsys_memset(&D_00007C00, 0, 2);
+    ((Flags_C00 *) &D_00007C00)->bit0 = 1;
+    ehsys_qsort(&D_00007B90, 4, 0xC, func_00002630);
+}
+
 /* func_000023C4 — 2 words. MATCH 100% (shape: m2c). */
 void func_000023C4(void) {
     func_000023CC();
@@ -82,6 +108,62 @@ void func_000023CC(void) {
         ehsys_20E340D9(*(int *) &D_00007D0C, *(int *) &D_00007C04);
         *(int *) &D_00007C04 = 0;
     }
+}
+
+/* func_00002404 — 44 words. Bit0 of D_00007C00 gates a one-shot re-run of
+ * a tutorial step: cleared via a bitfield write (see rel_shop.c header for
+ * the (x & ~1) | 0 lever), then reconfigures the current step through
+ * ehsys_D2A768F4/ehsys_41AABF28 and redraws it via ehsys_8288EEBC (which
+ * takes the step's own redraw callback, func_000025A0, as its 5th arg).
+ * `default:` written before `case 0:` in source is what gets MWCC to fold
+ * the frame-restore into the branch's delay slot — reordering the cases
+ * doesn't change codegen for the case bodies, only which delay slot the
+ * scheduler had available when it reached the shared exit. MATCH 100%. */
+s32 func_00002404(void) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned rest : 7;
+    } Flags_C00;
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    switch (*(int *) &D_00007C04) {
+    default:
+        return *(int *) &D_00007C04;
+    case 0:
+        if (((Flags_C00 *) &D_00007C00)->bit0) {
+            ((Flags_C00 *) &D_00007C00)->bit0 = 0;
+            temp_v0 = ehsys_D2A768F4(3, &D_00007BC0);
+            temp_v0_2 = ehsys_41AABF28(*(int *) &D_00007D0C, temp_v0);
+            *(int *) &D_00007C04 = temp_v0_2;
+            ehsys_8288EEBC(3, &D_00007BC0, temp_v0_2, temp_v0, func_000025A0, temp_v0_2);
+        }
+        return 0;
+    }
+}
+
+/* func_000025A0 — 36 words. Bumps the 7-bit step counter packed into bits
+ * 1-7 of D_00007C00 (declared as a real bitfield here, which lets MWCC's
+ * bitfield-store codegen do the wrap/mask automatically instead of the
+ * explicit shift-pair-and-mask arithmetic an m2c draft produces), then
+ * always sets bit0. Same call/bitfield shapes as func_00002404 and
+ * func_00004634 (rel_duelrecord). MATCH 100%. */
+s32 func_000025A0(s32 arg0, s32 arg1) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned field : 7;
+    } Flags_C00;
+    s32 temp_s0;
+
+    temp_s0 = arg1 > 0;
+    if (temp_s0 != 0) {
+        if (arg0 != 0) {
+            ehsys_4B0DABFA(0, arg0);
+        }
+        ((Flags_C00 *) &D_00007C00)->field = ((Flags_C00 *) &D_00007C00)->field + 1;
+    }
+    ((Flags_C00 *) &D_00007C00)->bit0 = 1;
+    return temp_s0;
 }
 
 /* func_00002630 — 4 words. MATCH 100% (shape: m2c). */

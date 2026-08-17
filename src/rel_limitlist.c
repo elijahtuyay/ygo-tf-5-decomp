@@ -69,6 +69,7 @@ void func_00001484(s32 arg0, s32 arg1, s32 arg2);
 void func_00001D14(s32 arg0, s32 arg1, int arg2, s32 arg3);
 void func_00001DB4(s32 arg0, s32 arg1, int arg2);
 void func_00002BC8(s32 arg0);
+void func_00003540(void);
 void func_000037F0(void);
 void func_00003DC0(s32 arg0, s32 arg1, int arg2);
 
@@ -140,6 +141,21 @@ void func_00002BC8(s32 arg0) {
 /* func_000034C8 — 4 words. MATCH 100% (shape: m2c). */
 s32 func_000034C8(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
+}
+
+/* func_00003540 — 32 words. Clears D_0000B670, sets its low bit via a
+ * bitfield write (see rel_shop.c header for the (x & ~1) | 1 lever), then
+ * qsorts two card-list arrays. MATCH 100%. */
+void func_00003540(void) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned rest : 7;
+    } Flags_B670;
+
+    ehsys_memset(&D_0000B670, 0, 2);
+    ((Flags_B670 *)&D_0000B670)->bit0 = 1;
+    ehsys_qsort(&D_0000ADEC, 0x29, 0xC, func_000034C8);
+    ehsys_qsort(&D_0000B004, 3, 0xC, func_000034C8);
 }
 
 /* func_000037F0 — 2 words. MATCH 100% (shape: m2c). */

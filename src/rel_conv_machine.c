@@ -134,6 +134,7 @@ extern int ehsys_A4AFF8E6();
 extern int ehsys_6533F67D();
 extern int ehsys_6FE21799();
 extern int ehsys_F352F222();
+extern int ehsys_4B0DABFA();
 
 /* ---- other module-local functions referenced but not yet matched ---- */
 extern int func_00000338();

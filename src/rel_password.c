@@ -42,6 +42,7 @@ extern int ehsys_558B2DCB();
 extern int ehsys_5F00A362();
 extern int ehsys_B8770B92();
 extern int ehsys_B89D38DC();
+extern int ehsys_BC8E65D7();
 extern int ehsys_memset();
 extern int ehsys_qsort();
 extern u8 D_00008ADC;
@@ -52,11 +53,18 @@ s32 func_0000152C(u16 *arg0, u16 *arg1);
 s32 func_0000159C(void);
 s32 func_0000337C(s32 arg0);
 s32 func_000034D8(void);
+int func_00000A10(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 void func_00000A24(s32 arg0, s32 arg1, s32 arg2);
 void func_00000A34(s32 arg0);
+int func_00000A3C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 void func_00000A58(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 void func_00000D6C(s32 arg0, s32 arg1, int arg2);
 void func_000010C4(void);
+
+/* func_00000A10 — 5 words. MATCH 100% (shape: hand, dead-arg thunk). */
+int func_00000A10(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
 
 /* func_00000A24 — 4 words. MATCH 100% (shape: hand). */
 void func_00000A24(s32 arg0, s32 arg1, s32 arg2) {
@@ -66,6 +74,11 @@ void func_00000A24(s32 arg0, s32 arg1, s32 arg2) {
 /* func_00000A34 — 2 words. MATCH 100% (shape: hand). */
 void func_00000A34(s32 arg0) {
     ehsys_5F00A362(arg0 << 6);
+}
+
+/* func_00000A3C — 7 words. MATCH 100% (shape: hand, dead-arg thunk). */
+int func_00000A3C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
 }
 
 /* func_00000A58 — 5 words. MATCH 100% (shape: hand). */
