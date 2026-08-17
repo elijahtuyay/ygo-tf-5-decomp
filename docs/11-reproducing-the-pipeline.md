@@ -366,24 +366,32 @@ times over. Recognise these before starting from m2c:
 
 ### Matching order matters: some functions unlock others
 
-MWCC will only keep a value in a caller-saved register across a call when it can
-see the callee's body in the same translation unit and verify the callee does
-not clobber that register. Against a bare `extern` declaration it must assume
-the worst and spills.
+Working UP the call graph — matching leaf callees first, then their callers —
+demonstrably pays off. In `rel_duel_draw`, matching `func_00031974` unlocked
+three direct callers plus two more functions in the same round, because once a
+callee's real signature and return type are settled the callers stop being
+guesswork.
 
-So a caller that needs that optimisation **cannot** match until its callee is
-already present in `src/<module>.c`. `func_0006E640` and `func_000319D4` in
-`rel_duel_draw` are both blocked this way, waiting on the
-`func_0006DE84`/`func_00031718` families. This is not a dead end — it is an
-ordering dependency, and the function becomes reachable the moment its callee
-lands.
+**A correction, recorded deliberately.** This section originally claimed the
+mechanism was that MWCC only keeps a value in a caller-saved register across a
+call when it can *see* the callee's body in the same translation unit. That was
+my inference, not a tested result, and it is **wrong — or at least not
+sufficient**. Retrying `func_0006E640` with its callee fully defined and visible
+in the same file, across four variants (statement-sequenced, expression-nested,
+K&R and ANSI prototypes, and a version calling an already-matched function three
+times), MWCC still spilled to `$s0` rather than trusting `$a1`. Something else
+about the original source shape is responsible and nobody has isolated it yet.
 
-Two practical consequences:
+So: the practice is right, the explanation is not.
 
-- A near-miss whose only diff is an extra spill around a call is a candidate to
-  RETRY later, not to abandon. Keep a list.
-- When a module stalls, matching leaf callees first can unlock their callers for
-  free. Prefer working up the call graph rather than down it.
+- A near-miss whose only diff is an extra spill around a call belongs on a RETRY
+  list rather than the abandoned pile — cheap to re-test, and it does sometimes
+  start matching as more of the call graph lands.
+- Prefer working up the call graph. But do not expect callee visibility alone to
+  unlock a caller; that specific claim is confirmed insufficient in isolation.
+- Check a function's EXISTING call sites before assuming its arity. K&R forward
+  declarations accept any number of arguments silently, so a caller elsewhere in
+  the file may already prove the signature your draft is guessing at.
 
 ### A harder category than levers
 

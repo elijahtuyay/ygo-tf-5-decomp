@@ -8,6 +8,56 @@ can be split and worked on immediately.
 Each module also has its own branch, `module/<name>`, carrying that module's
 config and survey doc. This branch (`survey/all-modules`) is the combined view.
 
+## Progress
+
+Measured with `scripts/progress.py`, which counts a function only when it is
+present in `src/<module>.c` **and** the freshly compiled object reports `MATCH`.
+Function counts are the headline number; bytes are the honest one, since a
+module is not half done because half its functions match if those are the small
+ones. 248 of the 14,083 functions are hand-written assembly and can never be
+matched from C (see `docs/11-reproducing-the-pipeline.md`).
+
+| module | functions | bytes of .text | % of code |
+|---|---|---|---:|
+| `rel_duel_eng` | 1200 / 7487 | 37,284 / 3,107,612 | 1.2% |
+| `rel_duel_draw` | 584 / 1546 | 19,852 / 452,356 | 4.4% |
+| `rel_story` | 327 / 640 | 10,104 / 88,840 | 11.4% |
+| `rel_field` | 306 / 730 | 10,116 / 228,624 | 4.4% |
+| `rel_deck` | 93 / 404 | 4,092 / 148,136 | 2.8% |
+| `rel_decktutorial` | 71 / 354 | 4,252 / 137,696 | 3.1% |
+| `rel_cutin_viewer` | 96 / 314 | 3,772 / 117,500 | 3.2% |
+| `rel_tutorial` | 95 / 190 | 2,312 / 26,740 | 8.6% |
+| `rel_shop` | 70 / 254 | 2,896 / 105,164 | 2.8% |
+| `rel_select_card` | 59 / 248 | 3,952 / 99,404 | 4.0% |
+| `rel_deckswap` | 52 / 245 | 3,832 / 98,028 | 3.9% |
+| `rel_duel_mgr` | 45 / 228 | 1,848 / 94,100 | 2.0% |
+| `rel_title` | 34 / 618 | 848 / 278,520 | 0.3% |
+| `rel_gallery` | 33 / 98 | 980 / 17,740 | 5.5% |
+| `rel_umd_replace` | 32 / 76 | 1,508 / 14,860 | 10.1% |
+| `rel_charalist` | 29 / 120 | 1,032 / 36,240 | 2.8% |
+| `rel_conv_machine` | 25 / 62 | 912 / 13,996 | 6.5% |
+| `rel_tutoriallist` | 22 / 31 | 3,256 / 10,620 | 30.7% |
+| `rel_debug_menu` | 20 / 44 | 1,292 / 16,408 | 7.9% |
+| `rel_duelrecord` | 20 / 47 | 976 / 18,776 | 5.2% |
+| `rel_movie_viewer` | 15 / 16 | 1,764 / 2,228 | 79.2% |
+| `rel_html_view` | 15 / 16 | 1,684 / 1,888 | 89.2% |
+| `rel_limitlist` | 13 / 70 | 784 / 22,648 | 3.5% |
+| `rel_cardalbum` | 13 / 82 | 672 / 28,340 | 2.4% |
+| `rel_labo` | 12 / 14 | 1,704 / 4,840 | 35.2% |
+| `rel_password` | 11 / 41 | 432 / 14,264 | 3.0% |
+| `rel_recipeviewer` | 11 / 96 | 296 / 35,564 | 0.8% |
+| `rel_soundtest` | 9 / 12 | 1,564 / 5,608 | 27.9% |
+| **total** | **3312 / 14083** | **124,016 / 5,226,740** | **2.37%** |
+
+No module is finished. The closest by proportion are `rel_html_view` and
+`rel_movie_viewer` (15 of 16 each, both blocked on one function that has
+resisted every documented lever and 777,000 decomp-permuter iterations) and
+`rel_tutoriallist` at 22 of its 30 matchable functions.
+
+Note what the byte column does *not* yet cover: import stubs, module tables,
+`.data` and ELF metadata are still carried over from the shipped module rather
+than reconstructed, which across the 28 modules is 37% of the bytes.
+
 ## The 28 modules
 
 Sorted by `.text` size — that, not file size, is the amount of work.
