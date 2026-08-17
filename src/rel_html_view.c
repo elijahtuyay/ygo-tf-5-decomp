@@ -143,6 +143,48 @@ extern char D_00006168;
 extern char D_000061F0;
 extern void *D_000061EC;
 
+/* ---- pspUtilityHtmlViewerParam (the SDK struct func_00000470 fills) ----
+ * sceUtilityHtmlViewerInitStart's parameter, identified via the resolved NID
+ * (docs/nids/README.md). sizeof is exactly 0xA8 — the size func_00000470
+ * memsets and then stores into `base.size`, which is what confirms the layout.
+ * Field names follow the public SDK headers; `unknownN` are unnamed there too. */
+typedef struct {
+    int size;           /* 0x00 */
+    int language;       /* 0x04 */
+    int buttonSwap;     /* 0x08 */
+    int graphicsThread; /* 0x0C */
+    int accessThread;   /* 0x10 */
+    int fontThread;     /* 0x14 */
+    int soundThread;    /* 0x18 */
+    int result;         /* 0x1C — read by func_000005A0 */
+    int reserved[4];    /* 0x20 */
+} SceUtilityDialogCommon;
+
+typedef struct {
+    SceUtilityDialogCommon base; /* 0x00 */
+    void *memaddr;               /* 0x30 */
+    unsigned int memsize;        /* 0x34 */
+    int unknown1;                /* 0x38 */
+    int unknown2;                /* 0x3C */
+    char *initialurl;            /* 0x40 */
+    unsigned int numtabs;        /* 0x44 */
+    unsigned int interfacemode;  /* 0x48 */
+    unsigned int options;        /* 0x4C */
+    char *dldirname;             /* 0x50 */
+    char *dlfilename;            /* 0x54 */
+    char *uldirname;             /* 0x58 */
+    char *ulfilename;            /* 0x5C */
+    unsigned int cookiemode;     /* 0x60 */
+    unsigned int unknown3;       /* 0x64 */
+    char *homeurl;               /* 0x68 */
+    unsigned int textsize;       /* 0x6C */
+    unsigned int displaymode;    /* 0x70 */
+    unsigned int connectmode;    /* 0x74 */
+    unsigned int disconnectmode; /* 0x78 */
+    unsigned int memused;        /* 0x7C */
+    int unknown4[10];            /* 0x80..0xA8 */
+} SceUtilityHtmlViewerParam;
+
 /* forward declarations: the call graph is not in address order */
 void func_00000034(void);
 void func_00000084(void);
@@ -383,47 +425,43 @@ void func_00000420(void *dst) {
  * rel_movie_viewer) — see the file header for the int[]-indexing +
  * pointer-typed-store combination that made $s0 stick. */
 int func_00000470(void *arg0) {
-    /* indexed as int[] (offset/4) rather than through recomputed byte
-     * offsets: this is the same lever that matched rel_movie_viewer's
-     * func_000005C8/func_000006BC — it keeps every offset folded into the
-     * store immediate off the single base register the target holds in $s0. */
-    int *cfg = (int *) &D_00005EB0;
+    SceUtilityHtmlViewerParam *cfg = (SceUtilityHtmlViewerParam *) &D_00005EB0;
 
-    ehsys_memset(cfg, 0, 0xA8);
+    ehsys_memset(cfg, 0, sizeof(*cfg));
 
-    cfg[0x00 / 4] = 0xA8; /* struct size */
-    cfg[0x04 / 4] = func_0000039C();
+    cfg->base.size = sizeof(*cfg);
+    cfg->base.language = func_0000039C();
     if ((ehsys_8171F765(0) & 0xFFFF) == 0x2000) {
-        cfg[0x08 / 4] = 0;
+        cfg->base.buttonSwap = 0;
     } else {
-        cfg[0x08 / 4] = 1;
+        cfg->base.buttonSwap = 1;
     }
-    cfg[0x18 / 4] = 0x10;
-    cfg[0x0C / 4] = 0x11;
-    cfg[0x14 / 4] = 0x12;
-    cfg[0x10 / 4] = 0x13;
-    cfg[0x34 / 4] = 0x600000; /* browser heap size */
-    *(void **) &cfg[0x30 / 4] = arg0;
+    cfg->base.soundThread = 0x10;
+    cfg->base.graphicsThread = 0x11;
+    cfg->base.fontThread = 0x12;
+    cfg->base.accessThread = 0x13;
+    cfg->memsize = 0x600000;   /* 6 MB browser heap */
+    cfg->memaddr = arg0;
 
     func_00000414(&D_00005F68);
-    *(void **) &cfg[0x40 / 4] = &D_00005F68;
-    cfg[0x44 / 4] = 3;
-    cfg[0x48 / 4] = 2;
-    cfg[0x4C / 4] = 0x2BA;
+    cfg->initialurl = &D_00005F68;
+    cfg->numtabs = 3;
+    cfg->interfacemode = 2;
+    cfg->options = 0x2BA;
 
     func_00000420(&D_00006168);
-    *(void **) &cfg[0x50 / 4] = &D_00006168;
-    cfg[0x60 / 4] = 3;
-    cfg[0x64 / 4] = 0x200;
-    cfg[0x6C / 4] = 1;
-    cfg[0x70 / 4] = 1;
-    cfg[0x74 / 4] = 1;
-    cfg[0xA4 / 4] = 1;
-    *(void **) &cfg[0x68 / 4] = &D_00005F68;
-    cfg[0x54 / 4] = 0;
-    cfg[0x5C / 4] = 0;
-    cfg[0x58 / 4] = 0;
-    cfg[0x78 / 4] = 0;
+    cfg->dldirname = &D_00006168;
+    cfg->cookiemode = 3;
+    cfg->unknown3 = 0x200;
+    cfg->textsize = 1;
+    cfg->displaymode = 1;
+    cfg->connectmode = 1;
+    cfg->unknown4[9] = 1;
+    cfg->homeurl = &D_00005F68;
+    cfg->dlfilename = 0;
+    cfg->ulfilename = 0;
+    cfg->uldirname = 0;
+    cfg->disconnectmode = 0;
 
     return sceUtilityHtmlViewerInitStart(cfg);
 }
