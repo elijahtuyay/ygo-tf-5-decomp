@@ -38,6 +38,9 @@ options:
   symbol_addrs_path: config/symbols/rel_tutoriallist.txt   # import stub names (scripts/resolve_nids.py)
   compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (see docs/06)
   find_file_boundaries: True
+  add_set_gp_64: False   # Allegrex is 32-bit; `.set gp=64` makes gas reject -march=mips32r2
+  ld_align_section_vram_end: False   # a 16-byte ALIGN between blocks shifts everything after .text
+  ld_align_segment_vram_end: False
   emit_subalign: False   # SUBALIGN(16) would pad every blob and change the file size
   section_order: [".text", ".data", ".rodata", ".bss"]
 

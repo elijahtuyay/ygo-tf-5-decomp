@@ -37,7 +37,13 @@ CROSS   := mips-linux-gnu-
 AS      := $(CROSS)as
 LDD     := $(CROSS)ld
 OBJCOPY := $(CROSS)objcopy
-ASFLAGS := -march=r4000 -mabi=32 -EL -I include -I asm/$(MODULE)
+# --no-pad-sections + explicit section alignments. gas otherwise rounds .text up
+# to 16 and marks it 2**4 (padding before the stub section, shifting every jal
+# target), and emits EMPTY .data/.bss sections aligned to 16 — which the linker
+# script pulls in before the data blobs, so the location counter gets aligned and
+# everything after .text shifts. rel_html_view hid both because its .text happens
+# to be a multiple of 16.
+ASFLAGS := -march=mips32r2 -mabi=32 -EL --no-pad-sections -I include -I asm/$(MODULE)
 
 ASM_SRCS   := $(wildcard asm/$(MODULE)/*.s)
 ASM_OBJS   := $(patsubst asm/$(MODULE)/%.s,build/asm/$(MODULE)/%.s.o,$(ASM_SRCS))
@@ -54,17 +60,28 @@ else
   LINK_LD   := $(LD)
 endif
 
+.PRECIOUS: build/asm/$(MODULE)/%.s
 .PHONY: all verify clean
 all: verify
 
-build/asm/$(MODULE)/%.s.o: asm/$(MODULE)/%.s
+# gas cannot assemble Allegrex's custom opcodes (min/max and the VFPU block),
+# which 20 of the 28 modules use. asm_prepare.py rewrites exactly the lines the
+# assembler rejects into .word with the identical encoding.
+build/asm/$(MODULE)/%.s: asm/$(MODULE)/%.s scripts/asm_prepare.py
+	@mkdir -p $(dir $@)
+	@python3 scripts/asm_prepare.py $< $@ -- $(AS) $(ASFLAGS)
+
+build/asm/$(MODULE)/%.s.o: build/asm/$(MODULE)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) $< -o $@
+	@$(OBJCOPY) --set-section-alignment .text=4 --set-section-alignment .data=1 \
+		--set-section-alignment .bss=1 $@
 
 build/assets/$(MODULE)/%.bin.o: assets/$(MODULE)/%.bin
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) -I binary -O elf32-tradlittlemips -B mips \
-		--rename-section .data=.data,alloc,load,readonly,data,contents $< $@
+		--rename-section .data=.data,alloc,load,readonly,data,contents \
+		--set-section-alignment .data=1 $< $@
 
 # Absolute addresses for every import stub and named global, so the linker can
 # resolve the references our object makes. Generated from the symbol file that
@@ -77,8 +94,8 @@ build/$(MODULE).symbols.ld: config/symbols/$(MODULE).txt $(ASM_SRCS)
 	@mkdir -p $(dir $@)
 	@sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\) *= *\(0x[0-9A-Fa-f]*\);.*/PROVIDE(\1 = \2);/p' \
 		config/symbols/$(MODULE).txt > $@
-	@grep -ohE '\b(jtbl|D)_[0-9A-F]{8}\b' $(ASM_SRCS) | sort -u | \
-		sed -E 's/^(.*)_([0-9A-F]{8})$$/PROVIDE(\1_\2 = 0x\2);/' >> $@
+	@grep -ohE '\b(jtbl|D)_[0-9A-F]{4,8}\b' $(ASM_SRCS) | sort -u | \
+		sed -E 's/^(.*)_([0-9A-F]{4,8})$$/PROVIDE(\1_\2 = 0x\2);/' >> $@
 
 build/mwcc/$(MODULE).o: src/$(MODULE).c
 	scripts/mwcc_build.sh $<
