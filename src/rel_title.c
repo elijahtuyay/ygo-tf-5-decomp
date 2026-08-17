@@ -48,6 +48,18 @@ void func_00002F9C(void *arg0) {
 }
 #pragma optimization_level 4
 
+/* func_0000330C — 12 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x20 stack frame). */
+#pragma optimization_level 2
+int func_0000330C(s32 arg0) {
+    extern int func_00003338();
+    extern int func_0000330C();
+    volatile int sp[4];
+    sp[0] = arg0;
+    return func_00003338(sp[0], 0x10);
+}
+#pragma optimization_level 4
+
 /* func_00003784 — 13 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
  * through a wasted 0x20 stack frame). */
 #pragma optimization_level 2

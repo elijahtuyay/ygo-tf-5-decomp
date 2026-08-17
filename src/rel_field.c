@@ -600,6 +600,15 @@ void *func_00003B00(V3_3B00 *arg0, V3_3B00 *arg1) {
     return arg0;
 }
 
+/* func_00003DA8 — 11 words. MATCH 100% (verified). */
+void func_00003DA8(void) {
+    extern int func_000139C0();
+    extern s32 D_00053858;
+    D_00053858 = 1;
+    func_000139C0();
+    D_00053858 = 0;
+}
+
 /* func_00003DD4 — 6 words. MATCH 100% (verified). */
 u8 func_00003DD4(void) {
     return !D_00053858;
@@ -988,6 +997,15 @@ u8 func_0000AFB8(void) {
     return !D_00054C20;
 }
 
+/* func_0000AFD0 — 11 words. MATCH 100% (verified). */
+void func_0000AFD0(void) {
+    extern int func_00013BD0();
+    extern s32 D_00054C24;
+    D_00054C24 = 1;
+    func_00013BD0();
+    D_00054C24 = 0;
+}
+
 /* func_0000AFFC — 6 words. MATCH 100% (verified). */
 u8 func_0000AFFC(void) {
     return !D_00054C24;
@@ -1067,6 +1085,14 @@ int func_0000BAF4(void) {
 /* func_0000BAFC — 9 words. MATCH 100% (shape: m2c). */
 s32 func_0000BAFC(void) {
     return ehsys_04E1CB0F() == 0;
+}
+
+/* func_0000BB20 — 11 words. MATCH 100% (verified). */
+extern void func_000119B8(void *);
+void func_0000BB20(void) {
+    s32 buf[3];
+    ehsys_memset(buf, 0, 0xC);
+    func_000119B8(buf);
 }
 
 /* func_0000BB80 — 9 words. MATCH 100% (shape: m2c). */
@@ -1759,6 +1785,13 @@ void func_0002D1E4(void ***arg0, void ***arg1) {
     *arg1 = (void **)&D_B7AD44;
 }
 
+/* func_0002D254 — 11 words. MATCH 100% (verified). */
+extern s32 *func_0002D200(void);
+s32 func_0002D254(void) {
+    s32 *p = func_0002D200();
+    return *p / 5;
+}
+
 /* func_0002D480 — 40 words. MATCH 100% (verified). */
 int func_0002D480(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     s32 temp_v0;
@@ -1940,6 +1973,13 @@ void func_000300DC(void) {
     func_00030078();
     ehsys_942B03D0(0xE, 0xE);
     ehsys_60B55A50(0xFF000000);
+}
+
+/* func_0003010C — 11 words. MATCH 100% (verified). */
+void func_0003010C(s32 *arg0) {
+    func_0002F470(arg0);
+    *(s16 *)((char *)arg0 + 0x30) = 0;
+    *(s16 *)((char *)arg0 + 0x32) = 0;
 }
 
 /* func_000304D4 — 2 words. MATCH 100% (shape: m2c). */
