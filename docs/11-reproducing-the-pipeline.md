@@ -164,7 +164,46 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
 20. **`(x >> n) & 1` folds into a single Allegrex `ext` at -O4.** A target with
     discrete `sll`/`srl` needs the two-shift phrasing instead:
     `((unsigned int)x << (31 - n)) >> 31`. Same family as lever 16.
-21. **Argument evaluation order is not always reachable from C.** At `-O4` MWCC's
+21. **A narrow global type silently deletes stores.** Writing through
+    `(char *)&D_X` at an offset past the declared size of `D_X` lets MWCC drop
+    the store as dead. Give the global a placeholder struct big enough to cover
+    every offset touched — `typedef struct { u8 pad[0x60]; } Big; extern Big D_X;`
+    — then go through a local `char *`.
+22. **K&R definitions keep a typed body call-compatible with `extern int f();`.**
+    Writing `void f(a, b) int a; int b; { ... }` lets a function be defined with
+    real types while an untyped forward declaration elsewhere in the file still
+    accepts the register-forwarding tail calls that need it. Without this you
+    get "too few arguments" the moment a sibling forwards registers untouched.
+23. **An unprototyped `extern s32 f();` promotes float arguments to double**,
+    emitting `__extendsfdf2` and a much bigger call. Always give a full
+    prototype to anything taking floats.
+24. **`return void_expr;` is rejected by MWCC** even though ISO C allows it. To
+    get the `j` tail-call form, caller and callee must share a non-void return
+    type, even when every real caller discards the value.
+25. **Branch polarity is inverted more often than not.** If the instructions are
+    right but the if and else bodies are swapped and the condition negated, just
+    flip the condition and swap the bodies — nothing else needs to change.
+26. **The rematerialisation trap runs both ways.** A local pointer variable
+    forces a named global's address to be computed once and reused. But for a
+    RAW literal address with no symbol, MWCC's constant folder re-CSEs the `lui`
+    across independent statements, and neither `volatile`, distinct pointer
+    variables, nor oversized types defeat it. Several `rel_field` functions
+    (`func_0002D17C`, `func_0002DC78`, `func_0002FB4C`, `func_0001A140`,
+    `func_00022708`, `func_0002D064`) are stuck on exactly this.
+
+### A known limitation of the differ
+
+`scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
+with an addend, `%hi(D_0005F900 + 0x4)`. That form is spimdisasm naming a baked
+address as nearest-symbol-plus-offset, not a real ELF addend, and `norm_sym()`
+has no way to equate it with a candidate that uses a different symbol at the
+same absolute address (`func_00011964` in `rel_field` is the example). Such
+functions are reported as non-matching even when the bytes are equivalent, so
+the project's counts are a slight UNDER-estimate. That is the correct direction
+to err: relaxing this check is how the differ once accepted `lb` for `lw` and
+recorded 171 functions as matched that were not.
+
+27. **Argument evaluation order is not always reachable from C.** At `-O4` MWCC's
     scheduler can evaluate a call's second argument before its first even when
     both are plain global loads with no side effects, contradicting the source
     order. Temporaries and explicit sequencing do not move it, and
