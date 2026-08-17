@@ -383,7 +383,12 @@ times over. Recognise these before starting from m2c:
     `a0->field2` twice stops the fold and matches.
 
     It generalises to more than one call: `func_0016E2CC` re-reads the same
-    field before two separate calls and matched the same way.
+    field before two separate calls and matched the same way. It also
+    generalises across modules — three `rel_duel_draw` functions matched with it
+    the same night it was found in `rel_duel_eng`. And its caveat has been
+    confirmed from the other direction: `func_0006994C` and its call-free
+    bit-modify siblings show the same access pattern and do NOT respond, because
+    there is no call to break the fold.
 
     The boundary matters: the same trick does NOT work without an intervening
     call. For three consecutive float reads from a global with no call between
