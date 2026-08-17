@@ -111,6 +111,41 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
 10. **A dead argument register can double as a switch constant** — a call site
     that sets up no argument register is not necessarily a no-argument function.
 
+### Found during the automated sweep (2026-08-17 night)
+
+11. **Integer arguments 5-8 go in `$t0`-`$t3`, not on the stack.** mwccpsp uses
+    an 8-register integer convention (the PSP's EABI), confirmed by an 8-argument
+    passthrough test and by matched functions in `rel_tutorial`. This was behind a
+    whole family of "mystery register" functions that looked unreachable from C:
+    they just need more declared parameters. Probably the highest-value single
+    fact on this list.
+12. **Thunks.** A tiny function that shifts or masks an argument and then `j`s to
+    another function is `return callee(arg0 << 6, arg1 << 6, ...)`, with the
+    transform sitting in the branch delay slot. m2c cannot see a parameter that is
+    forwarded without being touched, so it drops trailing arguments — add them
+    back as passthroughs. These make up a large share of the UI modules.
+13. **`return f(...)` versus a bare `f(...);`** decides tail call (`j`) versus
+    `jal` + return. Worth a word, and 280 functions were exactly one word short.
+14. **Load width follows the declared type.** A global declared `char` compiles to
+    `lb`; if the target uses `lw` or `lhu`, cast at the use site
+    (`*(int *)&D_XXXX`). This one silently produced false matches until the differ
+    was tightened — see below.
+15. **Raw baked addresses.** When the original baked an absolute address with no
+    relocation, the source must be `*(int *)0xADDR`; declaring `extern int D_XXXX`
+    forces a HI16/LO16 relocation and can never match.
+16. **`(x << 27) >> 29` is not `(x >> 2) & 7`** — the latter folds into a single
+    Allegrex `ext`, one word shorter, and can never match a `sll`+`srl` target.
+
+### A verification bug worth remembering
+
+`scripts/mwcc_diff.py` originally treated two words as equal whenever both
+carried the same relocation kind against the same symbol — without checking the
+rest of the instruction. That let `lb` pass for `lw`, and even a different
+destination register, as a MATCH. It now compares the whole instruction word with
+only the relocated immediate masked out. Tightening it invalidated 171 functions
+that had been recorded as verified, all of which were removed. If a matching
+rule ever feels generous, it probably is.
+
 ## Verification, three levels
 
 1. **Per function** — `scripts/mwcc_diff.py`. Relocation-aware: a word matches

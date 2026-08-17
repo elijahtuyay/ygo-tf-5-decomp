@@ -218,8 +218,41 @@ def shape_tail_return(src):
     return re.sub(r"^void(\s+\w+\s*\()", r"int\1", out, count=1, flags=re.M)
 
 
+def make_thunk_shape(extra):
+    """m2c only sees arguments the function TOUCHES. A thunk that forwards its
+    trailing parameter untouched (zero instructions for that register) therefore
+    comes out with too few parameters, and no reshuffling of the body can fix it.
+    These variants re-add passthrough parameters and make the call a tail call,
+    which is the shape the originals use throughout the UI modules.
+
+    CONFIRMED: mwccpsp passes integer arguments 5..8 in $t0-$t3, not on the
+    stack (verified by an 8-argument passthrough test and by matched functions
+    in rel_tutorial). So parameters beyond the fourth are worth trying — this is
+    why the range goes past 4."""
+    def shape(src):
+        m = re.match(r"\s*([\w \*]+?)\s+(func_[0-9A-F]+)\s*\(([^)]*)\)\s*\{\s*"
+                     r"(?:return\s+)?([A-Za-z_]\w*)\s*\(([^;]*)\)\s*;\s*\}\s*$", src, re.S)
+        if not m:
+            return None
+        _ret, fn, params, callee, args = m.groups()
+        params = [] if params.strip() in ("", "void") else [p.strip() for p in params.split(",")]
+        args = [a.strip() for a in args.split(",")] if args.strip() else []
+        for i in range(extra):
+            params.append(f"s32 pass{i}")
+            args.append(f"pass{i}")
+        return (f"int {fn}({', '.join(params) or 'void'}) {{\n"
+                f"    return {callee}({', '.join(args)});\n}}\n")
+    return shape
+
+
 SHAPES = [
     ("m2c", shape_identity),
+    ("thunk+1", make_thunk_shape(1)),
+    ("thunk+2", make_thunk_shape(2)),
+    ("thunk+3", make_thunk_shape(3)),
+    ("thunk+4", make_thunk_shape(4)),
+    ("thunk+5", make_thunk_shape(5)),
+    ("thunk+0", make_thunk_shape(0)),
     ("tail-return", shape_tail_return),
     ("baked-address", shape_baked_address),
     ("goto-loop", shape_while_to_goto),

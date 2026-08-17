@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 17 functions matched here. The rest of the module is not
+ * STATUS: 25 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -87,6 +87,12 @@ void func_00000948(s32 arg0) {
     }
 }
 
+/* func_0000149C — clears D_0001E778. MATCH 100% (shape: hand). */
+extern s32 D_0001E778;
+void func_0000149C(void) {
+    D_0001E778 = 0;
+}
+
 /* func_00001DEC — 4 words. MATCH 100% (shape: m2c). */
 u16 *func_00001DEC(u16 *arg0, u16 *arg1) {
     *arg0 = *arg1;
@@ -96,6 +102,33 @@ u16 *func_00001DEC(u16 *arg0, u16 *arg1) {
 /* func_0000344C — 2 words. MATCH 100% (shape: m2c). */
 void func_0000344C(void) {
 
+}
+
+/* func_00003E44 — resets D_0001F314 and registers the module's main/teardown
+ * callbacks (same shape as rel_movie_viewer/rel_html_view's entry helper).
+ * MATCH 100% (shape: hand). */
+extern s32 D_0001F314;
+extern char D_0001F318;
+extern void func_00003E80(void);
+extern void func_00004C60(void);
+extern void ehsys_B4471B5E(void (*)(void), void (*)(void), void *);
+s32 func_00003E44(void) {
+    D_0001F314 = 0;
+    ehsys_B4471B5E(func_00003E80, func_00004C60, &D_0001F318);
+    return 0;
+}
+
+/* func_0000463C — clamps D_0001E77C (a u16 counter) up to 0x14 once
+ * func_00012660() reports ready, then syncs a frame.
+ * MATCH 100% (shape: hand). */
+extern u16 D_0001E77C;
+extern s32 func_00012660(void);
+extern void ehsys_frame_sync(void);
+void func_0000463C(void) {
+    if ((D_0001E77C < 0x14) && (func_00012660() != 0)) {
+        D_0001E77C = 0x14;
+    }
+    ehsys_frame_sync();
 }
 
 /* func_00004688 — 13 words. MATCH 100% (shape: m2c). */
@@ -188,6 +221,21 @@ s32 func_00010DD0(void) {
     return 0;
 }
 
+/* func_00010E7C — if D_0001E930 (a pending value) is set, forwards it plus
+ * the pointer it points at through ehsys_20E340D9 and clears it; always
+ * clears D_0001E92C too. MATCH 100% (shape: hand). */
+extern s32 D_0001E930;
+extern s32 D_0001E92C;
+extern s32 D_0001F300;
+extern void ehsys_20E340D9(s32, s32);
+void func_00010E7C(void) {
+    if (D_0001E930 != 0) {
+        ehsys_20E340D9(D_0001F300, D_0001E930);
+        D_0001E930 = 0;
+    }
+    D_0001E92C = 0;
+}
+
 /* func_00011814 — 9 words. MATCH 100% (shape: m2c). */
 void func_00011814(void) {
     func_000126D0();
@@ -200,6 +248,15 @@ void func_00011A30(void) {
     func_00011C08();
 }
 
+/* func_00012850 — D_0001F32C holds a pointer value; loads that value and
+ * also dereferences it, forwarding both to ehsys_20E340D9 (same pattern as
+ * func_00010E7C above, seen also in rel_charalist/rel_tutorial).
+ * MATCH 100% (shape: hand). */
+extern s32 D_0001F32C;
+void func_00012850(void) {
+    ehsys_20E340D9(*(s32 *)D_0001F32C, D_0001F32C);
+}
+
 /* func_000150EC — 2 words. MATCH 100% (shape: hand). */
 void func_000150EC(s32 arg0) {
     ehsys_5F00A362(arg0 << 6);
@@ -208,5 +265,22 @@ void func_000150EC(s32 arg0) {
 /* func_00016EE8 — 4 words. MATCH 100% (shape: hand). */
 void func_00016EE8(s32 arg0, s32 arg1, s32 arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
+}
+
+/* func_00016F64 — clears the D_0001F304 counter. MATCH 100% (shape: hand). */
+extern s32 D_0001F304;
+void func_00016F64(void) {
+    D_0001F304 = 0;
+}
+
+/* func_00016F70 — reads the D_0001F304 counter. MATCH 100% (shape: hand). */
+s32 func_00016F70(void) {
+    return D_0001F304;
+}
+
+/* func_00016F7C — increments the D_0001F304 counter.
+ * MATCH 100% (shape: hand). */
+void func_00016F7C(void) {
+    D_0001F304 += 1;
 }
 

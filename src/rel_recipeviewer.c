@@ -1,35 +1,26 @@
 /*
- * rel_recipeviewer.prx -- reconstructed code (matching decompilation)
+ * rel_recipeviewer.prx — reconstructed code (matching decompilation)
  *
- * What it is:  Deck recipe viewer: browses saved/shared deck recipes (deck/all_%c.ehp, deck/recipe_view.ehp) and renders their card-icon/panel UI (cis_all.gim, ciss.gim, panel.gim, icon0N.gim).
- *
- * Compiler:     Metrowerks CodeWarrior for PSP -- MWCC 1.3 SP7 (mwccpsp_3.0.1_219)
- * Flags:        -O4,s -sdatathreshold 0   (SIZE, not ,p)
- * Verification: scripts/mwcc_build.sh src/rel_recipeviewer.c && \
+ * Compiler:     Metrowerks CodeWarrior for PSP — MWCC 1.3 SP7 (mwccpsp_3.0.1_219)
+ * Flags:        -O4,s -sdatathreshold 0
+ * Verification: scripts/mwcc_build.sh src/rel_recipeviewer.c
  *               scripts/mwcc_diff.py asm/rel_recipeviewer/text.s build/mwcc/rel_recipeviewer.o
- *               Every function below must report MATCH; if one regresses it
- *               must be fixed or pulled from this file (see docs/09-first-match.md
- *               and the src/rel_movie_viewer.c header for the accumulated list of
- *               MWCC -O4,s codegen levers this project has found so far).
  *
- * Status:       8/96 functions in this module are matched and present
- *               below (each tagged "MATCH 100%"). The rest are tracked in
- *               build/auto/rel_recipeviewer.json (status + closest-verdict per function,
- *               written by scripts/auto_decomp.py) and build/auto/rel_recipeviewer/*.c
- *               (per-function trial sources) for hand-iteration.
+ * Every function below is byte-identical to the shipped module — each was
+ * accepted only on a MATCH verdict from scripts/mwcc_diff.py, and the whole
+ * file is re-verified after assembly (scripts/assemble_module.py).
+ * Functions are in ADDRESS ORDER, which is what the linker needs.
  *
- * Conventions:  names func_XXXXXXXX / D_XXXXXXXX are placeholders (by address);
- *               extern declarations for globals/functions not defined in this
- *               file use whatever type ("char", "int", "void *", ...) the
- *               verified compile actually required -- these are NOT meant to
- *               convey the true C type, only to reproduce the exact codegen
- *               (see docs/09-first-match.md and scripts/auto_decomp.py's
- *               DATA_FLAVOURS). Absolute addresses baked directly into the
- *               original binary with no relocation (e.g. *(s32 *)0x290CE4)
- *               are written as raw pointer casts rather than named externs --
- *               see mwcc_diff.py's "raw word" vs "reloc" comparison.
+ * Import names are resolved from the module's NID tables and are identical
+ * across all 28 modules — see docs/nids/README.md.
  *
- * Matched functions (8): func_00000000, func_00000958, func_00002958, func_0000296C, func_00003BD4, func_00003ED0, func_0000695C, func_00006D64
+ * STATUS: 6 functions matched here. The rest of the module is not
+ * yet decompiled; build/auto/<module>.json has the status of every attempt.
+ *
+ * NOTE: assembled by scripts/assemble_module.py from drafts produced by
+ * scripts/auto_decomp.py (m2c + source reshapes + verification). Local names
+ * are therefore still m2c's (temp_v0, var_s1); renaming them and adding
+ * per-function commentary is safe as long as every edit is re-verified.
  */
 
 typedef signed char s8;
@@ -42,21 +33,29 @@ typedef long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
+#define NULL 0
 
+/* ---- imports and globals ---- */
 extern char D_0000E5BD;
-extern char D_0000E5BE;
 extern char D_00010358;
-extern char D_0001047C;
 extern char D_00010484;
-
+extern int ehsys_EF9B5D06();
 extern int func_00006D6C();
 
-/* func_00000000 -- MATCH 100% (2 words). */
+/* ---- forward declarations ---- */
+s32 func_00000000(void);
+s32 func_00000958(s32 arg0);
+s32 func_00003BD4(s32 arg0);
+s32 func_0000695C(u16 *arg0, u16 *arg1);
+u32 func_00002958(void);
+void func_00006D64(void);
+
+/* func_00000000 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_00000000(void) {
     return 0;
 }
 
-/* func_00000958 -- MATCH 100% (7 words). */
+/* func_00000958 — 7 words. MATCH 100% (shape: m2c). */
 s32 func_00000958(s32 arg0) {
     s32 var_a0;
 
@@ -67,17 +66,12 @@ s32 func_00000958(s32 arg0) {
     return var_a0;
 }
 
-/* func_00002958 -- MATCH 100% (5 words). */
+/* func_00002958 — 5 words. MATCH 100% (shape: m2c). */
 u32 func_00002958(void) {
     return (u32) ((u8) D_0000E5BD << 0x1E) >> 0x1F;
 }
 
-/* func_0000296C -- MATCH 100% (3 words). */
-u16 func_0000296C(void) {
-    return D_0000E5BE;
-}
-
-/* func_00003BD4 -- MATCH 100% (15 words). */
+/* func_00003BD4 — 15 words. MATCH 100% (shape: m2c). */
 s32 func_00003BD4(s32 arg0) {
     s32 sp1C;
 
@@ -87,18 +81,12 @@ s32 func_00003BD4(s32 arg0) {
     return sp1C;
 }
 
-/* func_00003ED0 -- MATCH 100% (12 words). */
-void func_00003ED0(void) {
-    ehsys_memset(&D_0001047C, 0, 0x12C);
-    D_0001047C = 0;
-}
-
-/* func_0000695C -- MATCH 100% (4 words). */
+/* func_0000695C — 4 words. MATCH 100% (shape: m2c). */
 s32 func_0000695C(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
 }
 
-/* func_00006D64 -- MATCH 100% (2 words). */
+/* func_00006D64 — 2 words. MATCH 100% (shape: m2c). */
 void func_00006D64(void) {
     func_00006D6C();
 }

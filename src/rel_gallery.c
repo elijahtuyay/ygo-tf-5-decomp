@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 10 functions matched here. The rest of the module is not
+ * STATUS: 9 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -37,16 +37,13 @@ typedef double f64;
 
 /* ---- imports and globals ---- */
 extern char D_0000A840;
-extern char D_0000A84C;
 extern int ehsys_B4471B5E();
 extern int func_00000188();
-extern int func_00003BCC();
 extern int func_00003F30();
 
 /* ---- forward declarations ---- */
 s32 func_00000150(s32 arg0);
 void func_00000228(void);
-void func_00000314(void);
 void func_00001818(void);
 void func_00003204(void);
 void func_00003F94(void);
@@ -66,13 +63,6 @@ s32 func_00000150(s32 arg0) {
 /* func_00000228 — 2 words. MATCH 100% (shape: m2c). */
 void func_00000228(void) {
 
-}
-
-/* func_00000314 — 12 words. MATCH 100% (shape: m2c). */
-void func_00000314(void) {
-    if (D_0000A84C != 0) {
-        func_00003BCC(*(s32 *)0x30A854);
-    }
 }
 
 /* func_00001818 — 2 words. MATCH 100% (shape: m2c). */
