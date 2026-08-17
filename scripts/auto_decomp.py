@@ -147,6 +147,16 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # m2c renders a load from an address it knows nothing about as *(void *)addr,
     # which is not a legal dereference; a word load is what the asm actually does
     src = src.replace("*(void *)", "*(int *)").replace("*(void*)", "*(int *)")
+    # m2c writes unknown struct fields as `p->unk34`, which MWCC rejects because
+    # nothing declares that struct. Rewrite to an explicit byte offset — the same
+    # access the asm performs. This is the single biggest source of compile
+    # failures in rel_duel_eng (3527 of ~4900 attempts).
+    src = re.sub(r"([A-Za-z_]\w*)->unk_?([0-9A-Fa-f]+)",
+                 lambda m: f"(*(int *)((char *){m.group(1)} + 0x{m.group(2)}))", src)
+    # Only the simple `identifier->unkNN` case is rewritten. A parenthesised
+    # left-hand side needs balanced-paren handling that a regex cannot do safely —
+    # an earlier attempt produced unbalanced output and broke otherwise-valid
+    # drafts, so those are left for the compiler to reject.
     return src
 
 
@@ -245,8 +255,36 @@ def make_thunk_shape(extra):
     return shape
 
 
+def make_leading_dummy_shape(n):
+    """When the target only ever touches $a1 (or $a2) and passes $a0 straight
+    through, m2c declares one parameter, which the compiler places in $a0. Adding
+    unused LEADING parameters pushes the real one into the register the target
+    actually uses. (Found on rel_duel_draw — about 10 of 23 fixes in one batch.)"""
+    def shape(src):
+        m = re.match(r"(\s*[\w \*]+?\s+func_[0-9A-F]+\s*\()([^)]*)(\))", src, re.S)
+        if not m:
+            return None
+        params = m.group(2).strip()
+        if params in ("", "void"):
+            return None
+        dummies = ", ".join(f"s32 unused{i}" for i in range(n))
+        return src[:m.end(1)] + dummies + ", " + params + src[m.start(3):]
+    return shape
+
+
+def shape_bool_fold(src):
+    """At -O4,s only `!f()` folds into beqz/bnez; `f() == 0` materialises the
+    comparison. m2c writes the explicit comparison, so try the negation form."""
+    out = re.sub(r"\(([\w\.\->\[\]]+(?:\([^()]*\))?) == 0\)", r"(!\1)", src)
+    out = re.sub(r"\(([\w\.\->\[\]]+(?:\([^()]*\))?) != 0\)", r"(\1)", out)
+    return out if out != src else None
+
+
 SHAPES = [
     ("m2c", shape_identity),
+    ("bool-fold", shape_bool_fold),
+    ("lead-dummy1", make_leading_dummy_shape(1)),
+    ("lead-dummy2", make_leading_dummy_shape(2)),
     ("thunk+1", make_thunk_shape(1)),
     ("thunk+2", make_thunk_shape(2)),
     ("thunk+3", make_thunk_shape(3)),
