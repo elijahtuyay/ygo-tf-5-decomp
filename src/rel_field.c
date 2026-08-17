@@ -1921,6 +1921,17 @@ void func_0001BB1C(void) {
     ehsys_AB962AE7(0);
 }
 
+/* func_0001BC58 — 17 words. MATCH 100% (verified). */
+extern void *func_000224C4(s32 arg0);
+extern s32 ehsys_1C99A7A5(void *arg0);
+void func_0001BC58(void) {
+    void *s0 = func_000224C4(0);
+    if (s0 != 0) {
+        s32 v0 = ehsys_1C99A7A5(s0);
+        *(f32 *)((char *)s0 + 0x20) = (f32)v0;
+    }
+}
+
 /* func_0001C1A4 — bulk-matched thunk into ehsys_B89D38DC. */
 s32 func_0001C1A4(s32 arg0, s32 arg1, s32 arg2) {
     return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
