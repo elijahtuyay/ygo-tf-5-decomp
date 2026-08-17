@@ -201,12 +201,27 @@ void func_0000320C(void *arg0) {
     }
 }
 
+/* func_000032F0 — 8 words. MATCH 100% (shape: twin-of-rel_select_card-
+ * func_00017094-family, via find_twins.py same-shape tier). */
+extern int ehsys_B89D38DC();
+s32 func_000032F0(s32 arg0, s32 arg1, s32 arg2) {
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
 /* func_00003510 — 23 words. MATCH 100% (shape: m2c). */
 void func_00003510(s32 *arg0, s32 arg1) {
     s32 v0 = func_00003D84((s32 *)arg0[0], 0x5E);
     v0 = ehsys_C6C15111(v0, D_0000A318, 0);
     ehsys_E58C0FDC(v0, D_000098A0[arg1]);
 }
+
+/* func_000037C0 — 5 words. MATCH 100% (shape: twin-of-rel_select_card-
+ * func_000012A8-family, via find_twins.py same-shape tier). */
+extern int ehsys_BC8E65D7();
+s32 func_000037C0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
 /* func_00003D24 — 18 words. MATCH 100% (shape: m2c). */
 void func_00003D24(void *arg0) {
     extern int ehsys_memset();

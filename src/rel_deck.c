@@ -322,6 +322,14 @@ s32 func_0000D734(s32 arg0, s32 arg1) {
 s32 func_0000DA6C(s32 arg0, s32 arg1) {
     return (arg1 & (1 << ehsys_56D1651D(func_00013098(), arg0 & 0xFFFF))) != 0;
 }
+/* func_0000DDFC — 0 words. MATCH 100% (shape: twin of func_00007EEC). */
+void func_0000DDFC(u16 *a0, s32 a1, u8 *a2) {
+
+    s32 t0;
+    for (t0 = 0; t0 < a1 - 1; t0++) {
+        a2[a0[t0]] = 0xFF;
+    }
+}
 
 /* func_0000EB20 — 13 words. MATCH 100% (shape: m2c). */
 s32 func_0000EB20(void) {

@@ -394,6 +394,14 @@ s32 func_00009E10(s32 arg0, s32 arg1) {
 s32 func_0000A148(s32 arg0, s32 arg1) {
     return (arg1 & (1 << ehsys_56D1651D(func_00007F34(), arg0 & 0xFFFF))) != 0;
 }
+/* func_0000A4AC — 0 words. MATCH 100% (shape: twin of func_00007EEC). */
+void func_0000A4AC(u16 *a0, s32 a1, u8 *a2) {
+
+    s32 t0;
+    for (t0 = 0; t0 < a1 - 1; t0++) {
+        a2[a0[t0]] = 0xFF;
+    }
+}
 /* func_0000B0F0 — 35 words. MATCH 100% (shape: m2c). */
 void func_0000B0F0(void) {
     extern int D_0002951C;
@@ -538,6 +546,33 @@ s32 func_0001CB4C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 /* func_0001CB68 — 2 words. MATCH 100% (shape: thunk, arg0<<6). */
 int func_0001CB68(int arg0) {
     return ehsys_5F00A362(arg0 << 6);
+}
+/* func_0001CFDC — 0 words. MATCH 100% (shape: twin of func_0001C630). */
+void func_0001CFDC(u16 *arg0, u16 *arg1, s32 arg2) {
+
+    s32 t1;
+    u16 t0;
+
+    t1 = 0;
+    goto test;
+loop:
+    t0 = *arg0;
+    if (t0 == 0) {
+        *arg1 = 0;
+        return;
+    }
+    if (t0 == 0xA) {
+        *arg1 = 0x20;
+    } else {
+        *arg1 = t0;
+    }
+    t1 += 1;
+    arg0 += 1;
+    arg1 += 1;
+test:
+    if (t1 < arg2) {
+        goto loop;
+    }
 }
 
 /* func_0001D798 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
