@@ -280,8 +280,20 @@ def shape_bool_fold(src):
     return out if out != src else None
 
 
+def shape_void_return(src):
+    """If the target never sets $v0 before `jr $ra` the function is void; a
+    phantom `return 0;` makes MWCC emit an extra `move $v0, $zero`. m2c adds one
+    whenever it cannot tell, so try dropping it."""
+    m = re.search(r"\n\s*return 0;\s*\n\}\s*$", src)
+    if not m:
+        return None
+    out = src[:m.start()] + "\n}\n"
+    return re.sub(r"^(?:int|s32|u32)(\s+func_[0-9A-F]+\s*\()", r"void\1", out, count=1, flags=re.M)
+
+
 SHAPES = [
     ("m2c", shape_identity),
+    ("void-return", shape_void_return),
     ("bool-fold", shape_bool_fold),
     ("lead-dummy1", make_leading_dummy_shape(1)),
     ("lead-dummy2", make_leading_dummy_shape(2)),
