@@ -34,6 +34,7 @@ options:
   target_path: iso_extracted/PSP_GAME/USRDIR/gmodule/rel_deck.prx
   asm_path: asm/rel_deck
   ld_script_path: build/rel_deck.ld
+  symbol_addrs_path: config/symbols/rel_deck.txt   # import stub names (scripts/resolve_nids.py)
   compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (see docs/06)
   find_file_boundaries: True
   section_order: [".text", ".data", ".rodata", ".bss"]

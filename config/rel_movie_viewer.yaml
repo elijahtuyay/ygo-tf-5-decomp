@@ -31,6 +31,7 @@ options:
   target_path: iso_extracted/PSP_GAME/USRDIR/gmodule/rel_movie_viewer.prx
   asm_path: asm/rel_movie_viewer
   ld_script_path: build/rel_movie_viewer.ld
+  symbol_addrs_path: config/symbols/rel_movie_viewer.txt   # import stub names (scripts/resolve_nids.py)
   compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (see docs/06)
   find_file_boundaries: True
   # all `bin` subsegments default to the ".data" linker section (splat's

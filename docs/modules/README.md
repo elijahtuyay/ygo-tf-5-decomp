@@ -51,13 +51,19 @@ it; the other 27 modules together are 1.7 MB.
 These are the reason for doing all 28 at once — each one is leverage that
 applies to many modules rather than one.
 
-**1. One NID table, 28 modules.** Every module's `.rodata.sceNid` is ~0x1B04
-bytes / 1729 entries, and each module's `.sceStub.text` has one 8-byte
-trampoline per entry. The import set is essentially identical across modules,
-so resolving those NIDs **once** names the imports in all 28 at the same time.
-That is currently the single biggest missing piece: every `func_00001D30`-style
-call in the matched sources is an unnamed import. Doing this turns
-`func_00001D30(dst, src)` into `strcat(dst, src)` project-wide.
+**1. One NID table, 28 modules. — DONE, see `docs/nids/README.md`.** Every
+module's `.rodata.sceNid` is ~0x1B04 bytes / 1729 entries with one 8-byte
+`.sceStub.text` trampoline each. Those 1729 are **not** SDK imports (an earlier
+version of this note said so and was wrong): they are the complete export list
+of `libehsys_rel`, the engine in the EBOOT, which every module links a stub for
+whether it calls it or not. The array is byte-identical in all 28 modules *and*
+in the EBOOT's export table (`sha1 820088858e31`), so stub *k* is the same
+engine function everywhere and the EBOOT pairs each NID with its address.
+
+Resolved: **986** engine functions actually called project-wide, **275**
+module-to-module imports, and **47** genuine `sce*` SDK imports (all
+hash-verified against their names). `config/symbols/<module>.txt` now feeds
+splat, so any module re-split gets named calls.
 
 **2. A shared card-list widget is statically linked into six modules.** The
 asset set `cis_all.gim`, `ciss.gim`, `panel.gim`, `icon01..icon06.gim`,

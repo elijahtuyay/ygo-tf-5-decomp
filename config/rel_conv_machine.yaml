@@ -34,6 +34,7 @@ options:
   target_path: iso_extracted/PSP_GAME/USRDIR/gmodule/rel_conv_machine.prx
   asm_path: asm/rel_conv_machine
   ld_script_path: build/rel_conv_machine.ld
+  symbol_addrs_path: config/symbols/rel_conv_machine.txt   # import stub names (scripts/resolve_nids.py)
   compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (see docs/06)
   find_file_boundaries: True
   section_order: [".text", ".data", ".rodata", ".bss"]
