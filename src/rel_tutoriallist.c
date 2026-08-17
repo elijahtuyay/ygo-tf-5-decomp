@@ -283,53 +283,6 @@ s32 func_00000D74(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     return ehsys_FDD168CA(v, arg1 + 6, arg2 + 6, 0, 0x1F, 0x35, 0, 0);
 }
 
-/* func_00000FD8 — close miss: 16 word-level diffs, all $s0<->$s1 swaps
- * between `c` (reused for both the initial call-result check and the
- * later margin arithmetic) and `s1v`. Unlike func_000024B4's analogous
- * swap, neither an intermediate temp nor splitting `c` into two variables
- * nor declaration-order changes fixed it -- still unmatched. */
-s32 func_00000FD8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 bit;
-    s32 c;
-    s32 s1v;
-    s32 s3v;
-    s32 s2v;
-    s32 s4v;
-    s32 s6v;
-    s32 s7v;
-    s32 v;
-
-    c = func_000024B4(0x1003);
-    if (c == 0) {
-        return arg0;
-    }
-    bit = ((*(int *) ehsys_B2B9FEFA()) >> 3) & 1;
-    s1v = bit << 1;
-    arg0 = ehsys_CABEA834(arg0, -1);
-    v = ehsys_E6E4401F(arg0, 0, 0);
-    v = ehsys_9EA6989A(v, c);
-    v = ehsys_8EA6B1E7(v, 6, 6, 6, 6);
-    c = s1v >> 1;
-    if (s1v < 0) {
-        c = (s1v + 1) >> 1;
-    }
-    s3v = (arg2 - 4) - c;
-    s2v = (arg1 - 4) - c;
-    v = ehsys_FDD168CA(v, s2v, s3v, 0, 0x19, 0x14, 0, 0);
-    s7v = c + ((arg1 + arg3) - 2);
-    v = ehsys_FDD168CA(v, s7v, s3v, 0, 0x28, 0x14, 0, 0);
-    s6v = c + ((arg2 + arg4) - 2);
-    v = ehsys_FDD168CA(v, s2v, s6v, 0, 0x19, 0x29, 0, 0);
-    v = ehsys_FDD168CA(v, s7v, s6v, 0, 0x28, 0x29, 0, 0);
-    v = ehsys_8EA6B1E7(v, 6, 1, 6, (arg4 + s1v) - 4);
-    s4v = (arg2 + 2) - c;
-    v = ehsys_FDD168CA(v, s2v, s4v, 0, 0x19, 0x1A, 0, 0);
-    v = ehsys_FDD168CA(v, s7v, s4v, 0, 0x28, 0x1A, 0, 0);
-    v = ehsys_8EA6B1E7(v, 1, 6, (arg3 + s1v) - 4, 6);
-    c = (arg1 + 2) - c;
-    v = ehsys_FDD168CA(v, c, s3v, 0, 0x1F, 0x14, 0, 0);
-    return ehsys_FDD168CA(v, c, s6v, 0, 0x1F, 0x29, 0, 0);
-}
 
 /* func_000017C0 — 8 words. Calls ehsys_B2B9FEFA (returns a pointer) and
  * reads back its second word. MATCH 100%. */
@@ -358,25 +311,6 @@ void func_000022B8(void) {
     ehsys_qsort(D_00007B90, 4, 0xC, func_00002630);
 }
 
-/* func_0000231C — 41/42 words matched; close miss, see docs. */
-s32 func_0000231C(void) {
-    typedef struct {
-        unsigned bit0 : 1;
-        unsigned field : 7;
-    } Flags_C00;
-
-    if (((Flags_C00 *) &D_00007C00)->bit0 == 0) {
-        return 0;
-    }
-    if (((Flags_C00 *) &D_00007C00)->field == 0) {
-        if (func_00002404() != 0) {
-            ((Flags_C00 *) &D_00007C00)->field = ((Flags_C00 *) &D_00007C00)->field + 1;
-        }
-        return 0;
-    }
-    ((Flags_C00 *) &D_00007C00)->field = 0;
-    return 1;
-}
 
 /* func_000023C4 — 2 words. MATCH 100% (shape: m2c). */
 void func_000023C4(void) {
