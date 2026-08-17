@@ -226,6 +226,23 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     one at the call site, which changes register and callee-saved behaviour.
     Lever 10's dead-argument rule applies on the calling side too.
 
+36. **One symbol-table entry per external identifier, file-wide.** MWCC merges
+    declarations across the whole translation unit, so a new function calling a
+    helper that is already declared `extern int f();` elsewhere must reuse that
+    exact declaration. Adding a stricter local prototype is a redeclaration
+    error, which is why lever 22's K&R definitions matter so much in practice.
+37. **A dead store before a call is not dead.** `sw $a0, n($sp)` immediately
+    followed by the same slot being overwritten with a call result comes from
+    `s32 local = arg0; local = f(...);` — the compiler must spill the incoming
+    register before the call clobbers it. Do not "simplify" it away.
+38. **A chain of `beq`s against named constants is a `switch`**, not an
+    if/else-if chain, even when it reads like one. Combined with lever 2
+    (reverse-order case tests) this is a reliable identification.
+39. **Twin functions are a two-for-one.** Several modules ship byte-identical
+    functions at two addresses (`func_00002E10`/`func_0002D540`,
+    `func_00002DF0`/`func_0002D520` in `rel_field`). The moment one matches, try
+    the same body at its twin.
+
 ### A known limitation of the differ
 
 `scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
