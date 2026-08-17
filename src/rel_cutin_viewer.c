@@ -567,6 +567,25 @@ s32 func_00004C50(void) {
     return *(s32 *)0xB2EEC8 != 0;
 }
 
+/* func_000040E8 — 10 words. MATCH 100% (verified). */
+typedef struct { f32 a, b, c, d; } V4_58A0_40E8;
+void *func_000040E8(V4_58A0_40E8 *arg0, V4_58A0_40E8 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    arg0->d = arg1->d;
+    return arg0;
+}
+
+/* func_00004110 — 10 words. MATCH 100% (verified). */
+void *func_00004110(V4_58A0_40E8 *arg0, V4_58A0_40E8 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    arg0->d = arg1->d;
+    return arg0;
+}
+
 /* func_000044D0 — 5 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_000044D0(void) {
     ehsys_memset(&D_B2EEBC, 0, 0xC);

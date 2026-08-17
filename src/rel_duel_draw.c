@@ -706,6 +706,15 @@ s32 func_00002250(void) {
     return (*(s32 *)&D_0007EB38);
 }
 
+/* func_0000225C — 7 words. MATCH 100% (verified). */
+int func_0000225C(s32 arg0) {
+    char *base = &D_0007EB30;
+    if (arg0 == 0) {
+        arg0 = -1;
+    }
+    *(s32 *)(*(s32 *)(base + 8) + 0x1B0) = arg0;
+}
+
 /* func_00002278 — 10 words. MATCH 100% (shape: m2c). */
 void func_00002278(s32 arg0, s32 arg1, s32 arg2) {
     void *temp_a0;
@@ -875,6 +884,25 @@ s32 func_0000465C(void) {
 s32 func_00004664(void) {
     return 0;
 }
+/* func_000048B8 — 10 words. MATCH 100% (verified). */
+typedef struct { f32 a, b, c, d; } V4_58A0_48B8;
+void *func_000048B8(V4_58A0_48B8 *arg0, V4_58A0_48B8 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    arg0->d = arg1->d;
+    return arg0;
+}
+
+/* func_000048E0 — 10 words. MATCH 100% (verified). */
+void *func_000048E0(V4_58A0_48B8 *arg0, V4_58A0_48B8 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    arg0->d = arg1->d;
+    return arg0;
+}
+
 /* func_00004CA0 — 0 words. MATCH 100% (shape: twin of func_00004CB4). */
 s32 func_00004CA0(s32 arg0, s32 arg1, s32 arg2) {
 
@@ -951,6 +979,15 @@ void func_00008494(void) {
     func_0000BD14();
 }
 
+/* func_00008184 — 8 words. MATCH 100% (verified). */
+typedef struct { f32 a, b, c; } V3_3B00_8184;
+void *func_00008184(V3_3B00_8184 *arg0, V3_3B00_8184 *arg1) {
+    arg0->a = arg1->a;
+    arg0->b = arg1->b;
+    arg0->c = arg1->c;
+    return arg0;
+}
+
 /* func_00008758 — 14 words. MATCH 100% (shape: single-switch). */
 s32 func_00008758(void) {
     s32 temp_v0;
@@ -992,6 +1029,18 @@ void func_0000B464(s32 arg0, void *arg1) {
     (&D_000909E0)[arg0] = arg1;
 }
 
+/* func_0001095C — 5 words. MATCH 100% (verified). */
+s32 func_0001095C(void) {
+    extern s32 D_00090C08;
+    return ehsys_memset(&D_00090C08, 0, 0x9C);
+}
+
+/* func_00010970 — 5 words. MATCH 100% (verified). */
+s32 func_00010970(void) {
+    extern s32 D_00090C08;
+    return ehsys_memset(&D_00090C08, 0, 0x9C);
+}
+
 /* func_00010C20 — 7 words. MATCH 100% (shape: thunk). */
 s32 func_00010C20(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6) {
     return ehsys_3BB2BAC6((arg0 << 6), (arg1 << 6), (arg2 << 6), (arg3 << 6), arg4, -0x1, 0);
@@ -1005,6 +1054,12 @@ s32 func_00010FB4(void) {
 /* func_00010FC0 — 12 words. MATCH 100% (shape: m2c). */
 void *func_00010FC0(void) {
     return (&D_00077BE0)[func_00051770()];
+}
+
+/* func_00011060 — 5 words. MATCH 100% (verified). */
+s32 func_00011060(void) {
+    extern s32 D_00090CA4;
+    return ehsys_memset(&D_00090CA4, 0, 0x74);
 }
 
 /* func_00011074 — 2 words. MATCH 100% (shape: m2c). */
@@ -2318,6 +2373,12 @@ int func_00051630(arg0) s32 arg0;
     (*(s32 *)&D_000940F4) = arg0;
 }
 
+/* func_00051600 — 6 words. MATCH 100% (verified). */
+u8 func_00051600(void) {
+    extern s32 D_00094108;
+    return !D_00094108;
+}
+
 /* func_0005163C — 3 words. MATCH 100% (shape: m2c). */
 int func_0005163C() {
     return (s32)((*(s32 *)&D_000940F4));
@@ -3108,6 +3169,18 @@ void func_0005A90C(s32 arg0) {
 s32 func_0005ACCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_B89D38DC((arg0 << 6), (arg1 << 6), ((0x1E0 - arg0) << 6), arg2);
 }
+/* func_0005AED8 — 5 words. MATCH 100% (verified). */
+s32 func_0005AED8(void) {
+    extern s32 D_395D58;
+    return ehsys_memset(&D_395D58, 0, 0x24);
+}
+
+/* func_0005AEEC — 5 words. MATCH 100% (verified). */
+s32 func_0005AEEC(void) {
+    extern s32 D_395D58;
+    return ehsys_memset(&D_395D58, 0, 0x24);
+}
+
 /* func_0005AF00 — 35 words. MATCH 100% (shape: m2c). */
 void func_0005AF00(s32 arg0) {
     extern int D_395D58;
@@ -3623,6 +3696,14 @@ void func_000687B4(void) {
 /* func_00068CC4 — 5 words. MATCH 100% (shape: thunk). */
 s32 func_00068CC4(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     return ehsys_BC8E65D7((arg0 << 6), (arg1 << 6), (arg2 << 6), arg3, -0x1);
+}
+
+/* func_000687E0 — 2 words. MATCH 100% (verified). */
+int func_000687E0(arg0, arg1)
+void *arg0;
+u16 arg1;
+{
+    *(u16 *)((char *)arg0 + 2) = arg1;
 }
 
 /* func_00068CD8 — 16 words. MATCH 100% (shape: m2c). */

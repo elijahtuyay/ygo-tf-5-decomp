@@ -4397,6 +4397,134 @@ int func_0016E720(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
     extern int func_0016E658();
     return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_0016E658), 0, (*(int *)((char *)(a0) + 8)), 17);
 }
+/* func_00163128 — 14 words. MATCH 100% (shape: hand). */
+int func_00163128(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_00163128();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x20);
+}
+/* func_00163630 — 14 words. MATCH 100% (shape: hand). */
+int func_00163630(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_00163630();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x2);
+}
+/* func_001658F0 — 14 words. MATCH 100% (shape: hand). */
+int func_001658F0(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162D68();
+    extern int func_001658F0();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162D68), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x2);
+}
+/* func_00168A60 — 14 words. MATCH 100% (shape: hand). */
+int func_00168A60(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_00168A60();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0);
+}
+/* func_00169510 — 14 words. MATCH 100% (shape: hand). */
+int func_00169510(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DE0();
+    extern int func_00169510();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DE0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0);
+}
+/* func_0016A4E0 — 14 words. MATCH 100% (shape: hand). */
+int func_0016A4E0(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_0016A4E0();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x11);
+}
+/* func_0016C1D0 — 14 words. MATCH 100% (shape: hand). */
+int func_0016C1D0(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_0016C1D0();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x10);
+}
+/* func_0016C57C — 14 words. MATCH 100% (shape: hand). */
+int func_0016C57C(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_0016C57C();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x8);
+}
+/* func_0016CF64 — 14 words. MATCH 100% (shape: hand). */
+int func_0016CF64(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162B50();
+    extern int func_0016CF64();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162B50), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x20);
+}
+/* func_0016D038 — 14 words. MATCH 100% (shape: hand). */
+int func_0016D038(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162B50();
+    extern int func_0016D038();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162B50), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x2);
+}
+/* func_0016D554 — 14 words. MATCH 100% (shape: hand). */
+int func_0016D554(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162B50();
+    extern int func_0016D554();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162B50), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x10);
+}
+/* func_0016DE90 — 14 words. MATCH 100% (shape: hand). */
+int func_0016DE90(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162D68();
+    extern int func_0016DE90();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162D68), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x11);
+}
+/* func_0016E744 — 14 words. MATCH 100% (shape: hand). */
+int func_0016E744(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DE0();
+    extern int func_0016E744();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DE0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x10);
+}
+/* func_0016F040 — 14 words. MATCH 100% (shape: hand). */
+int func_0016F040(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DE0();
+    extern int func_0016F040();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DE0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x2);
+}
+/* func_0016F2BC — 14 words. MATCH 100% (shape: hand). */
+int func_0016F2BC(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162DD0();
+    extern int func_0016F2BC();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x4);
+}
+/* func_0016F574 — 14 words. MATCH 100% (shape: hand). */
+int func_0016F574(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
+    extern int func_00161DF0();
+    extern int func_00162E18();
+    extern int func_0016F574();
+    int local = *(short *)((char *)a0 + 0x2);
+    return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162E18), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x11);
+}
 /* func_0016EC64 — 9 words. MATCH 100% (shape: bulk). */
 int func_0016EC64(int a0, int a1, int a2, int a3, int t0, int t1) {
     extern int func_001621C4();
