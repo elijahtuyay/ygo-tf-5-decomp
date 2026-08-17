@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 10 functions matched here. The rest of the module is not
+ * STATUS: 11 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -50,6 +50,7 @@ extern s32 ehsys_BC8E65D7(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 /* ---- forward declarations ---- */
 s32 func_00000000(void);
 s32 func_00000958(s32 arg0);
+s32 func_000018E8(s32 arg0, s32 arg1, s32 arg2);
 u32 func_00002958(void);
 u16 func_0000296C(void);
 s32 func_00003BD4(s32 arg0);
@@ -73,6 +74,19 @@ s32 func_00000958(s32 arg0) {
         var_a0 -= 4;
     }
     return var_a0;
+}
+
+/* func_000018E8 — 17 words. MATCH 100% (shape: m2c, delay-slot mult reorder). */
+s32 func_000018E8(s32 arg0, s32 arg1, s32 arg2) {
+    s32 v0;
+    if (arg1 < arg2) {
+        return arg1;
+    }
+    v0 = arg2 * arg0;
+    if (arg1 < v0) {
+        return arg2;
+    }
+    return (arg1 + arg0 - 1) / arg0;
 }
 
 /* func_00002958 — 5 words. MATCH 100% (shape: m2c). */

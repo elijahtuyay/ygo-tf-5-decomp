@@ -129,6 +129,12 @@ void func_00001484(int arg0, int arg1, int arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
 }
 
+/* func_00001B38 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00001B38(int arg0, int arg1, int arg2, int arg3) {
+    extern int ehsys_BC8E65D7(int, int, int, int, int);
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
 /* func_00001F28 — like func_00001484, but arg0 is ALSO mirrored against the
  * 0x1E0 (480, PSP screen width) right edge for the third coordinate.
  * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -248,6 +254,61 @@ extern int D_00027918;
 extern void ehsys_20E340D9(int, int);
 void func_000063E8(void) {
     ehsys_20E340D9(*(int *)D_00027918, D_00027918);
+}
+
+/* func_000062B4 unmatched (register-allocation quirk); func_000065AC follows.
+ * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_000065AC(void) {
+    extern int D_00027918;
+    extern int func_0000660C(void);
+    extern void func_00006C30(void);
+    int v0;
+    int s0;
+
+    s0 = 1;
+    v0 = *(int *)((char *)D_00027918 + 0x10);
+    switch (v0) {
+    case 0:
+        s0 = func_0000660C();
+        break;
+    case 1:
+        func_00006C30();
+        break;
+    }
+    return s0;
+}
+
+/* func_00006D50 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00006D50(void) {
+    extern int D_00027918;
+    int *p = (int *)((char *)D_00027918 + 0x14C);
+    if (*p == 1) {
+        *p = 2;
+    }
+}
+
+/* func_00008598 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00008598(void *arg0, int arg1) {
+    extern void ehsys_memset(void *, int, int);
+    ehsys_memset(arg0, 0, 0x154);
+    *(int *)arg0 = arg1;
+}
+
+/* func_000085D4 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_000085D4(int *arg0, int arg1, int arg2, int arg3) {
+    extern void func_0000861C(int *, int);
+    extern int func_00008684(int, int *, int);
+    volatile int sp[8];
+
+    func_0000861C((int *)&sp[0], arg1 + arg2);
+    return func_00008684(*arg0, (int *)&sp[0], arg3);
+}
+
+/* func_00008684 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00008684(int arg0, int arg1, int arg2) {
+    extern int ehsys_C6C15111(int, int, int);
+    extern int ehsys_E58C0FDC(int, int);
+    return ehsys_E58C0FDC(ehsys_C6C15111(arg0, arg1, 0), arg2);
 }
 
 /* func_00008D18 — runs ehsys_6A55182E(arg1, arg2) and forwards its result

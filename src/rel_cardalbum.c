@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 8 functions matched here. The rest of the module is not
+ * STATUS: 13 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -49,17 +49,50 @@ extern s32 ehsys_20E340D9(s32 arg0, s32 arg1);
 
 /* ---- forward declarations ---- */
 s32 func_000008A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+void func_00001708(void);
+s32 func_00001C48(s32 arg0);
 s32 func_00002E24(s32 arg0);
 s32 func_00002E34(s32 arg0);
 s32 func_000043E8(s32 arg0);
 s32 func_000063E4(u16 *arg0, u16 *arg1);
+void func_00006480(u16 arg0);
+void func_00006800(void);
 s32 func_00006A84(void);
 void func_000052C4(void);
+void func_00005C90(void);
 void func_00005EFC(void);
 
 /* func_000008A8 — 4 words. MATCH 100% (shape: m2c). */
 s32 func_000008A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6, arg3);
+}
+
+/* func_00001708 — 27 words. MATCH 100% (shape: m2c, extern-symbol lever). */
+void func_00001708(void) {
+    extern int ehsys_E1139F1A();
+    extern s32 D_0000CA74;
+    extern s32 D_0000CA84;
+
+    if (D_0000CA74 != 0) {
+        ehsys_20E340D9(D_0000F074, D_0000CA74);
+        D_0000CA74 = 0;
+    }
+    if (D_0000CA84 != 0) {
+        ehsys_E1139F1A(D_0000CA84);
+        ehsys_20E340D9(D_0000F074, D_0000CA84);
+        D_0000CA84 = 0;
+    }
+}
+
+/* func_00001C48 — 11 words. MATCH 100% (shape: m2c, extern-symbol lever). */
+s32 func_00001C48(s32 arg0) {
+    extern int ehsys_EF9B5D06();
+    extern s32 D_0000CA84;
+    s32 sp1C;
+
+    sp1C = arg0;
+    ehsys_EF9B5D06(&sp1C, D_0000CA84);
+    return sp1C;
 }
 
 /* func_00002E24 — 4 words. MATCH 100% (shape: m2c). */
@@ -107,6 +140,21 @@ void func_000052C4(void) {
     }
 }
 
+/* func_00005C90 — 32 words. MATCH 100% (shape: m2c, bitfield lever). */
+void func_00005C90(void) {
+    extern int ehsys_memset();
+    extern int ehsys_qsort();
+    extern u8 D_0000C694;
+    extern u8 D_0000C96C;
+    struct bf1 { unsigned bit0 : 1; };
+    extern struct bf1 D_0000CAD0;
+
+    ehsys_memset(&D_0000CAD0, 0, 0x26);
+    D_0000CAD0.bit0 = 1;
+    ehsys_qsort(&D_0000C694, 0x21, 0x10, func_000063E4);
+    ehsys_qsort(&D_0000C96C, 5, 0x14, func_000063E4);
+}
+
 /* func_00005EFC — 2 words. MATCH 100% (shape: m2c). */
 void func_00005EFC(void) {
     func_00005F04();
@@ -115,6 +163,37 @@ void func_00005EFC(void) {
 /* func_000063E4 — 4 words. MATCH 100% (shape: m2c). */
 s32 func_000063E4(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
+}
+
+/* func_00006480 — 16 words. MATCH 100% (shape: m2c, u16 array lhu). */
+void func_00006480(u16 arg0) {
+    extern u16 D_0000CAD0[];
+    s32 i;
+
+    for (i = 0; i < 0x12; i++) {
+        if (D_0000CAD0[i + 1] != 0) {
+            continue;
+        }
+        D_0000CAD0[i + 1] = arg0;
+        break;
+    }
+}
+
+/* func_00006800 — 18 words. MATCH 100% (shape: m2c, extern-symbol + while lever). */
+void func_00006800(void) {
+    extern int ehsys_20E340D9();
+    extern s32 D_0000CB18;
+    extern s32 D_0000F074;
+    s32 temp_s0;
+    s32 var_a1;
+
+    var_a1 = D_0000CB18;
+    D_0000CB18 = 0;
+    while (var_a1 != 0) {
+        temp_s0 = (*(int *)((char *)var_a1 + 0xB0));
+        ehsys_20E340D9(D_0000F074, (void *) var_a1);
+        var_a1 = temp_s0;
+    }
 }
 
 /* func_00006A84 — 2 words. MATCH 100% (shape: m2c). */

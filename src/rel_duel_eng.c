@@ -266,6 +266,13 @@ extern int func_0001A1A0();
 int func_0001A35C(int a0, int a1, int a2) {
     extern int func_0001A1A0();
     extern int func_0001A35C(); return func_0001A1A0(a0, 0, 0x2); }
+/* func_0001D4D4 — 8 words. MATCH 100% (shape: hand). */
+int func_0001D4D4(void) {
+    extern int D_003517A8;
+    extern int D_003517A0;
+    extern int func_0001D4D4();
+    return D_003517A8 ? D_003517A0 : 0;
+}
 
 
 
@@ -481,6 +488,13 @@ void func_0003FBA8(int a0) {
     extern int func_0003FBA8();
     D_0034DF4C = a0;
 }
+/* func_0003FBB4 — 8 words. MATCH 100% (shape: hand). */
+void *func_0003FBB4(void) {
+    extern int D_0034DF4C;
+    extern char D_0034DF44;
+    extern int func_0003FBB4();
+    return &D_0034DF44 + (D_0034DF4C * 4) + 0x14;
+}
 /* func_0003FBD4 — 6 words. MATCH 100% (shape: m2c). */
 void *func_0003FBD4(s32 arg0) {
     extern char D_0034DF44;
@@ -494,6 +508,12 @@ int func_0003FBEC(void) {
     extern int func_0003FBEC();
     return func_0003FEEC(D_0034DF4C);
 }
+/* func_0003FEEC — 8 words. MATCH 100% (shape: hand). */
+int func_0003FEEC(int a0) {
+    extern char D_0034DF44;
+    extern int func_0003FEEC();
+    return (*((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C4) >> 1) & 0x1F;
+}
 /* func_0003FBF8 — 3 words. MATCH 100% (shape: hand). */
 int func_0003FBF8(void) {
     extern int D_0034DF50;
@@ -505,6 +525,18 @@ int func_0003FF0C(int a0) {
     extern char D_0034DF44;
     extern int func_0003FF0C();
     return *((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C4) & 1;
+}
+/* func_0003FF28 — 8 words. MATCH 100% (shape: hand). */
+int func_0003FF28(int a0) {
+    extern char D_0034DF44;
+    extern int func_0003FF28();
+    return (*((unsigned char *)&D_0034DF44 + a0 * 2 + 0x4C5) >> 7) & 1;
+}
+/* func_00040358 — 8 words. MATCH 100% (shape: hand). */
+int func_00040358(int a0) {
+    extern char D_0034DF44;
+    extern int func_00040358();
+    return (*(unsigned short *)((char *)&D_0034DF44 + a0 * 2 + 0x4C4) >> 6) & 0x1FF;
 }
 /* func_0004458C — 3 words. MATCH 100% (shape: hand). */
 int func_0004458C(void) {
@@ -2502,6 +2534,18 @@ s32 func_000D7AFC(void) {
         return 0;
     }
     return 2;
+}
+/* func_000D816C — 8 words. MATCH 100% (shape: hand). */
+int func_000D816C(void *a0) {
+    extern int func_000A455C();
+    extern int func_000D816C();
+    return func_000A455C(*(unsigned short *)((char *)a0 + 2)) != 0;
+}
+/* func_000DB028 — 8 words. MATCH 100% (shape: hand). */
+int func_000DB028(void) {
+    extern int D_00351724;
+    extern int func_000DB028();
+    return (D_00351724 != 3) ? 2 : 0;
 }
 /* func_000DAFA8 — 11 words. MATCH 100% (shape: hand). */
 int func_000DAFA8(unsigned short *a0) {
@@ -5351,6 +5395,18 @@ int func_00285C90(int arg1, int arg2, int arg3) {
     extern char D_00324468;
     return func_002EED24(arg1, ((int)&D_00324468), 1);
 }
+/* func_00285EDC — 7 words. MATCH 100% (shape: hand). */
+int func_00285EDC(int a0, int a1, int a2, int a3) {
+    extern int D_0034DF44;
+    extern int D_0034DF48;
+    extern int D_0034DF4C;
+    extern int func_00170F10();
+    extern int func_00285EDC();
+    D_0034DF44 = a0;
+    D_0034DF48 = a3;
+    D_0034DF4C = 0;
+    return func_00170F10(a0, a1, a2, a3);
+}
 
 /* func_0028AD44 — 2 words. MATCH 100% (shape: bulk). */
 int func_0028AD44(int arg1, int arg2, int arg3, int arg4, int arg5) {
@@ -5705,6 +5761,13 @@ void func_002D7C74(void) {
     func_002EF364(func_0017CA50());
 }
 
+/* func_002DD564 — 6 words. MATCH 100% (shape: hand). */
+int func_002DD564(void *a0) {
+    extern int D_0034D558;
+    extern int func_002EB6D0();
+    extern int func_002DD564();
+    return func_002EB6D0(1 - *(unsigned short *)((char *)a0 + 2), D_0034D558);
+}
 /* func_002D7C98 — 2 words. MATCH 100% (shape: bulk). */
 int func_002D7C98(int arg1, int arg2, int arg3) {
     extern int func_000A094C();
@@ -6148,6 +6211,13 @@ int func_002EFE3C(int arg1, int arg2) {
     extern char D_003518FC;
     return func_002EFE50(((int)&D_003518F4), ((int)&D_003518FC));
 }
+/* func_002EFE50 — 6 words. MATCH 100% (shape: hand). */
+void *func_002EFE50(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002EFE50();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002EFEE0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002EFEE0(int arg1, int arg2) {
 
@@ -6261,6 +6331,13 @@ int func_002F013C(int arg1, int arg2) {
     extern char D_00351934;
     return func_002F0150(((int)&D_0035192C), ((int)&D_00351934));
 }
+/* func_002F0150 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0150(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0150();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F0264 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0264(int arg1, int arg2) {
 
@@ -6269,6 +6346,13 @@ int func_002F0264(int arg1, int arg2) {
     extern char D_00351944;
     return func_002F0278(((int)&D_0035193C), ((int)&D_00351944));
 }
+/* func_002F0278 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0278(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0278();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F0370 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0370(int arg1, int arg2) {
 
@@ -6276,6 +6360,13 @@ int func_002F0370(int arg1, int arg2) {
     extern char D_0035194C;
     extern char D_00351954;
     return func_002F0384(((int)&D_0035194C), ((int)&D_00351954));
+}
+/* func_002F0384 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0384(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0384();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F04C0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F04C0(int arg1, int arg2) {
@@ -6317,6 +6408,13 @@ int func_002F0A50(int arg1, int arg2) {
     extern char D_00351AC4;
     return func_002F0A64(((int)&D_00351ABC), ((int)&D_00351AC4));
 }
+/* func_002F0A64 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0A64(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0A64();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F0B98 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0B98(int arg1, int arg2) {
 
@@ -6324,6 +6422,13 @@ int func_002F0B98(int arg1, int arg2) {
     extern char D_00351ACC;
     extern char D_00351AD4;
     return func_002F0BAC(((int)&D_00351ACC), ((int)&D_00351AD4));
+}
+/* func_002F0BAC — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0BAC(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0BAC();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F0CE4 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0CE4(int arg1, int arg2) {
@@ -6333,6 +6438,13 @@ int func_002F0CE4(int arg1, int arg2) {
     extern char D_00351AE4;
     return func_002F0CF8(((int)&D_00351ADC), ((int)&D_00351AE4));
 }
+/* func_002F0CF8 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0CF8(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0CF8();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F0E34 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0E34(int arg1, int arg2) {
 
@@ -6340,6 +6452,13 @@ int func_002F0E34(int arg1, int arg2) {
     extern char D_00351AEC;
     extern char D_00351AF4;
     return func_002F0E48(((int)&D_00351AEC), ((int)&D_00351AF4));
+}
+/* func_002F0E48 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F0E48(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F0E48();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F10D8 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F10D8(int arg1, int arg2) {
@@ -6413,6 +6532,13 @@ int func_002F1BBC(int arg1, int arg2) {
     extern char D_00352F6C;
     return func_002F1BD0(((int)&D_00352F64), ((int)&D_00352F6C));
 }
+/* func_002F1BD0 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F1BD0(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F1BD0();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F1CE4 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1CE4(int arg1, int arg2) {
 
@@ -6421,6 +6547,13 @@ int func_002F1CE4(int arg1, int arg2) {
     extern char D_00352F7C;
     return func_002F1CF8(((int)&D_00352F74), ((int)&D_00352F7C));
 }
+/* func_002F1CF8 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F1CF8(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F1CF8();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F1E0C — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1E0C(int arg1, int arg2) {
 
@@ -6428,6 +6561,13 @@ int func_002F1E0C(int arg1, int arg2) {
     extern char D_00352F84;
     extern char D_00352F8C;
     return func_002F1E20(((int)&D_00352F84), ((int)&D_00352F8C));
+}
+/* func_002F1E20 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F1E20(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F1E20();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F1EA4 — 19 words. MATCH 100% (shape: m2c). */
 void func_002F1EA4(s32 arg0, int arg1, int arg2) {
@@ -6453,6 +6593,13 @@ int func_002F2070(int arg1, int arg2) {
     extern char D_00352FC0;
     return func_002F2084(((int)&D_00352FBC), ((int)&D_00352FC0));
 }
+/* func_002F2084 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F2084(void *a0, void *a1) {
+    struct vec2s { s16 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F2084();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F2148 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2148(int arg1, int arg2) {
 
@@ -6460,6 +6607,13 @@ int func_002F2148(int arg1, int arg2) {
     extern char D_00352FC4;
     extern char D_00352FC8;
     return func_002F215C(((int)&D_00352FC4), ((int)&D_00352FC8));
+}
+/* func_002F215C — 6 words. MATCH 100% (shape: hand). */
+void *func_002F215C(void *a0, void *a1) {
+    struct vec2s { s16 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F215C();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F2220 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2220(int arg1, int arg2) {
@@ -6469,6 +6623,13 @@ int func_002F2220(int arg1, int arg2) {
     extern char D_00352FD0;
     return func_002F2234(((int)&D_00352FCC), ((int)&D_00352FD0));
 }
+/* func_002F2234 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F2234(void *a0, void *a1) {
+    struct vec2s { s16 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F2234();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F22F8 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F22F8(int arg1, int arg2) {
 
@@ -6477,6 +6638,13 @@ int func_002F22F8(int arg1, int arg2) {
     extern char D_00352FD8;
     return func_002F230C(((int)&D_00352FD4), ((int)&D_00352FD8));
 }
+/* func_002F230C — 6 words. MATCH 100% (shape: hand). */
+void *func_002F230C(void *a0, void *a1) {
+    struct vec2s { s16 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F230C();
+    *arg0 = *arg1;
+    return arg0;
+}
 /* func_002F23D0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F23D0(int arg1, int arg2) {
 
@@ -6484,6 +6652,13 @@ int func_002F23D0(int arg1, int arg2) {
     extern char D_00352FDC;
     extern char D_00352FE0;
     return func_002F23E4(((int)&D_00352FDC), ((int)&D_00352FE0));
+}
+/* func_002F23E4 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F23E4(void *a0, void *a1) {
+    struct vec2s { s16 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F23E4();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F24E0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F24E0(int arg1, int arg2) {
@@ -6697,6 +6872,13 @@ int func_002F4970(int arg1, int arg2) {
     extern char D_0035816C;
     extern char D_00358174;
     return func_002F4984(((int)&D_0035816C), ((int)&D_00358174));
+}
+/* func_002F4984 — 6 words. MATCH 100% (shape: hand). */
+void *func_002F4984(void *a0, void *a1) {
+    struct vec2f { f32 x, y; } *arg0 = a0, *arg1 = a1;
+    extern int func_002F4984();
+    *arg0 = *arg1;
+    return arg0;
 }
 /* func_002F4AD4 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4AD4(int arg1, int arg2) {

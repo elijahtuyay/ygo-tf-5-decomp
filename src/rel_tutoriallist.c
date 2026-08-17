@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 8 functions matched here. The rest of the module is not
+ * STATUS: 13 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -43,16 +43,23 @@ extern char D_00007D14;
 extern char D_00007B90;
 extern char D_00007BC0;
 extern char D_00007C00;
+extern u16 D_00007C10;
+extern int ehsys_13A4081A();
 extern int ehsys_20E340D9();
 extern int ehsys_41AABF28();
+extern int ehsys_450CD6C5();
 extern int ehsys_8288EEBC();
 extern int ehsys_97BB99A5();
 extern int ehsys_B89D38DC();
 extern int ehsys_D2A768F4();
+extern int ehsys_D470D0B2();
 extern int ehsys_ED1410E0();
 extern int ehsys_F6414A71();
 extern int ehsys_memset();
 extern int ehsys_qsort();
+extern int func_00001880();
+extern int func_00001C68();
+extern int func_0000231C();
 
 /* ---- forward declarations ---- */
 s32 func_00002404(void);
@@ -60,6 +67,7 @@ s32 func_00002630(u16 *arg0, u16 *arg1);
 s32 func_000025A0(s32 arg0, s32 arg1);
 s32 func_000026B8(void);
 s32 func_00002908(void);
+s32 func_000027E4(void);
 void func_000022B8(void);
 void func_00000658(s32 arg0, s32 arg1, int arg2);
 void func_00000B8C(s32 arg0, s32 arg1, s32 arg2);
@@ -176,6 +184,60 @@ s32 func_000026B8(void) {
     return 0;
 }
 
+/* func_000027E4 — 73 words. Tutorial-step state machine: D_00007C10 is a
+ * u16 step index (lhu/sh, not char -- see rel_shop.c/rel_movie_viewer.c
+ * header for the load-width lever) driving a switch over 5 states. `default`
+ * has to be the LAST case in source, after case 4, for MWCC to place the
+ * shared `return 0;` block physically after all case bodies -- writing it
+ * between case 0 and case 1 (its natural textual position given the
+ * `goto block_19` targets) still compiles, but leaves case 4 needing an
+ * extra branch to skip over the shared block since MWCC then lays it out
+ * mid-function. The final if/else assigning 1 vs 2 also had to have its
+ * condition sense flipped (`!= 0` first) to get the target's `beql`
+ * (branch-likely-equal) rather than `bnezl` -- same tell as func_00002950's
+ * -1 return. MATCH 100%. */
+s32 func_000027E4(void) {
+    extern char D_00007C14;
+    s32 var_v0;
+
+    switch (D_00007C10) {
+    case 0:
+        if (func_0000231C() != 0) {
+            func_00001880();
+            D_00007C10 = 1;
+            ehsys_D470D0B2(1, 0xFF000000, 0x10);
+            ehsys_13A4081A(0);
+        }
+        goto block_19;
+    case 1:
+        if (ehsys_450CD6C5() != 0) {
+            D_00007C10 = 2;
+        }
+        goto block_19;
+    case 2:
+        func_00001C68();
+        goto block_19;
+    case 3:
+        if (ehsys_450CD6C5() != 0) {
+            D_00007C10 = 4;
+        }
+        goto block_19;
+    case 4:
+        if (func_00002908() != 0) {
+            if (((u32) ((u8) D_00007C14 << 0x1B) >> 0x1F) != 0) {
+                var_v0 = 2;
+            } else {
+                var_v0 = 1;
+            }
+            return var_v0;
+        }
+        goto block_19;
+    default:
+block_19:
+        return 0;
+    }
+}
+
 /* func_00002908 — 18 words. MATCH 100% (shape: hand). */
 s32 func_00002908(void) {
     func_000023C4();
@@ -184,5 +246,22 @@ s32 func_00002908(void) {
         ehsys_ED1410E0(*(int *) &D_00007D10);
     }
     return 1;
+}
+
+/* func_00002950 — 11 words. Bit 3 of D_00007C14 (extracted with the
+ * shift-pair form, not `(x >> N) & 1` -- see rel_movie_viewer.c for why
+ * those aren't interchangeable to MWCC) gates whether the current
+ * highlighted tutorial index (D_00007C16) is valid; returns -1 (as a
+ * genuine signed int literal, which compiles to `addiu $v0,-1` -- an
+ * unsigned/u16 -1 constant folds to `ori` instead and is one word
+ * different in opcode form) when it isn't. MATCH 100%. */
+s32 func_00002950(void) {
+    extern char D_00007C14;
+    extern u16 D_00007C16;
+
+    if (((u32) ((u8) D_00007C14 << 0x1B) >> 0x1F) != 0) {
+        return -1;
+    }
+    return D_00007C16;
 }
 

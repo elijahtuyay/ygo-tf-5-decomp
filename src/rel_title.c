@@ -37,6 +37,31 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 #define NULL 0
+/* func_00002F9C — 8 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x10 stack frame). */
+#pragma optimization_level 2
+void func_00002F9C(void *arg0) {
+    extern int func_00002F9C();
+    volatile int sp[4];
+    sp[0] = (int)arg0;
+    *(short *)((char *)sp[0] + 0x10) = 1;
+}
+#pragma optimization_level 4
+
+/* func_00003784 — 13 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x20 stack frame). */
+#pragma optimization_level 2
+int func_00003784(s32 arg0) {
+    extern int ehsys_2012884C();
+    extern int ehsys_E1139F1A();
+    extern int func_00003784();
+    volatile int sp[4];
+    sp[0] = arg0;
+    ehsys_E1139F1A(sp[0]);
+    return ehsys_2012884C(sp[0]);
+}
+#pragma optimization_level 4
+
 /* func_00006B40 — 3 words. MATCH 100% (shape: m2c -O2). */
 #pragma optimization_level 2
 s32 func_00006B40(void) {
@@ -153,6 +178,20 @@ int func_000226C0(int a, int b, int c, int d, int e) {
     extern int func_000226C0();
     return ehsys_3BB2BAC6(a << 6, b << 6, c << 6, d << 6, e, -1, 0);
 }
+/* func_00022C8C — 13 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x20 stack frame). */
+#pragma optimization_level 2
+int func_00022C8C(u16 arg0) {
+    extern int ehsys_06380DFA();
+    extern int ehsys_AB962AE7();
+    extern int func_00022C8C();
+    volatile unsigned short sp[8];
+    sp[0] = arg0;
+    ehsys_06380DFA(sp[0]);
+    return ehsys_AB962AE7(0);
+}
+#pragma optimization_level 4
+
 /* func_00023D04 — 9 words. MATCH 100% (shape: m2c -O2). */
 #pragma optimization_level 2
 void func_00023D04(void) {
@@ -205,6 +244,19 @@ void func_0002B944(int a, int b, int c, int d) {
     extern int func_0002B944();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
+/* func_0002BE88 — 16 words. MATCH 100% (shape: m2c -O2; spill/reload of a0/a1
+ * through a wasted 0x30 stack frame). */
+#pragma optimization_level 2
+void func_0002BE88(s32 *arg0, s32 arg1) {
+    extern int ehsys_memset();
+    volatile int sp[8];
+    sp[0] = (int)arg0;
+    sp[4] = arg1;
+    ehsys_memset((void *)sp[0], 0, 0x154);
+    *(s32 *)sp[0] = sp[4];
+}
+#pragma optimization_level 4
+
 /* func_0002C7C4 — 6 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
  * through a wasted 0x40 stack frame). */
 #pragma optimization_level 2

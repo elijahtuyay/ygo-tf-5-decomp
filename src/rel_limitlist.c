@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 11 functions matched here. The rest of the module is not
+ * STATUS: 13 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -40,6 +40,7 @@ extern char D_0000B0D5;
 extern char D_0000B134;
 extern char D_0000B540;
 extern u16 D_0000AB00[];
+extern int ehsys_4B0DABFA();
 extern int ehsys_60B55A50();
 extern int ehsys_831C5769();
 extern int ehsys_942B03D0();
@@ -69,6 +70,7 @@ void func_00001484(s32 arg0, s32 arg1, s32 arg2);
 void func_00001D14(s32 arg0, s32 arg1, int arg2, s32 arg3);
 void func_00001DB4(s32 arg0, s32 arg1, int arg2);
 void func_00002BC8(s32 arg0);
+s32 func_00003B18(s32 arg0, s32 arg1);
 void func_00003540(void);
 void func_000037F0(void);
 void func_00003DC0(s32 arg0, s32 arg1, int arg2);
@@ -161,6 +163,29 @@ void func_00003540(void) {
 /* func_000037F0 — 2 words. MATCH 100% (shape: m2c). */
 void func_000037F0(void) {
     func_000037F8();
+}
+
+/* func_00003B18 — 36 words. Bumps the 7-bit step counter packed into bits
+ * 1-7 of D_0000B670 (real bitfield struct), then always sets bit0. Same
+ * shape as func_000006F0 (rel_conv_machine) and func_000025A0
+ * (rel_tutoriallist) — see rel_shop.c header for the (x & ~1) | 1 lever.
+ * MATCH 100%. */
+s32 func_00003B18(s32 arg0, s32 arg1) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned field : 7;
+    } Flags_B670;
+    s32 temp_s0;
+
+    temp_s0 = arg1 > 0;
+    if (temp_s0 != 0) {
+        if (arg0 != 0) {
+            ehsys_4B0DABFA(0, arg0);
+        }
+        ((Flags_B670 *) &D_0000B670)->field = ((Flags_B670 *) &D_0000B670)->field + 1;
+    }
+    ((Flags_B670 *) &D_0000B670)->bit0 = 1;
+    return temp_s0;
 }
 
 /* func_00003DC0 — 8 words. Same shape as func_00000B30/func_00001DB4. MATCH 100%. */

@@ -18,9 +18,10 @@
  *               then `scripts/mwcc_diff.py asm/rel_conv_machine/text.s
  *               build/mwcc/rel_conv_machine.o`).
  *
- * STATUS (24 of 62 functions matched — see individual comments below):
+ * STATUS (25 of 62 functions matched — see individual comments below):
  *   func_00000000  MATCH 100%   u16 3-way compare (qsort-style callback)
  *   func_00000330  MATCH 100%   trampoline -> func_00000338
+ *   func_000006F0  MATCH 100%   bumps a 7-bit bitfield counter in D_00009030, sets bit0
  *   func_00000780  MATCH 100%   u16 3-way compare (qsort-style callback)
  *   func_00000808  MATCH 100%   stub, returns 0
  *   func_00000A10  MATCH 100%   trampoline -> func_000018D8
@@ -143,6 +144,7 @@ extern int func_000018D8();
 /* ---- module data ---- */
 extern char D_47D410;
 extern void *D_47D4B4;
+extern char D_00009030;
 
 /* D_47D460 is a much larger state blob; only the fields proven by the
  * functions below are named here. See STATUS list for which functions use
@@ -173,6 +175,30 @@ s32 func_00000000(u16 *arg0, u16 *arg1) {
 /* trampoline */
 void func_00000330(void) {
     func_00000338();
+}
+
+/* func_000006F0 — 36 words. Bumps the 7-bit step counter packed into bits
+ * 1-7 of D_00009030 (real bitfield struct so MWCC's own mask/wrap codegen
+ * is used, rather than an m2c shift-pair-and-mask expression), then always
+ * sets bit0. Identical shape to func_00003B18 (rel_limitlist) and
+ * func_000025A0 (rel_tutoriallist) — see rel_shop.c header for the
+ * (x & ~1) | 1 bitfield lever. MATCH 100%. */
+s32 func_000006F0(s32 arg0, s32 arg1) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned field : 7;
+    } Flags_9030;
+    s32 temp_s0;
+
+    temp_s0 = arg1 > 0;
+    if (temp_s0 != 0) {
+        if (arg0 != 0) {
+            ehsys_4B0DABFA(0, arg0);
+        }
+        ((Flags_9030 *) &D_00009030)->field = ((Flags_9030 *) &D_00009030)->field + 1;
+    }
+    ((Flags_9030 *) &D_00009030)->bit0 = 1;
+    return temp_s0;
 }
 
 /* qsort-style 3-way compare on a pair of u16 values (identical shape to

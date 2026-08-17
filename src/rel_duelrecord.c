@@ -16,7 +16,7 @@
  * and are identical across all modules that import them — see
  * config/symbols/rel_duelrecord.txt.
  *
- * STATUS: 19 / 47 functions matched.
+ * STATUS: 20 / 47 functions matched.
  *   func_00000000  MATCH   2 words
  *   func_00000204  MATCH  34 words
  *   func_00000B80  MATCH   5 words

@@ -157,6 +157,16 @@ void func_000020D4(void) {
     D_00029CCE &= 0xFFFB;
 }
 
+/* func_000022C4 — 9 words. MATCH 100% (verified). */
+extern int func_00007324();
+void func_000022C4(void) {
+    struct bf1 { unsigned bit0 : 1; };
+    extern struct bf1 D_0002954C;
+    u8 old = *(u8 *)&D_0002954C;
+    D_0002954C.bit0 = 0;
+    func_00007324(old);
+}
+
 /* func_0000242C — 23 words. MATCH 100% (shape: manual thunk). */
 void func_0000242C(void) {
     s32 sp1C;
@@ -188,6 +198,34 @@ void func_00002500(void) {
 void func_000026B0(void) {
     ehsys_E1139F1A(&D_00029F6C);
     D_00029CCE &= 0xFFBF;
+}
+
+/* func_00002848 — 27 words. MATCH 100% (verified). */
+extern int func_00002EB8();
+void func_00002848(void *arg0) {
+    extern int D_00029D1C;
+    extern unsigned short D_00029D20;
+    extern short D_00029D7C;
+    extern short D_00029D7E;
+    if ((D_00029CCE & 1) && (D_00029D20 != 0)) {
+        func_00002EB8(D_00029D7C, D_00029D7E, D_00029D20);
+    }
+    *(int *)((char *)arg0 + 0xE0) = ~D_00029D1C;
+    D_00029CCD = 0;
+}
+
+/* func_00003198 — 27 words. MATCH 100% (verified). */
+extern int ehsys_memset();
+extern int ehsys_qsort();
+extern int func_00016644();
+void func_00003198(void) {
+    struct bf1 { unsigned bit0 : 1; };
+    extern struct bf1 D_00028D40;
+    extern char D_00027EB0;
+    func_00016644();
+    ehsys_memset(&D_00028D40, 0, 2);
+    D_00028D40.bit0 = 1;
+    ehsys_qsort(&D_00027EB0, 9, 0xC, func_0000353C);
 }
 
 /* func_000032C4 — 2 words. MATCH 100% (shape: m2c). */
@@ -233,6 +271,39 @@ void func_00004C14(void) {
 /* func_00006D14 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_00006D14(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_000071B4 — 31 words. MATCH 100% (verified). */
+extern int ehsys_1CC5878C();
+extern int func_000168C0();
+void func_000071B4(void) {
+    extern int D_00029520;
+    s32 sp[9];
+
+    ehsys_memset(&sp[0], 0, 0x24);
+    sp[0] = func_000168C0(0x8007);
+    sp[1] = func_000168C0(0x8009);
+    sp[2] = func_000168C0(0x8024);
+    sp[3] = func_000168C0(0x8011);
+    sp[4] = func_000168C0(0x8010);
+    sp[7] = D_00029520;
+    ehsys_1CC5878C(&sp[0]);
+    func_00007324();
+}
+
+/* func_00007BF8 — 24 words. MATCH 100% (verified). */
+s32 func_00007BF8(void *arg0) {
+    extern unsigned short D_00029370;
+    extern char D_00028D50;
+    char *addr;
+
+    if (D_00029370 == 0) {
+        return 0;
+    }
+    D_00029370 = D_00029370 - 1;
+    addr = (char *)&D_00028D50 + (D_00029370 * 0xA) + 0x622;
+    ehsys_memcpy(arg0, addr, 0xA);
+    return 1;
 }
 
 /* func_00007C58 — 2 words. MATCH 100% (shape: m2c). */
@@ -367,6 +438,17 @@ void func_000137A0(void) {
         ehsys_20E340D9(D_0002951C, D_0002B7D0);
     }
     D_0002B7D0 = 0;
+}
+
+/* func_00013C28 — 11 words. MATCH 100% (verified). */
+extern int func_00014FDC();
+void func_00013C28(void) {
+    extern int D_0002B7D0;
+    extern char D_00028D50;
+    u8 byte = *(u8 *)(D_0002B7D0 + 0x6);
+    unsigned short half = *(unsigned short *)(D_0002B7D0 + 0x2);
+    u32 idx = ((u32)(byte << 27)) >> 29;
+    func_00014FDC((char *)&D_00028D50 + (idx << 5), half);
 }
 
 /* func_000165A0 — 11 words. MATCH 100% (shape: m2c). */

@@ -187,6 +187,23 @@ void func_000068B4(void) {
     D_0002CFE0 = 0;
 }
 
+/* func_00006D3C — 11 words. MATCH 100% (shape: m2c; (x<<27)>>29 field extract
+ * via unsigned intermediate to get srl not sra). */
+s32 func_00006D3C(void) {
+    extern int D_0002CFE0;
+    extern int D_0002D930;
+    extern int func_00000F98();
+    u8 byte6;
+    u16 half2;
+    u32 v1;
+
+    byte6 = *(u8 *)((char *)D_0002CFE0 + 0x6);
+    half2 = *(u16 *)((char *)D_0002CFE0 + 0x2);
+    v1 = ((u32) byte6 << 27) >> 29;
+    v1 = v1 << 5;
+    return func_00000F98((char *)&D_0002D930 + v1, half2);
+}
+
 /* func_0000B440 — 11 words. MATCH 100% (shape: m2c). */
 s32 func_0000B440(s32 arg0) {
     s32 sp1C;
@@ -233,6 +250,33 @@ int func_0000C838(s32 arg0, s32 arg1, int arg2) {
 /* func_0000C858 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_0000C858(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_0000D198 — 41 words. MATCH 100% (shape: m2c; volatile reload of
+ * D_0002D916 reproduces the target's separate reload before the branch and
+ * the multiply — order of the two leading stores also matters). */
+void func_0000D198(void *arg0, s32 arg1) {
+    extern char D_0002D914;
+    extern short D_0002D916;
+    extern int D_0002D91C;
+    extern int D_0002D920;
+    extern int D_0002D924;
+    extern int D_0002E0FC;
+    extern int ehsys_41AABF28();
+    extern int ehsys_memset();
+    s32 temp_v0;
+    u16 v0;
+
+    ehsys_memset(&D_0002D914, 0, 0x14);
+    D_0002D916 = *(u16 *)((char *)arg0 + 0x14);
+    D_0002D920 = arg1;
+    v0 = *(volatile u16 *)&D_0002D916;
+    if (v0 > 0) {
+        D_0002D91C = ehsys_41AABF28(D_0002E0FC, v0 * 2);
+    }
+    temp_v0 = ehsys_41AABF28(D_0002E0FC, 0x10000);
+    D_0002D924 = temp_v0;
+    ehsys_memset((void *)temp_v0, 0xFF, 0x10000);
 }
 
 /* func_0000D670 — 24 words. MATCH 100% (shape: m2c). */
