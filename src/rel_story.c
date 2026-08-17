@@ -2147,6 +2147,17 @@ void func_0000FCC8(void) {
 
 }
 
+/* func_0000FCD0 — 17 words. MATCH 100% (shape: manual). */
+void func_0000FCD0(void) {
+    extern s32 D_00034F9C;
+    extern int func_00011F04();
+    char *p = (char *)D_00034F9C;
+    (*(unsigned char *)(p + 0x65))++;
+    if ((*(unsigned char *)(p + 0x65)) >= 5) {
+        func_00011F04(0x18, 1);
+    }
+}
+
 /* func_0000FD14 — 3 words. MATCH 100% (shape: manual). */
 s32 func_0000FD14(void) {
     extern int func_00011F04();
