@@ -116,10 +116,26 @@ def body_of(module, func):
     lines = open(path).read().split("\n")
     start = None
     for i, line in enumerate(lines):
-        m = re.match(rf"^[A-Za-z_][\w \*]*?\b{func}\s*\(", line)
-        if m and (line.rstrip().endswith("{") or
-                  (i + 1 < len(lines) and lines[i + 1].strip() == "{")):
+        if not re.match(rf"^[A-Za-z_][\w \*]*?\b{func}\s*\(", line):
+            continue
+        # The body brace follows immediately for an ANSI definition, but a K&R
+        # one puts its parameter declarations in between:
+        #     void f(a, b)
+        #     int a;  int b;
+        #     {
+        # Those declarations are exactly what lever 22 needs, so look ahead a
+        # few lines rather than rejecting the definition outright.
+        if line.rstrip().endswith("{"):
             start = i
+            break
+        for j in range(i + 1, min(i + 8, len(lines))):
+            stripped = lines[j].strip()
+            if stripped == "{" or stripped.endswith("{"):
+                start = i
+                break
+            if not stripped or not stripped.endswith(";"):
+                break
+        if start is not None:
             break
     if start is None:
         return None
