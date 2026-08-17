@@ -443,10 +443,26 @@ scheduling choice of its own:
   others. Thirteen compile iterations over `&&`/`||` shapes, early and late base
   caching, and reordering did not reproduce it.
 
+- **A saved register held for no reason.** Across 14 `rel_title` functions the
+  target caches a global's address into `$s0` with `lui`/`addiu` even though
+  nothing crosses a call to justify it, or keeps a stack frame and register save
+  for what looks like dead code. Neither `volatile`, nor `register`, nor
+  `#pragma optimization_level` reproduces it. This is distinct from the
+  rematerialisation trap of lever 9, which is the opposite complaint.
+
 Recognise this category early. A near-miss whose diff is "same instructions,
-different scratch register" or "extra redundant compare in a delay slot" is not
-waiting for a cleverer phrasing; it needs either the literal original source or
-a systematic search. Spend the time on a fresh function instead.
+different scratch register", "extra redundant compare in a delay slot" or "a
+saved register we never needed" is not waiting for a cleverer phrasing; it needs
+either the literal original source or a systematic search. Spend the time on a
+fresh function instead.
+
+`rel_title` is a good illustration of why a module's shape matters more than its
+size. At 618 functions it is the third largest in the game, but it has no large
+dispatcher or accessor family of the kind that made `rel_duel_eng` and
+`rel_story` productive — only two or three small twin pairs. Its one workable
+vein was a family of 9-20 word "pure stack-spill" leaves that respond to the
+`#pragma optimization_level 2` plus `volatile` spill lever, and that vein is
+largely mined out. Survey a module for families before committing to it.
 
 ### A known limitation of the differ
 
