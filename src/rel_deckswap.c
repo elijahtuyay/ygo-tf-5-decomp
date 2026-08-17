@@ -92,6 +92,7 @@ extern char D_0001D668;
 extern char D_0001D930;
 extern char D_0001D944;
 extern char D_0001DE60;
+extern char D_0001DEA4;
 extern char D_0001E2E0;
 extern int D_0001E2E4;
 extern int D_0001E884;
@@ -106,6 +107,7 @@ extern int D_0001E8B0;
 extern int D_0001E8B4;
 extern char D_0001E8C0;
 extern char D_0001F040;
+extern char *D_0001F994;
 extern int D_0001E89C;
 extern unsigned short D_0001E88A;
 extern int duel_draw_2E8EDDC8();
@@ -325,6 +327,13 @@ void func_0000C438(void) {
 /* func_0000D21C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000D21C(int a0, unsigned short a1, int a2, int a3) {
     return func_0001283C(a0, &D_0001DE60 + (a1 + 1) * 6, a2, a3 + 1, 0x88, 0);
+}
+
+/* func_0000D24C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000D24C(int a0, unsigned short a1, int a2, int a3) {
+    char *p = *(char **) (D_0001F994 + 0x14);
+    unsigned short val = *(unsigned short *) (p + 0xF4);
+    return func_0001283C(a0, &D_0001DEA4 + a1 * 6, a2, a3 + 1, val, 0);
 }
 
 /* func_0000D9D8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

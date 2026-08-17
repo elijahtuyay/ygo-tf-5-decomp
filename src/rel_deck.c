@@ -37,13 +37,13 @@ typedef double f64;
 
 /* ---- imports and globals ---- */
 extern char D_0002CFE8;
-extern char D_0002DA7C;
 extern char D_0002E120;
 extern char D_F768A0;
 extern char D_F76A70;
 extern char D_F76A80;
 extern char D_F76C90;
 extern char D_F76C9C;
+extern char D_F76D7C;
 extern char D_F76EA0;
 extern int ehsys_4AA58320();
 extern int ehsys_56D1651D();
@@ -86,9 +86,9 @@ extern int func_0001D9CC();
 extern int func_0001E4CC();
 extern int func_0001E644();
 extern int func_00022B70();
-extern int func_00022B8C();
-extern int func_00022B94();
+extern int func_000206E0();
 extern int func_000236B8();
+extern int func_000237FC();
 
 /* ---- forward declarations ---- */
 s32 func_0000B440(s32 arg0);
@@ -115,6 +115,8 @@ s32 func_0001F328(s32 arg0, s32 arg1, s32 arg2);
 s32 func_0001F890(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_0001FC98(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_00020B10(s32 arg0, s32 arg1);
+s32 func_0002151C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7);
+s32 func_00021530(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7);
 s32 func_00022134(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_00022188(void);
 s32 func_00022264(s32 arg0);
@@ -124,6 +126,7 @@ s32 func_00023078(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_000235EC(s32 arg0, s32 arg1);
 s32 func_00024214(s32 arg0, s32 arg1);
 u32 func_00013070(void);
+u32 func_00013084(void);
 void func_00015D20(void);
 void func_00017290(void);
 void func_00018638(s32 arg0, int arg1, int arg2, int arg3);
@@ -140,16 +143,22 @@ void func_00020E5C(void);
 void func_00022148(void);
 void func_00022974(void);
 void func_000229A8(void);
+void func_000229F0(void *arg0);
 void func_00022B68(void);
+void func_00023100(void);
+void func_00023C7C(void);
+void func_00023C88(int arg0);
+void func_00023CD4(void *arg0);
+void func_00023CE4(void);
+void func_00023CF0(void *arg0);
 void func_000230F0(void);
 void func_000235F8(void);
 void func_0002362C(void);
 void func_0002365C(void);
 void func_00023A54(void);
-void func_00023A5C(void);
-void func_00023A64(void);
-void func_00023A6C(void);
-void func_00023C7C(void);
+void func_00023A5C();
+void func_00023A64();
+void func_00023A6C();
 void func_00024220(void);
 
 /* func_0000B440 — 11 words. MATCH 100% (shape: m2c). */
@@ -234,12 +243,21 @@ s32 func_00012DC4(u16 *arg0) {
 
 /* func_00013060 — 4 words. MATCH 100% (shape: m2c). */
 s32 func_00013060(void) {
+    extern char D_0002DA7C;
     return (u8) D_0002DA7C & 3;
 }
 
 /* func_00013070 — 5 words. MATCH 100% (shape: m2c). */
 u32 func_00013070(void) {
+    extern char D_0002DA7C;
     return (u32) ((u8) D_0002DA7C << 0x1C) >> 0x1E;
+}
+
+/* func_00013084 — 5 words. MATCH 100% (shape: m2c; local extern re-declares
+ * D_0002DA7C at u16 width so this site loads lhu instead of lb). */
+u32 func_00013084(void) {
+    extern u16 D_0002DA7C;
+    return (u32) (D_0002DA7C << 20) >> 24;
 }
 
 /* func_00013098 — 8 words. MATCH 100% (shape: m2c). */
@@ -416,6 +434,18 @@ void func_00020E5C(void) {
     ehsys_60B55A50(0xFF000000);
 }
 
+/* func_0002151C — 5 words. MATCH 100% (shape: thunk, tail call w/ fixed args
+ * in the $t0-$t3 8-register slots; arg0-arg2 and arg7 forwarded untouched). */
+s32 func_0002151C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
+    return func_000206E0(arg0, arg1, arg2, 0, 0, 7, 6, arg7);
+}
+
+/* func_00021530 — 5 words. MATCH 100% (shape: thunk, same target as
+ * func_0002151C with a different arg4). */
+s32 func_00021530(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
+    return func_000206E0(arg0, arg1, arg2, 0, 6, 7, 6, arg7);
+}
+
 /* func_00022134 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_00022134(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
@@ -466,9 +496,31 @@ void func_000229A8(void) {
     ehsys_60B55A50(0xFF000000);
 }
 
+/* func_000229F0 — 2 words. MATCH 100% (shape: m2c). */
+void func_000229F0(void *arg0) {
+    *(s32 *)((char *)arg0 + 8) = 0;
+}
+
 /* func_00022B68 — 2 words. MATCH 100% (shape: m2c). */
 void func_00022B68(void) {
 
+}
+
+/* func_00022B8C — 2 words. MATCH 100% (shape: K&R definition — old-style
+ * unprototyped signature so func_00023A64 can also call it with 0 args). */
+u16 func_00022B8C(arg0)
+void *arg0;
+{
+    return *(u16 *)((char *)arg0 + 2);
+}
+
+/* func_00022B94 — 2 words. MATCH 100% (shape: K&R definition — old-style
+ * unprototyped signature so func_00023A6C can also call it with 0 args). */
+void func_00022B94(arg0, arg1)
+void *arg0;
+u16 arg1;
+{
+    *(u16 *)((char *)arg0 + 2) = arg1;
 }
 
 /* func_000230F0 — 4 words. MATCH 100% (shape: m2c). */
@@ -479,6 +531,12 @@ void func_000230F0(void) {
 /* func_00023078 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_00023078(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_00023100 — 3 words. MATCH 100% (shape: thunk; sets $a0 = &D_F76D7C then
+ * tail-calls func_00023A64, whose own K&R signature is unprototyped). */
+void func_00023100(void) {
+    func_00023A64(&D_F76D7C);
 }
 
 /* func_000235EC — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
@@ -513,24 +571,51 @@ void func_00023A54(void) {
     func_00022B68();
 }
 
-/* func_00023A5C — 2 words. MATCH 100% (shape: m2c). */
-void func_00023A5C(void) {
+/* func_00023A5C — 2 words. MATCH 100% (shape: m2c; unprototyped so
+ * func_00023CD4 can tail-call it with 2 args). */
+void func_00023A5C() {
     func_00022B70();
 }
 
-/* func_00023A64 — 2 words. MATCH 100% (shape: m2c). */
-void func_00023A64(void) {
+/* func_00023A64 — 2 words. MATCH 100% (shape: m2c; unprototyped so
+ * func_00023100/func_00023CE4 can tail-call it with 1 arg). */
+void func_00023A64() {
     func_00022B8C();
 }
 
-/* func_00023A6C — 2 words. MATCH 100% (shape: m2c). */
-void func_00023A6C(void) {
+/* func_00023A6C — 2 words. MATCH 100% (shape: m2c; unprototyped so
+ * func_00023CF0 can tail-call it with 2 args). */
+void func_00023A6C() {
     func_00022B94();
 }
 
 /* func_00023C7C — 3 words. MATCH 100% (shape: m2c). */
 void func_00023C7C(void) {
     func_000236B8(&D_F76EA0);
+}
+
+/* func_00023C88 — 3 words. MATCH 100% (shape: thunk; unused leading arg0
+ * forwarded into $a0 so the target only has to set $a1 = &D_F76EA0). */
+void func_00023C88(int arg0) {
+    func_000237FC(arg0, &D_F76EA0);
+}
+
+/* func_00023CD4 — 4 words. MATCH 100% (shape: thunk; forwards arg0 into
+ * $a1 and tail-calls the unprototyped func_00023A5C with &D_F76EA0 in $a0). */
+void func_00023CD4(void *arg0) {
+    func_00023A5C(&D_F76EA0, arg0);
+}
+
+/* func_00023CE4 — 3 words. MATCH 100% (shape: thunk; sets $a0 = &D_F76EA0
+ * then tail-calls the unprototyped func_00023A64). */
+void func_00023CE4(void) {
+    func_00023A64(&D_F76EA0);
+}
+
+/* func_00023CF0 — 4 words. MATCH 100% (shape: thunk; forwards arg0 into
+ * $a1 and tail-calls the unprototyped func_00023A6C with &D_F76EA0 in $a0). */
+void func_00023CF0(void *arg0) {
+    func_00023A6C(&D_F76EA0, arg0);
 }
 
 /* func_00024214 — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
