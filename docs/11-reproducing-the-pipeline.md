@@ -325,6 +325,12 @@ times over. Recognise these before starting from m2c:
     shape. Expect this wherever a target "calls" `ehsys_memset` with a small
     constant size but shows no call instruction.
 
+49b. **Materialising a boolean through a byte-typed local changes its idiom.**
+    `u8 a1 = !arg1;` reliably produces the three-instruction
+    `sltu`+`xori`+`andi` form where the equivalent single expression does not.
+    So the choice from lever 43 depends not only on the operator but on whether
+    the operand is a bare expression or has been assigned to a local first.
+
 50. **Three phrasings of a byte comparison, one right answer.** `b == CONST`,
     `(b ^ CONST) == 0` and `!(b ^ CONST)` produce `xori`+`sltiu` versus
     `sltu`+`xori`+`andi`. Same family as lever 43; try all three.
