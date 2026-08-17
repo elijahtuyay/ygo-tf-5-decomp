@@ -154,6 +154,14 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     `volatile s32 sp[24]; sp[0] = x; return sp[0];` matched a 6-word target that
     no -O4 phrasing could reach.
 
+18. **Argument evaluation order is not always reachable from C.** At `-O4` MWCC's
+    scheduler can evaluate a call's second argument before its first even when
+    both are plain global loads with no side effects, contradicting the source
+    order. Temporaries and explicit sequencing do not move it, and
+    `#pragma optimization_level 2` changes the word count instead of the order.
+    When a diff is nothing but two relocations swapped, this is probably why —
+    it is a known dead end, not a phrasing you have not found yet.
+
 ### A function that matches alone can still fail in the file
 
 Matching a function in isolation is not the same as matching it inside
