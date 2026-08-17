@@ -14,7 +14,7 @@ Sorted by `.text` size — that, not file size, is the amount of work.
 
 | module | .text | funcs | <=16w | imports | median | what it is |
 |---|---:|---:|---:|---:|---:|---|
-| `rel_html_view` | 0x760 | 16 | 5 | 34 | 20 | in-game browser: Konami's TF5 download page + `/PSP/SAVEDATA/` **(15/17 matched)** |
+| `rel_html_view` | 0x760 | 16 | 5 | 34 | 20 | in-game browser: Konami's TF5 download page + `/PSP/SAVEDATA/` **(14/16 matched + 1 modulo section)** |
 | `rel_movie_viewer` | 0x8B4 | 16 | 6 | 37 | 19 | `movie/` .pmf player **(15/16 matched)** |
 | `rel_labo` | 0x12E8 | 14 | 5 | 75 | 28 | the "Labo" hub menu — launches password, rental, trade, convert, deckswap, album, duelist list, ranking, limit list, tutorial, partner select, voice & subtitle |
 | `rel_soundtest` | 0x15E8 | 12 | 4 | 64 | 31 | sound test (`database/soundtest.ehp`) |
