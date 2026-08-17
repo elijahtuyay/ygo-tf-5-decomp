@@ -617,6 +617,14 @@ void func_00006310(void) {
 
 }
 
+/* func_0000640C — 11 words. MATCH 100% (shape: manual). */
+s32 func_0000640C(void *arg0) {
+    if ((arg0 != 0) && ((*(unsigned char *)((char *)arg0 + 0x10)) & 1)) {
+        return 1;
+    }
+    return 0;
+}
+
 /* func_000067B0 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_000067B0(void) {
     return 0;

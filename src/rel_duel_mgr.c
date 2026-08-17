@@ -83,6 +83,7 @@ void func_00010DC0(s32 arg0, s32 arg1, s32 arg2);
 void func_00011814(void);
 void func_00011A30(void);
 void func_000150EC(s32 arg0);
+void func_00016BB8(void *arg0, s32 arg1, s32 arg2);
 void func_00016EE8(s32 arg0, s32 arg1, s32 arg2);
 
 /* func_00000948 — 13 words. MATCH 100% (shape: m2c). */
@@ -335,6 +336,34 @@ int func_000150CC(s32 a0, s32 a1, s32 a2) {
 /* func_000150EC — 2 words. MATCH 100% (shape: hand). */
 void func_000150EC(s32 arg0) {
     ehsys_5F00A362(arg0 << 6);
+}
+
+/* func_00013094 — tail call into func_00016BB8, offsetting the pointer
+ * stored in D_0001F32C by 0x78. MATCH 100% (verified). */
+extern s32 D_0001F32C;
+void func_00013094(s32 arg0, s32 arg1) {
+    func_00016BB8((void *)(D_0001F32C + 0x78), arg0, arg1);
+}
+
+/* func_00016BA8 — 4 words. MATCH 100% (verified). */
+void func_00016BA8(void *arg0) {
+    *(char *)((char *)arg0 + 0x0) = 0;
+    *(short *)((char *)arg0 + 0x2) = 0;
+    *(short *)((char *)arg0 + 0x4) = 0;
+}
+
+/* func_00016BB8 — 4 words. MATCH 100% (verified). */
+void func_00016BB8(void *arg0, s32 arg1, s32 arg2) {
+    *(char *)((char *)arg0 + 0x0) = (char)arg1;
+    *(short *)((char *)arg0 + 0x2) = 0;
+    *(short *)((char *)arg0 + 0x4) = (short)arg2;
+}
+
+/* func_00016C18 — 6 words. MATCH 100% (verified). */
+u8 func_00016C18(void *arg0, s16 *arg1, s16 *arg2) {
+    *arg1 = *(short *)((char *)arg0 + 0x2);
+    *arg2 = *(short *)((char *)arg0 + 0x4);
+    return *(u8 *)((char *)arg0 + 0x0);
 }
 
 /* func_00016E70 — 5 words. MATCH 100% (verified). */

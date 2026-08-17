@@ -128,6 +128,7 @@ typedef struct {
 /* ---- imports ---- */
 extern int ehsys_20E340D9(int arg0, int arg1);
 extern int ehsys_3BB2BAC6();
+extern int ehsys_4B0DABFA();
 extern int ehsys_97BB99A5();
 extern int ehsys_B2B9FEFA(void);
 extern int ehsys_B89D38DC();
@@ -314,6 +315,26 @@ void func_000042F8(s32 arg0) {
 void func_00004354(void) {
     ehsys_memset(&D_0000A2F0, 0, 2);
     ehsys_qsort(&D_00009F70, 3, 0xC, func_00004694);
+}
+
+/* func_00004634 — 24 words. MATCH 100%.
+ * `D_0000A2F0`'s low bit is set unconditionally via a bitfield write
+ * (the (x & ~1) | 1 idiom); a plain arithmetic phrasing gets folded
+ * into a single `ori` by MWCC, one word short of the target's
+ * redundant AND+OR pair. See src/rel_shop.c's header for this lever. */
+s32 func_00004634(s32 arg0, s32 arg1) {
+    typedef struct {
+        unsigned bit0 : 1;
+        unsigned rest : 7;
+    } Flags_0000A2F0;
+    s32 temp_s0;
+
+    temp_s0 = arg1 > 0;
+    if (temp_s0 && arg0 != 0) {
+        ehsys_4B0DABFA(0, arg0);
+    }
+    ((Flags_0000A2F0 *)&D_0000A2F0)->bit0 = 1;
+    return temp_s0;
 }
 
 /* func_0000471C — 15 words. MATCH 100%. */

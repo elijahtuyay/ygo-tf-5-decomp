@@ -42,6 +42,9 @@ extern int ehsys_558B2DCB();
 extern int ehsys_5F00A362();
 extern int ehsys_B8770B92();
 extern int ehsys_B89D38DC();
+extern int ehsys_memset();
+extern int ehsys_qsort();
+extern u8 D_00008ADC;
 extern int func_00001358();
 
 /* ---- forward declarations ---- */
@@ -53,6 +56,7 @@ void func_00000A24(s32 arg0, s32 arg1, s32 arg2);
 void func_00000A34(s32 arg0);
 void func_00000A58(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 void func_00000D6C(s32 arg0, s32 arg1, int arg2);
+void func_000010C4(void);
 
 /* func_00000A24 — 4 words. MATCH 100% (shape: hand). */
 void func_00000A24(s32 arg0, s32 arg1, s32 arg2) {
@@ -72,6 +76,15 @@ void func_00000A58(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 /* func_00000D6C — 8 words. MATCH 100% (shape: hand). */
 void func_00000D6C(s32 arg0, s32 arg1, int arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+
+/* func_000010C4 — 25 words. MATCH 100% (shape: m2c, bitfield lever). */
+void func_000010C4(void) {
+    struct bf1 { unsigned bit0 : 1; };
+    extern struct bf1 D_00008C40;
+    ehsys_memset(&D_00008C40, 0, 2);
+    D_00008C40.bit0 = 1;
+    ehsys_qsort(&D_00008ADC, 0x11, 0x10, func_0000152C);
 }
 
 /* func_0000152C — 4 words. MATCH 100% (shape: m2c). */

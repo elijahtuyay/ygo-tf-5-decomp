@@ -1043,6 +1043,21 @@ u8 func_0000C718(void) {
     return !D_000550A4;
 }
 
+/* func_0000D0C8 — 6 words. MATCH 100% (verified). */
+void func_0000D0C8(s32 *arg0, s32 arg1, void *arg2) {
+    *(s32 *)((char *)arg2 + 0x154) = (s32)arg0;
+    if (arg0 != 0) {
+        *(s32 *)((char *)arg2 + 0x4) = *arg0;
+    }
+}
+
+/* func_0000D0E0 — 6 words. MATCH 100% (verified). */
+void func_0000D0E0(s32 *arg0, s32 arg1, void *arg2) {
+    if (arg0 != 0) {
+        *(s32 *)((char *)arg2 + 0x8) = *arg0;
+    }
+}
+
 /* func_0000D1FC — 2 words. MATCH 100% (shape: m2c). */
 void func_0000D1FC(void) {
 
@@ -1134,9 +1149,22 @@ void func_0001181C(void) {
     D_0005F8E4 = 1;
 }
 
+/* func_0001182C — 5 words. MATCH 100% (verified). */
+void func_0001182C(void) {
+    extern s32 D_0005F790;
+    char *p = (char *)&D_0005F790;
+    *(s32 *)(p + 0x24) = 0;
+    *(s32 *)(p + 0x1C) = 0;
+}
+
 /* func_00011980 — 4 words. MATCH 100% (verified). */
 int func_00011980(void) {
     return D_0005F890 != 0;
+}
+
+/* func_00011A3C — 3 words. MATCH 100% (verified). */
+void func_00011A3C(s32 arg0) {
+    D_0005F8E4 = arg0;
 }
 
 /* func_00011A48 — 6 words. MATCH 100% (verified). */
@@ -1159,6 +1187,18 @@ void func_00012FD4(void) {
 /* func_00013038 — bulk-matched thunk into ehsys_20E340D9. */
 s32 func_00013038(s32 arg0) {
     return ehsys_20E340D9(*(int*)&D_0005FE44, (arg0));
+}
+
+/* func_00013048 — 3 words. MATCH 100% (verified). */
+s32 func_00013048(void) {
+    extern s32 D_0005FE44;
+    return D_0005FE44;
+}
+
+/* func_000130A0 — 3 words. MATCH 100% (verified). */
+s32 func_000130A0(void) {
+    extern s32 D_0005FE48;
+    return D_0005FE48;
 }
 
 /* func_00013908 — bulk-matched thunk into func_00013420. */
@@ -1298,6 +1338,14 @@ s32 func_00018604(void) {
     return *(s32 *)0xB7473C != 0;
 }
 
+/* func_00018DF8 — 6 words. MATCH 100% (verified). */
+typedef struct { s32 i; f32 f; } Vec2_18DF8;
+void *func_00018DF8(Vec2_18DF8 *arg0, Vec2_18DF8 *arg1) {
+    arg0->i = arg1->i;
+    arg0->f = arg1->f;
+    return arg0;
+}
+
 /* func_00019C54 — 9 words. MATCH 100% (shape: m2c). */
 void func_00019C54(void) {
     func_0001A5B0();
@@ -1365,6 +1413,13 @@ void **func_0001B380(void) {
 /* func_0001B38C — 3 words. MATCH 100% (shape: m2c). */
 void func_0001B38C(s32 arg0) {
     *(s32 *)0xB75AA8 = arg0;
+}
+
+/* func_0001B398 — 5 words. MATCH 100% (verified). */
+void func_0001B398(u8 arg0) {
+    char *p = (char *)&D_B75994;
+    p[0x50] = arg0;
+    p[0x5C] = arg0;
 }
 
 /* func_0001B3AC — 3 words. MATCH 100% (shape: m2c). */

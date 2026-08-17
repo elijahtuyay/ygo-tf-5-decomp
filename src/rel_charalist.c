@@ -205,6 +205,29 @@ void func_00006574(void) {
     ehsys_2A501391((*(int *)((char *)temp_s0 + 0x20)), (*(int *)((char *)temp_s0 + 0x24)));
 }
 
+/* func_000066F4 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000066F4(void) {
+    extern void *D_00027918;
+    extern int func_00006F20(int, int, int, int);
+    extern int func_00006FAC(int);
+    extern int func_00007224(void *);
+    void *temp_s1;
+    void *temp_s2;
+    int temp_s0;
+
+    temp_s1 = D_00027918;
+    temp_s2 = (void *)((char *)temp_s1 + 0x28);
+    temp_s0 = func_00006FAC(0);
+    func_00006FAC(1);
+    if (temp_s0 == 0x10) {
+        func_00006F20(0, 2, 0x11, 0x60);
+    }
+    if (temp_s0 >= 0x10) {
+        (*(int *)((char *)temp_s1 + 0x14)) = 3;
+        func_00007224(temp_s2);
+    }
+}
+
 /* func_00006A08 — plain tail call to func_00006FAC with a literal 0 first
  * argument (same shape as func_000002A8).
  * MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
