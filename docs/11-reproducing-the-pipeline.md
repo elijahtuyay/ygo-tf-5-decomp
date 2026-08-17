@@ -211,6 +211,21 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     (rather than a fresh volatile read per use) matches a target that writes,
     reloads once, and then reuses the loaded value.
 
+33. **m2c's `p->unkNN` does not compile under mwccpsp at all** — it is a hard
+    error, not a mismatch, because nothing declares the struct. Rewrite it as
+    `*(type *)((char *)p + 0xNN)` with the width taken from the target's actual
+    load instruction. This was the single biggest source of compile failures in
+    the automated pass (3,527 of ~4,900 attempts in `rel_duel_eng`), and getting
+    the WIDTH right is half the value: `scripts/auto_decomp.py` forced `int`
+    everywhere until it was taught to try `unsigned short` and `unsigned char`.
+34. **A dummy frame without side effects**: `volatile int pad[N]; (void)pad;`
+    enlarges the stack frame to match a target whose frame is bigger than its
+    real locals justify, without emitting a spurious store.
+35. **A caller may have to forward an argument the callee ignores.** Even when
+    the callee takes no real parameters, the original source sometimes declared
+    one at the call site, which changes register and callee-saved behaviour.
+    Lever 10's dead-argument rule applies on the calling side too.
+
 ### A known limitation of the differ
 
 `scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
