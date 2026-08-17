@@ -191,6 +191,26 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     (`func_0002D17C`, `func_0002DC78`, `func_0002FB4C`, `func_0001A140`,
     `func_00022708`, `func_0002D064`) are stuck on exactly this.
 
+27. **Bitfields are real.** A counter-plus-flag global updated as
+    `(x & ~0xFE) | (((f + 1) & 0x7F) * 2)` is a C bitfield in the original;
+    declaring a struct with the actual bitfield members makes MWCC's own
+    read-modify-write codegen reproduce the target exactly. This shape recurred
+    across five or more globals in different modules.
+28. **Baked-address guessing runs both ways** — and getting it wrong was the
+    single highest-yield error found. Lever 15 says a word carrying no
+    relocation must be `*(int *)0xADDR`; the converse matters just as much, as
+    plenty of targets that *look* like baked constants do carry real HI16/LO16
+    relocations and need an `extern`. Check the relocation, never the shape.
+29. **Where `default:` sits textually** decides where MWCC lays out the shared
+    exit block and whether the last branch's delay slot gets filled.
+30. **A switch case needs an explicit `goto` to a shared return**, not
+    source-level fallthrough, when its call site precedes the shared label.
+31. **Signed versus unsigned `-1`** picks `addiu` or `ori` for an otherwise
+    identical constant return.
+32. **Assigning a global then re-reading it once through a volatile local**
+    (rather than a fresh volatile read per use) matches a target that writes,
+    reloads once, and then reuses the loaded value.
+
 ### A known limitation of the differ
 
 `scripts/mwcc_diff.py` cannot verify a function whose target references a symbol
