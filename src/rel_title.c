@@ -18,7 +18,7 @@
  * file-scope declaration would change the load/store width and break the
  * match. See scripts/assemble_module.py.
  *
- * STATUS: 29 functions matched. build/auto/rel_title.json has the
+ * STATUS: 43 functions matched. build/auto/rel_title.json has the
  * status of every attempt, including what the rest of the module still needs.
  *
  * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,
@@ -37,6 +37,40 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 #define NULL 0
+
+/* func_0000250C — 15 words. MATCH 100% (shape: m2c -O2; address-of-global
+ * stride computed via shift-add chain, arg0*0x98). */
+#pragma optimization_level 2
+void *func_0000250C(s32 arg0) {
+    extern char D_0004D8FC;
+    volatile s32 sp[4];
+    sp[0] = arg0;
+    return (char *)&D_0004D8FC + (sp[0] * 0x98) + 4;
+}
+#pragma optimization_level 4
+
+/* func_00002598 — 10 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x10 stack frame). */
+#pragma optimization_level 2
+void *func_00002598(s32 arg0) {
+    extern char D_0004C6DC;
+    volatile int sp[4];
+    sp[0] = arg0;
+    return (char *)&D_0004C6DC + (sp[0] << 6);
+}
+#pragma optimization_level 4
+
+/* func_000025C0 — 10 words. MATCH 100% (shape: m2c -O2; twin of func_00002598
+ * against D_0004C21C). */
+#pragma optimization_level 2
+void *func_000025C0(s32 arg0) {
+    extern char D_0004C21C;
+    volatile int sp[4];
+    sp[0] = arg0;
+    return (char *)&D_0004C21C + (sp[0] << 6);
+}
+#pragma optimization_level 4
+
 /* func_00002F9C — 8 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
  * through a wasted 0x10 stack frame). */
 #pragma optimization_level 2
@@ -114,6 +148,18 @@ void func_00017374(void) {
 
 }
 
+/* func_0001737C — 12 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x10 stack frame). */
+#pragma optimization_level 2
+int func_0001737C(s32 arg0) {
+    extern int func_000241EC();
+    volatile int sp[4];
+    sp[0] = arg0;
+    sp[0] = func_000241EC(sp[0]);
+    return sp[0];
+}
+#pragma optimization_level 4
+
 /* func_0001A2E4 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0001A2E4(int a, int b, int c, int d) {
     extern int ehsys_BC8E65D7();
@@ -180,6 +226,20 @@ void func_00020CF0(void) {
     extern int func_00006990();
     extern int func_00020CF0();
     func_00006990();
+}
+#pragma optimization_level 4
+
+/* func_00022634 — 15 words. MATCH 100% (shape: m2c -O2; spill/reload of a0/a1
+ * through a wasted 0x20 stack frame; 2-field float vector copy). */
+#pragma optimization_level 2
+void *func_00022634(void *arg0, void *arg1) {
+    volatile s32 sp1[4];
+    volatile s32 sp0[4];
+    sp0[0] = (s32)arg0;
+    sp1[0] = (s32)arg1;
+    *(f32 *)sp0[0] = *(f32 *)sp1[0];
+    *(f32 *)(sp0[0] + 4) = *(f32 *)(sp1[0] + 4);
+    return (void *)sp0[0];
 }
 #pragma optimization_level 4
 
@@ -250,6 +310,18 @@ int func_000294F4(int a, int b, int c, int d, int e) {
     return ehsys_3BB2BAC6(a << 6, b << 6, c << 6, d << 6, e, -1, 0);
 }
 
+/* func_000290A4 — 11 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x10 stack frame; zeroes byte@0, s16@2, s16@4). */
+#pragma optimization_level 2
+void func_000290A4(void *arg0) {
+    volatile s32 sp0[4];
+    sp0[0] = (s32)arg0;
+    *(unsigned char *)sp0[0] = 0;
+    *(s16 *)(sp0[0] + 0x2) = 0;
+    *(s16 *)(sp0[0] + 0x4) = 0;
+}
+#pragma optimization_level 4
+
 /* func_0002B944 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0002B944(int a, int b, int c, int d) {
     extern int ehsys_BC8E65D7();
@@ -266,6 +338,39 @@ void func_0002BE88(s32 *arg0, s32 arg1) {
     sp[4] = arg1;
     ehsys_memset((void *)sp[0], 0, 0x154);
     *(s32 *)sp[0] = sp[4];
+}
+#pragma optimization_level 4
+
+/* func_0002BF50 — 17 words. MATCH 100% (shape: m2c -O2; spill/reload of a0/a1
+ * through a wasted 0x30 stack frame; index computed via shift, store result
+ * of func_0002BEC8 into arg0+idx+0x140). */
+#pragma optimization_level 2
+void func_0002BF50(s32 arg0, s32 arg1) {
+    extern int func_0002BEC8();
+    volatile s32 sp1[4];
+    volatile s32 sp0[4];
+    s32 idx;
+    s32 v;
+    sp0[0] = arg0;
+    sp1[0] = arg1;
+    v = func_0002BEC8(sp0[0], sp1[0]);
+    idx = sp1[0] << 2;
+    *(s32 *)(sp0[0] + idx + 0x140) = v;
+}
+#pragma optimization_level 4
+
+/* func_0002BF94 — 11 words. MATCH 100% (shape: m2c -O2; spill/reload of a0/a1
+ * through a wasted 0x20 stack frame; index computed via shift, load from
+ * arg0+idx+0x140). */
+#pragma optimization_level 2
+s32 func_0002BF94(s32 arg0, s32 arg1) {
+    volatile s32 sp1[4];
+    volatile s32 sp0[4];
+    s32 idx;
+    sp0[0] = arg0;
+    sp1[0] = arg1;
+    idx = sp1[0] << 2;
+    return *(int *)(sp0[0] + idx + 0x140);
 }
 #pragma optimization_level 4
 
@@ -288,6 +393,17 @@ int func_0002C870(int a, int b) {
     volatile int sp[8];
     sp[4] = b;
     return sp[4];
+}
+#pragma optimization_level 4
+
+/* func_00032458 — 12 words. MATCH 100% (shape: m2c -O2; spill/reload of a0
+ * through a wasted 0x10 stack frame). */
+#pragma optimization_level 2
+void func_00032458(void *arg0) {
+    extern int ehsys_memset();
+    volatile int sp[4];
+    sp[0] = (int)arg0;
+    ehsys_memset((void *)sp[0], 0, 0x17CC);
 }
 #pragma optimization_level 4
 
