@@ -154,6 +154,25 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     `volatile s32 sp[24]; sp[0] = x; return sp[0];` matched a 6-word target that
     no -O4 phrasing could reach.
 
+### A function that matches alone can still fail in the file
+
+Matching a function in isolation is not the same as matching it inside
+`src/<module>.c`, and the gap was almost entirely self-inflicted:
+
+- `scripts/merge_matches.py` injected its own block-scope externs into every
+  candidate, including ones that already declared their own. The second set won,
+  changed the load widths, and broke functions that had verified cleanly. It now
+  skips the injection when the body already contains `extern`. That one change
+  recovered 135 functions in `rel_duel_eng`.
+- Those injected externs were always `char`, so any function whose target used
+  `lw`/`sw` was rejected for a single word. The merge now retries `int`, `char`,
+  `unsigned short` and `void *` per candidate.
+
+What remains is genuine: a handful of candidates match on their own and still
+regress a distant function in the same translation unit. Always verify the whole
+file — `scripts/mwcc_build.sh` + `scripts/mwcc_diff.py` with no function
+argument — and treat a per-function trial as a candidate, never as a result.
+
 ### 248 functions are hand-written assembly
 
 spimdisasm marks them `/* Handwritten function */` in `asm/<module>/text.s` — they
