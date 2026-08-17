@@ -313,6 +313,15 @@ times over. Recognise these before starting from m2c:
   `addiu $t1, $zero, N` in the delay slot. m2c drops both the forwarded
   register and the immediate.
 
+49. **A small `memset` was written out by hand, not called.** Where the target
+    zeroes a few bytes of a local with an inlined byte-copy loop and a `beqz`
+    null guard — no `jal` anywhere — declaring `extern void *memset(...)` does
+    NOT make MWCC inline it; it emits the call. Writing the loop explicitly,
+    `do { *p = 0; p++; } while (--n);` with an unsigned counter and a
+    pre-decrement test, reproduces both the null guard and the bottom-test loop
+    shape. Expect this wherever a target "calls" `ehsys_memset` with a small
+    constant size but shows no call instruction.
+
 ### A harder category than levers
 
 Everything numbered above is a rule: a source shape that reproducibly produces a
