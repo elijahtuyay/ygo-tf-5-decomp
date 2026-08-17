@@ -50,11 +50,13 @@ typedef double f64;
 extern char D_0001D8C4;
 extern char D_0001DBA8;
 extern char D_0001DBC0;
+extern char D_0001DF48;
 extern char D_0001E450;
 extern char D_0001E5E0;
 extern char D_0001EB90;
 extern char D_0001F310;
 extern int D_0001E5E4;
+extern u16 D_0001EA2C;
 extern unsigned short D_0001EB54;
 extern int D_0001EB58;
 extern int D_0001EB7C;
@@ -72,6 +74,7 @@ extern int ehsys_BC8E65D7(int, int, int, int, int);
 extern int ehsys_E5738C32();
 extern int ehsys_E58C0FDC();
 extern int ehsys_E62CCE79();
+extern int ehsys_memcpy(int, void *, int);
 extern int ehsys_EF9B5D06();
 extern int ehsys_FE91A2EC();
 extern int func_000012A8();
@@ -258,6 +261,16 @@ int func_0000BE8C(int a0) {
     return func_0000956C(a0 & 0xFFFF);
 }
 
+/* func_0000C7A4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000C7A4(int a0) {
+    if (D_0001EA2C == 0) {
+        return 0;
+    }
+    D_0001EA2C -= 1;
+    ehsys_memcpy(a0, &D_0001E5E0 + (int) D_0001EA2C * 10 + 0x44E, 0xA);
+    return 1;
+}
+
 /* func_0000DF9C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000DF9C(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
@@ -287,6 +300,25 @@ s32 func_0000F7A8(u16 *arg0, u16 *arg1) {
 /* func_0000FBA0 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0000FBA0(void) {
 
+}
+
+/* func_0000FC64 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void *func_0000FC64(int a0) {
+    int found = -1;
+    unsigned int i;
+    u16 code = a0 & 0xFFFF;
+
+    for (i = 0; i < 4; i++) {
+        u16 entry = *(u16 *) ((char *) &D_0001DF48 + i * 12);
+        if (code == entry) {
+            found = i;
+            break;
+        }
+    }
+    if (found < 0) {
+        return 0;
+    }
+    return (char *) &D_0001DF48 + found * 12;
 }
 
 /* func_00010A18 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

@@ -62,6 +62,8 @@ extern char D_00023480;
 extern char D_00023484;
 extern char D_00023E38;
 extern char D_00023E94;
+extern int D_00024008;
+extern u16 D_0002400E;
 extern int *D_0002DF80;
 extern u16 D_0002DF90[];
 extern char D_000240A4;
@@ -75,17 +77,23 @@ extern int D_0002F1C8;
 extern int ehsys_0089B865(void *);
 extern int ehsys_03E45FFF();
 extern int ehsys_06380DFA();
+extern int ehsys_09794DF0(int, int, int);
 extern int ehsys_20E340D9(int, int);
 extern int ehsys_291D6262(void *, int, int);
 extern int ehsys_3BB2BAC6(int, int, int, int, int, int, int);
+extern int ehsys_4175E3DB(int, int);
 extern int ehsys_41AABF28(int, int);
 extern int ehsys_42C464D5(void *);
 extern int ehsys_4F22C9AA();
+extern int ehsys_5CBB9E43(int, int, int, int, int, int);
 extern int ehsys_5DF04F49();
 extern int ehsys_5F00A362(int);
 extern int ehsys_78749045(int, u8);
 extern int ehsys_9EA6989A();
 extern int ehsys_AB962AE7();
+extern int ehsys_C0AB60EF(int, int);
+extern int ehsys_E6E4401F(int, int, int);
+extern int ehsys_F462EE6E(int, int);
 extern int ehsys_B2B9FEFA();
 extern int ehsys_B4471B5E();
 extern int ehsys_B89D38DC(); /* called with 3 OR 4 args depending on site (see below) */
@@ -112,6 +120,7 @@ extern int func_00012FB4();
 extern int func_000130AC();
 extern int func_00015228();
 extern int func_00015650();
+extern int func_00017304(int, void *, void *);
 
 /* ============================================================
  * Matched functions, in address order (required for linking).
@@ -154,6 +163,16 @@ s32 func_000063D4(s32 arg0) {
 /* func_00006754 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00006754(s32 arg0, s32 arg1) {
     ehsys_9EA6989A(arg0, func_0000FB88(arg1 & 0xFFFF));
+}
+
+/* func_0000667C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000667C(int a0, int a1, int a2) {
+    if (a1 == 1) {
+        int r = ehsys_F462EE6E(a0, 1);
+        ehsys_C0AB60EF(r, a2);
+    } else {
+        ehsys_4175E3DB(a0, 1);
+    }
 }
 
 /* func_000067E4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -267,6 +286,16 @@ void func_0000A434(void *a0, f32 a1) {
 /* func_0000A62C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000A62C(int a0, int a1, int a2) {
     return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
+}
+
+/* func_0000A64C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000A64C(int a0) {
+    int v = ehsys_F462EE6E(a0, 9);
+    v = ehsys_F462EE6E(v, 4);
+    v = ehsys_09794DF0(v, 0, 1);
+    v = ehsys_E6E4401F(v, 0, 0);
+    v = ehsys_5CBB9E43(v, 0, 2, 3, 0, 0);
+    ehsys_4175E3DB(v, 1);
 }
 
 /* func_0000AA7C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -514,9 +543,41 @@ void func_00016B74(void) {
     ehsys_AB962AE7(0);
 }
 
+/* func_00016D24 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00016D24(u16 lo, u16 hi, void *arr) {
+    u32 target = (u32) lo | ((u32) hi << 16);
+    int count = *(int *) arr;
+    int idx;
+    for (idx = 0; idx < count; idx++) {
+        if (*(u32 *)((char *) arr + idx * 4 + 4) == target) {
+            return idx;
+        }
+    }
+    return -1;
+}
+
 /* func_00017068 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00017068(int a0, int a1, int a2) {
     return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
+}
+
+/* func_00017650 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+struct S17650 {
+    s16 lo;
+    s16 hi;
+    s32 w;
+    s16 f1C;
+    s16 f1E;
+};
+
+void func_00017650(int a0, int a1, u16 a2, void *a3) {
+    struct S17650 s;
+    s.hi = (s16)(a1 >> 16);
+    s.f1C = (s16)(a2 * 17 + 0x33);
+    s.lo = (s16) a1;
+    s.w = D_00024008;
+    s.f1E = D_0002400E;
+    func_00017304(a0, &s, a3);
 }
 
 /* func_000187B0 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

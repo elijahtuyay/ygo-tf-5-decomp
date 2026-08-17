@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 4 functions matched here. The rest of the module is not
+ * STATUS: 8 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -41,12 +41,50 @@ extern int ehsys_831C5769();
 extern int ehsys_B8770B92();
 extern int func_00005F04();
 extern int func_0000608C();
+extern s32 D_0000F074;
+extern s32 D_0000C3F0[];
+extern s32 ehsys_B89D38DC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern s32 ehsys_41AABF28(s32 arg0, s32 arg1);
+extern s32 ehsys_20E340D9(s32 arg0, s32 arg1);
 
 /* ---- forward declarations ---- */
+s32 func_000008A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+s32 func_00002E24(s32 arg0);
+s32 func_00002E34(s32 arg0);
+s32 func_000043E8(s32 arg0);
 s32 func_000063E4(u16 *arg0, u16 *arg1);
 s32 func_00006A84(void);
 void func_000052C4(void);
 void func_00005EFC(void);
+
+/* func_000008A8 — 4 words. MATCH 100% (shape: m2c). */
+s32 func_000008A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6, arg3);
+}
+
+/* func_00002E24 — 4 words. MATCH 100% (shape: m2c). */
+s32 func_00002E24(s32 arg0) {
+    return ehsys_41AABF28(D_0000F074, arg0);
+}
+
+/* func_00002E34 — 4 words. MATCH 100% (shape: m2c). */
+s32 func_00002E34(s32 arg0) {
+    return ehsys_20E340D9(D_0000F074, arg0);
+}
+
+/* func_000043E8 — 17 words. MATCH 100% (shape: m2c). */
+s32 func_000043E8(s32 arg0) {
+    u16 val = (u16) arg0;
+    s32 i;
+    s32 v0;
+
+    for (i = 0; (v0 = D_0000C3F0[i]) >= 0; i++) {
+        if (val == v0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 /* func_000052C4 — 27 words. MATCH 100% (shape: m2c). */
 void func_000052C4(void) {

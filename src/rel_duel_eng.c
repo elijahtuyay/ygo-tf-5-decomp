@@ -18,7 +18,7 @@
  * file-scope declaration would change the load/store width and break the
  * match. See scripts/assemble_module.py.
  *
- * STATUS: 45 functions matched. build/auto/rel_duel_eng.json has the
+ * STATUS: 44 functions matched. build/auto/rel_duel_eng.json has the
  * status of every attempt, including what the rest of the module still needs.
  *
  * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,
@@ -88,28 +88,6 @@ s32 func_000197DC(void) {
 /* func_0001D97C — 2 words. MATCH 100% (shape: m2c). */
 s32 func_0001D97C(void) {
     extern int func_0001D97C();
-    return 0;
-}
-
-/* func_0002B00C — 26 words. MATCH 100% (shape: single-switch). */
-s32 func_0002B00C(void) {
-    extern char D_002FCFA8;
-    extern char D_0035175C;
-    extern char D_00351760;
-    extern int func_0002B00C();
-    s32 temp_v0;
-
-    temp_v0 = (&D_002FCFA8)[D_0035175C];
-
-    switch (temp_v0) {
-    case 0:
-        return 1;
-        break;
-    }
-    if (((s32 (*)()) temp_v0)() != 0) {
-        D_00351760 = 0;
-        D_0035175C += 1;
-    }
     return 0;
 }
 
