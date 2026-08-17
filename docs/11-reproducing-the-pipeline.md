@@ -154,7 +154,17 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     `volatile s32 sp[24]; sp[0] = x; return sp[0];` matched a 6-word target that
     no -O4 phrasing could reach.
 
-18. **Argument evaluation order is not always reachable from C.** At `-O4` MWCC's
+18. **Signedness picks the load opcode, not just the width.** `extern char D_X`
+    gives `lb`; a target using `lbu` needs `unsigned char` at the *read* site.
+    The declared type governs reads as tightly as it governs stores.
+19. **Boolean idioms are not interchangeable.** For a target ending in
+    `sltiu $v0, $v0, 1` write `(unsigned int)x < 1`; for one using
+    `sltu $v0, $zero, $v0` + `xori $v0, $v0, 1` write plain `!x`. Logically
+    identical, one word apart.
+20. **`(x >> n) & 1` folds into a single Allegrex `ext` at -O4.** A target with
+    discrete `sll`/`srl` needs the two-shift phrasing instead:
+    `((unsigned int)x << (31 - n)) >> 31`. Same family as lever 16.
+21. **Argument evaluation order is not always reachable from C.** At `-O4` MWCC's
     scheduler can evaluate a call's second argument before its first even when
     both are plain global loads with no side effects, contradicting the source
     order. Temporaries and explicit sequencing do not move it, and
