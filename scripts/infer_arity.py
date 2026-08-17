@@ -37,7 +37,11 @@ def import_names(module):
     return out
 
 
-def scan(module, arity, sites):
+def scan(module, arity, sites, internal=False):
+    """Walk every call site. `internal` switches the target set from the
+    module's engine imports to its own func_* definitions — a module's internal
+    calls are just as informative, and for rel_duel_eng's 7487 functions they
+    are the only source of arity there is."""
     path = os.path.join(ROOT, "asm", module, "text.s")
     if not os.path.exists(path):
         return
@@ -45,7 +49,12 @@ def scan(module, arity, sites):
     lines = open(path, errors="replace").read().splitlines()
     for i, line in enumerate(lines):
         m = re.search(r"\b(?:jal|j)\s+(\w+)\s*$", line)
-        if not m or m.group(1) not in known:
+        if not m:
+            continue
+        if internal:
+            if not re.match(r"^func_[0-9A-F]+$", m.group(1)):
+                continue
+        elif m.group(1) not in known:
             continue
         callee = m.group(1)
         sites[callee] += 1
@@ -89,6 +98,27 @@ def main():
     print("\nmost-called, with inferred arity:")
     for name, n, mx, dist in rows[:15]:
         print(f"  {name:<36} {n:>5} sites  max={mx}  most common: {dist[0][0]} args")
+
+    # Same inference for each module's own functions, written per module. An
+    # internal callee's arity is otherwise unknowable without decompiling it,
+    # and guessing it wrong is a common reason a small caller will not match.
+    d = os.path.join(ROOT, "nids/func_arity")
+    os.makedirs(d, exist_ok=True)
+    total = 0
+    for mod in mods:
+        ar, st = defaultdict(Counter), Counter()
+        scan(mod, ar, st, internal=True)
+        rows = sorted(((n, st[n], max(c), c.most_common(3))
+                       for n, c in ar.items() if c), key=lambda r: -r[1])
+        if not rows:
+            continue
+        with open(os.path.join(d, mod + ".csv"), "w", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["name", "call_sites", "max_args", "distribution"])
+            for name, n, mx, dist in rows:
+                w.writerow([name, n, mx, "; ".join(f"{a} args x{c}" for a, c in dist)])
+        total += len(rows)
+    print(f"\n{total} internal functions with inferred arity -> nids/func_arity/")
 
 
 if __name__ == "__main__":
