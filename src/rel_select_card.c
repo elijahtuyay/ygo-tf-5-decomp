@@ -86,6 +86,8 @@ extern int ehsys_E62CCE79();
 extern int ehsys_memcpy(int, void *, int);
 extern int ehsys_EF9B5D06();
 extern int ehsys_FE91A2EC();
+extern int func_000011B4();
+extern void func_00001160(void);
 extern int func_000012A8();
 extern int func_000029A0(void *, int);
 extern int func_0000A768(int, int, int, void *);
@@ -106,10 +108,36 @@ extern int func_000155AC();
 extern int func_0001565C();
 extern unsigned char *D_0001FC50;
 extern void *D_0001FC4C;
+extern void *D_0001FC34;
 
 /* ============================================================
  * Matched functions, in address order (required for linking).
  * ============================================================ */
+
+/* func_00000A08 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00000A08(void) {
+    int v;
+
+    v = *(int *)((char *)D_0001E5D0 + 0x94);
+    if (v != 0) {
+        ehsys_E1139F1A(v);
+        ehsys_20E340D9(D_0001EB7C, (void *)(*(int *)((char *)D_0001E5D0 + 0x94)));
+    }
+    v = *(int *)((char *)D_0001E5D0 + 0x90);
+    if (v != 0) {
+        ehsys_E1139F1A(v);
+        ehsys_20E340D9(D_0001EB7C, (void *)(*(int *)((char *)D_0001E5D0 + 0x90)));
+    }
+    func_00001160();
+    func_000011B4();
+    v = *(int *)((char *)D_0001E5D0 + 0x8C);
+    if (v != 0) {
+        ehsys_E1139F1A(v);
+        ehsys_20E340D9(D_0001EB7C, (void *)(*(int *)((char *)D_0001E5D0 + 0x8C)));
+    }
+    ehsys_20E340D9(D_0001EB7C, (void *)D_0001E5D0);
+    D_0001E5D0 = 0;
+}
 
 /* func_00001058 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00001058(void) {
@@ -224,6 +252,21 @@ s32 func_00006B30(s32 arg0) {
     return sp1C;
 }
 
+/* func_00007644 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00007644(void) {
+    int v;
+
+    v = *(int *)((char *)D_0001FC34 + 0x14);
+    if (v != 0) {
+        ehsys_E1139F1A(v);
+        ehsys_20E340D9(D_0001EB7C, (void *)(*(int *)((char *)D_0001FC34 + 0x14)));
+    }
+    ehsys_E1139F1A(*(int *)((char *)D_0001FC34 + 0x10));
+    ehsys_20E340D9(D_0001EB7C, (void *)(*(int *)((char *)D_0001FC34 + 0x10)));
+    ehsys_20E340D9(D_0001EB7C, (void *)D_0001FC34);
+    D_0001FC34 = 0;
+}
+
 /* func_00007770 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00007770(int a0, unsigned short a1, int a2, int a3) {
     return func_00011968(a0, &D_0001D8C4 + (a1 + 1) * 6, a2, a3 + 1, 0xA4, 0);
@@ -316,6 +359,26 @@ int func_0000A2E4(int a0) {
         ehsys_EF9B5D06(&sp1C, a1);
     }
     return sp1C;
+}
+
+/* func_0000A330 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000A330(void) {
+    int v;
+
+    v = *(int *)((char *)D_0001FC4C + 0x14);
+    if (v != 0) {
+        ehsys_E1139F1A(v);
+        ehsys_20E340D9(D_0001EB7C, (void *)(*(int *)((char *)D_0001FC4C + 0x14)));
+        *(int *)((char *)D_0001FC4C + 0x14) = 0;
+    }
+    ehsys_E1139F1A(*(int *)((char *)D_0001FC4C + 0x10));
+    v = *(int *)((char *)D_0001FC4C + 0x10);
+    if (v != 0) {
+        ehsys_20E340D9(D_0001EB7C, (void *)v);
+        *(int *)((char *)D_0001FC4C + 0x10) = 0;
+    }
+    ehsys_20E340D9(D_0001EB7C, D_0001FC4C);
+    D_0001FC4C = 0;
 }
 
 /* func_0000AB9C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
