@@ -322,6 +322,27 @@ times over. Recognise these before starting from m2c:
     shape. Expect this wherever a target "calls" `ehsys_memset` with a small
     constant size but shows no call instruction.
 
+50. **Three phrasings of a byte comparison, one right answer.** `b == CONST`,
+    `(b ^ CONST) == 0` and `!(b ^ CONST)` produce `xori`+`sltiu` versus
+    `sltu`+`xori`+`andi`. Same family as lever 43; try all three.
+51. **A truncating `andi 0xff` needs somewhere to live.** When an existing
+    `int`-typed forward declaration forces a function away from a `u8` return,
+    the mask the target has only reappears if the result is assigned to an
+    explicit `u8` local and returned through it. A bare boolean expression in an
+    `int`-returning function skips the mask entirely.
+52. **Declare a function pointer with FEWER arguments than it appears to take.**
+    Several vtable thunks are typed `fn(void)` while the caller has a live
+    second argument, which is what produces the silent dead-forward through an
+    untouched register. Lever 35 again, through a function pointer.
+53. **Early return, if/else, and if-with-trailing-return are three different
+    shapes**, and which one the original used is not predictable from the logic.
+    Several functions converged only after trying two or all three.
+54. **Known unsolved, seen three times** (`func_0001B6BC`, `func_0002F5F0`,
+    `func_000687BC`): the read-modify-write bit shape
+    `byte = (byte & ~1) | (arg & 1);` always compiles with the mask and bit
+    operands swapped relative to the target, under every declaration order,
+    temporary and statement split tried.
+
 ### A harder category than levers
 
 Everything numbered above is a rule: a source shape that reproducibly produces a
