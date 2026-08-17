@@ -110,6 +110,66 @@ def report(title, groups, done, show_all):
     print(f"{title}: {actionable} functions obtainable by copying a matched twin\n")
 
 
+def body_of(module, func):
+    """The source text of an already-matched function, from src/<module>.c."""
+    path = os.path.join(ROOT, "src", module + ".c")
+    lines = open(path).read().split("\n")
+    start = None
+    for i, line in enumerate(lines):
+        m = re.match(rf"^[A-Za-z_][\w \*]*?\b{func}\s*\(", line)
+        if m and (line.rstrip().endswith("{") or
+                  (i + 1 < len(lines) and lines[i + 1].strip() == "{")):
+            start = i
+            break
+    if start is None:
+        return None
+    i, depth, started = start, 0, False
+    while i < len(lines):
+        depth += lines[i].count("{") - lines[i].count("}")
+        started = started or "{" in lines[i]
+        i += 1
+        if started and depth <= 0:
+            break
+    return "\n".join(lines[start:i])
+
+
+def apply_twins(groups, done):
+    """Copy each matched body onto its unmatched duplicates and verify."""
+    sys.path.insert(0, os.path.join(ROOT, "scripts"))
+    import merge_matches as M
+
+    added = 0
+    for members in groups.values():
+        have = [m for m in members if m in done]
+        want = [m for m in members if m not in done]
+        if not have or not want:
+            continue
+        src = body_of(*have[0])
+        if not src:
+            continue
+        for mod, func in want:
+            path = os.path.join(ROOT, "src", mod + ".c")
+            if not os.path.exists(path):
+                continue
+            before = open(path).read()
+            if func in M.defined_in(before):
+                continue
+            # Rename the definition only; anything it calls keeps its own name.
+            renamed = re.sub(rf"\b{have[0][1]}\b(?=\s*\()", func, src, count=1)
+            entry = {"func": func, "words": 0, "shape": f"twin of {have[0][1]}",
+                     "src": renamed}
+            open(path, "w").write(M.insert(before, entry, []))
+            bad = M.verify(mod, M.defined_in(before) | {func})
+            if bad is None or bad:
+                open(path, "w").write(before)
+            else:
+                done.add((mod, func))
+                added += 1
+                print(f"  + {mod} {func}  (twin of {have[0][0]} {have[0][1]})",
+                      flush=True)
+    return added
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     show_all = "--all" in sys.argv
@@ -127,6 +187,14 @@ def main():
 
     print(f"{len(mods)} module(s), {sum(len(v) for v in by_words.values())} "
           f"matchable functions, {len(done)} already matched\n")
+    if "--apply" in sys.argv:
+        # Only the exact tier is safe to copy blind; the shape tier differs in
+        # constants and symbols, so those still need a human edit.
+        print("copying matched bodies onto their exact duplicates:")
+        n = apply_twins(by_words, done)
+        print(f"\nadded {n} functions")
+        return
+
     print("=== identical instruction words ===")
     report("identical", by_words, done, show_all)
     print("=== identical once immediates and symbols are masked ===")
