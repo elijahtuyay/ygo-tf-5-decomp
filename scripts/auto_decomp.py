@@ -159,8 +159,12 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # nothing declares that struct. Rewrite to an explicit byte offset — the same
     # access the asm performs. This is the single biggest source of compile
     # failures in rel_duel_eng (3527 of ~4900 attempts).
+    # The width is left as a placeholder rather than fixed at `int`: the access
+    # width is whatever the target's load instruction does, and guessing `lw`
+    # everywhere silently dooms every halfword and byte field. shape_field_width
+    # below tries the alternatives.
     src = re.sub(r"([A-Za-z_]\w*)->unk_?([0-9A-Fa-f]+)",
-                 lambda m: f"(*(int *)((char *){m.group(1)} + 0x{m.group(2)}))", src)
+                 lambda m: f"(*(M2C_W *)((char *){m.group(1)} + 0x{m.group(2)}))", src)
     # Only the simple `identifier->unkNN` case is rewritten. A parenthesised
     # left-hand side needs balanced-paren handling that a regex cannot do safely —
     # an earlier attempt produced unbalanced output and broke otherwise-valid
@@ -212,6 +216,12 @@ def shape_single_switch(src):
 
 
 DATA_FLAVOURS = ["char", "void *", "int"]
+
+# Widths tried for m2c's unknown struct fields (the M2C_W placeholder). The
+# access width is whatever the target's load does; forcing `int` everywhere
+# quietly dooms every halfword and byte field, which is how a family of 35
+# rel_story getters and setters ended up needing to be fixed by hand.
+FIELD_WIDTHS = ["int", "unsigned short", "unsigned char"]
 
 def shape_baked_address(src):
     """Some globals are baked into the ORIGINAL as raw absolute immediates with
@@ -372,14 +382,23 @@ def main():
                 continue
             compiled = False
             for name, shape in SHAPES:
-                body = shape(draft)
-                if not body:
+                shaped = shape(draft)
+                if not shaped:
                     continue
                 ok = False
-                for fl in FLAG_SETS:
-                    ok, verdict = try_candidate(mod, fn, decls, body, workdir, fl)
+                # Only iterate widths when the draft actually has unknown fields,
+                # so functions without them cost nothing extra.
+                widths = FIELD_WIDTHS if "M2C_W" in shaped else FIELD_WIDTHS[:1]
+                for width in widths:
+                    body = shaped.replace("M2C_W", width)
+                    for fl in FLAG_SETS:
+                        ok, verdict = try_candidate(mod, fn, decls, body, workdir, fl)
+                        if ok:
+                            if width != FIELD_WIDTHS[0]:
+                                name += f" {width}-fields"
+                            name = name if fl is FLAG_SETS[0] else name + " -O2"
+                            break
                     if ok:
-                        name = name if fl is FLAG_SETS[0] else name + " -O2"
                         break
                 if verdict != "compile-error":
                     compiled = True
