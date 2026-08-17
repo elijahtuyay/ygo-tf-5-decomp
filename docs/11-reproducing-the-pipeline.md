@@ -270,6 +270,20 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     be matched by trying sizes. Lever 34's `volatile int pad[N]` is the blunt
     version of the same thing.
 
+45. **A store can sit in a `jal`'s delay slot**, so it executes BEFORE the
+    callee. A store appearing textually just after a `jal` in the disassembly
+    must be written before that call in the C, not after.
+46. **Do not cache a repeated field read across a loop.** Hoisting the recurring
+    expression into a local costs an extra register and a move per call that the
+    target does not have; let the redundant reload happen.
+47. **A strict ANSI prototype can regress the CALLER.** Giving a function a
+    prototype made MWCC insert a truncating `andi` at a call site that the
+    target does not have; the K&R definition of lever 22 avoided it. When adding
+    a function regresses its caller, the prototype is the first suspect.
+48. **Judge a candidate by its diff, not by its shape.** An `array + i * 0x5C`
+    expression that looked like the commutative-`addu` dead end (lever 42) in
+    fact matched fine. Resemblance to a known dead end is not proof.
+
 ### Function families worth recognising
 
 Several shapes recur dozens of times, so identifying one pays for itself many
