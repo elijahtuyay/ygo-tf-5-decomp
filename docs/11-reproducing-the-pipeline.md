@@ -154,6 +154,26 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     `volatile s32 sp[24]; sp[0] = x; return sp[0];` matched a 6-word target that
     no -O4 phrasing could reach.
 
+### 248 functions are hand-written assembly
+
+spimdisasm marks them `/* Handwritten function */` in `asm/<module>/text.s` — they
+use instruction patterns a compiler does not emit, so they can never be matched
+from C and should eventually be carried as assembly rather than decompiled. They
+are concentrated where you would expect:
+
+| module | handwritten | | module | handwritten |
+|---|---:|---|---|---:|
+| `rel_duel_draw` | 121 | | `rel_shop` | 14 |
+| `rel_field` | 50 | | `rel_gallery` | 6 |
+| `rel_cutin_viewer` | 24 | | `rel_cardalbum` | 6 |
+| 16 others | 1-4 each | | **total** | **248** |
+
+So the matchable denominator is 13,835 functions, not 14,083 — and in
+`rel_duel_draw` nearly 8% of the module is off the table for a C decompilation.
+Check for the marker before spending time on a stubborn function:
+
+    grep -A2 'glabel func_XXXXXXXX$' asm/<module>/text.s | grep -c Handwritten
+
 ### A verification bug worth remembering
 
 `scripts/mwcc_diff.py` originally treated two words as equal whenever both
