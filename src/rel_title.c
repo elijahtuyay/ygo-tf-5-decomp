@@ -18,7 +18,7 @@
  * file-scope declaration would change the load/store width and break the
  * match. See scripts/assemble_module.py.
  *
- * STATUS: 12 functions matched. build/auto/rel_title.json has the
+ * STATUS: 16 functions matched. build/auto/rel_title.json has the
  * status of every attempt, including what the rest of the module still needs.
  *
  * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,
@@ -66,6 +66,20 @@ void func_0001A2E4(int a, int b, int c, int d) {
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
+/* func_0001A318 — 2 words. MATCH 100% (shape: thunk+1). */
+int func_0001A318(int a) {
+    extern int ehsys_5F00A362();
+    extern int func_0001A318();
+    return ehsys_5F00A362(a << 6);
+}
+
+/* func_0001A5A8 — 4 words. MATCH 100% (shape: thunk+1). */
+int func_0001A5A8(int a, int b, int c) {
+    extern int ehsys_B89D38DC();
+    extern int func_0001A5A8();
+    return ehsys_B89D38DC(a << 6, b << 6, c << 6);
+}
+
 /* func_0001D46C — 2 words. MATCH 100% (shape: m2c). */
 void func_0001D46C(void) {
     extern int func_0001D46C();
@@ -78,11 +92,25 @@ void func_0001D650(void) {
 
 }
 
+/* func_000268A0 — 2 words. MATCH 100% (shape: thunk+1). */
+int func_000268A0(int a) {
+    extern int ehsys_5F00A362();
+    extern int func_000268A0();
+    return ehsys_5F00A362(a << 6);
+}
+
 /* func_00029470 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_00029470(int a, int b, int c, int d) {
     extern int ehsys_BC8E65D7();
     extern int func_00029470();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
+}
+
+/* func_00029574 — 4 words. MATCH 100% (shape: thunk+1). */
+int func_00029574(int a, int b, int c) {
+    extern int ehsys_B89D38DC();
+    extern int func_00029574();
+    return ehsys_B89D38DC(a << 6, b << 6, c << 6);
 }
 
 /* func_0002B944 — 5 words. MATCH 100% (shape: thunk+1). */

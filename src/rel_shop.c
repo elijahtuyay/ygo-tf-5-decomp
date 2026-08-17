@@ -58,7 +58,12 @@ extern char D_0001F220;
 extern char D_00023062;
 extern char D_0002305C;
 extern char D_0002305D;
+extern char D_00023480;
+extern char D_00023484;
 extern char D_00023E38;
+extern char D_00023E94;
+extern int *D_0002DF80;
+extern u16 D_0002DF90[];
 extern char D_000240A4;
 extern char D_0002E017;
 extern char D_76F1F0;
@@ -67,21 +72,25 @@ extern char D_8E73B8;
 extern char D_8E73C0;
 extern int D_0002F1C4;
 extern int D_0002F1C8;
+extern int ehsys_0089B865(void *);
 extern int ehsys_03E45FFF();
 extern int ehsys_06380DFA();
 extern int ehsys_20E340D9(int, int);
 extern int ehsys_291D6262(void *, int, int);
 extern int ehsys_3BB2BAC6(int, int, int, int, int, int, int);
 extern int ehsys_41AABF28(int, int);
+extern int ehsys_42C464D5(void *);
 extern int ehsys_4F22C9AA();
 extern int ehsys_5DF04F49();
 extern int ehsys_5F00A362(int);
+extern int ehsys_78749045(int, u8);
 extern int ehsys_9EA6989A();
 extern int ehsys_AB962AE7();
 extern int ehsys_B2B9FEFA();
 extern int ehsys_B4471B5E();
 extern int ehsys_B89D38DC(); /* called with 3 OR 4 args depending on site (see below) */
 extern int ehsys_BC8E65D7(int, int, int, int, int);
+extern int ehsys_E58C0FDC(int, int);
 extern int ehsys_EBD1986B();
 extern int ehsys_EF9B5D06();
 extern int ehsys_memset();
@@ -96,7 +105,9 @@ void func_00015648(void); /* forward decl: defined below, called before its own 
 void func_00015914(void); /* forward decl: defined below, called before its own definition */
 extern int func_0000F998();
 extern int func_0000FB88();
+extern int func_0000FCD4(int);
 extern int func_0001161C();
+extern int func_000164C8(void);
 extern int func_00012FB4();
 extern int func_000130AC();
 extern int func_00015228();
@@ -109,6 +120,17 @@ extern int func_00015650();
 /* func_000049BC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_000049BC(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
+/* func_00004CF4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00004CF4(int a0) {
+    int c;
+    for (c = a0 + 1; c < 0x3C; c++) {
+        if (D_0002DF90[c + 6] > 0) {
+            return c;
+        }
+    }
+    return -1;
 }
 
 /* func_00005E84 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -134,6 +156,24 @@ void func_00006754(s32 arg0, s32 arg1) {
     ehsys_9EA6989A(arg0, func_0000FB88(arg1 & 0xFFFF));
 }
 
+/* func_000067E4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000067E4(f32 a0, f32 a1, f32 a2) {
+    struct { char pad[12]; } tmp = {0};
+    ((f32 *) &tmp)[0] = a0;
+    ((f32 *) &tmp)[1] = a1;
+    ((f32 *) &tmp)[2] = a2;
+    ehsys_42C464D5(&tmp);
+}
+
+/* func_00006828 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00006828(f32 a0, f32 a1, f32 a2) {
+    struct { char pad[12]; } tmp = {0};
+    ((f32 *) &tmp)[0] = a0;
+    ((f32 *) &tmp)[1] = a1;
+    ((f32 *) &tmp)[2] = a2;
+    ehsys_0089B865(&tmp);
+}
+
 /* func_0000694C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 f32 func_0000694C(s32 arg0, s32 arg1) {
     s32 var_a0;
@@ -153,6 +193,17 @@ f32 func_00006980(int a0, int a1) {
     return 1.0f - func_0000694C(a0, a1);
 }
 
+/* func_00008204 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void *func_00008204(void *a0, void *a1) {
+    ((f32 *)a0)[0] = ((f32 *)a1)[0];
+    ((f32 *)a0)[1] = ((f32 *)a1)[1];
+    ((s32 *)a0)[2] = ((s32 *)a1)[2];
+    ((f32 *)a0)[3] = ((f32 *)a1)[3];
+    ((f32 *)a0)[4] = ((f32 *)a1)[4];
+    ((f32 *)a0)[5] = ((f32 *)a1)[5];
+    return a0;
+}
+
 /* func_00009714 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00009714(int a0) {
     return ehsys_41AABF28(D_0002F1C4, a0);
@@ -161,6 +212,13 @@ int func_00009714(int a0) {
 /* func_00009724 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00009724(int a0) {
     return ehsys_20E340D9(D_0002F1C4, a0);
+}
+
+/* func_00009980 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00009980(int arg0) {
+    int sp1C = arg0;
+    ehsys_EF9B5D06(&sp1C, D_0002DF80[2]);
+    return sp1C;
 }
 
 /* func_00009F64 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -199,6 +257,13 @@ void func_0000A404(void) {
     ehsys_EBD1986B(0, 0);
 }
 
+/* func_0000A434 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000A434(void *a0, f32 a1) {
+    ehsys_memset(a0, 0, 0xC);
+    ((f32 *) a0)[0] = a1;
+    ((f32 *) a0)[1] = a1;
+}
+
 /* func_0000A62C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000A62C(int a0, int a1, int a2) {
     return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
@@ -210,6 +275,26 @@ void *func_0000AA7C(void *a0, void *a1) {
     ((f32 *)a0)[1] = ((f32 *)a1)[1];
     ((f32 *)a0)[2] = ((f32 *)a1)[2];
     return a0;
+}
+
+/* func_0000B0F8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_0000B0F8(void) {
+    int i;
+    for (i = 0; i < 0x3C; i++) {
+        ehsys_78749045(i, ((u8 *) D_0002DF90)[0x100 + i]);
+    }
+}
+
+/* func_0000B140 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000B140(u16 a0) {
+    int r = func_0000FCD4(0xC001);
+    return ehsys_E58C0FDC(r, *(int *)((char *)&D_00023484 + a0 * 8));
+}
+
+/* func_0000B188 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000B188(u16 a0) {
+    int r = func_0000FCD4(0xC001);
+    return ehsys_E58C0FDC(r, *(int *)((char *)&D_00023480 + a0 * 8));
 }
 
 /* func_0000B1D0 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -233,6 +318,27 @@ u8 func_0000B444(s32 arg0) {
     return *(&D_0002305D + ((arg0 & 0xFFFF) * 0xC));
 }
 
+/* func_0000B55C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000B55C(void) {
+    int i;
+    u32 sum = 0;
+    for (i = 0; i < 0x3C; i++) {
+        sum += D_0002DF90[i + 6];
+    }
+    return sum;
+}
+
+/* func_0000B89C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_0000B89C(u16 a0, u16 *a1, u16 a2) {
+    int idx;
+    for (idx = 0; idx < a2; idx++) {
+        if (a1[idx] == a0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /* func_0000EE20 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void *func_0000EE20(void *a0, void *a1) {
     ((u16 *)a0)[0] = ((u16 *)a1)[0];
@@ -250,9 +356,29 @@ void func_0000F928(void) {
     func_0000F998();
 }
 
+/* func_00010BF4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00010BF4(int a0) {
+    int *p;
+    int sp1C;
+    p = *(int **)0x8E7354;
+    sp1C = a0;
+    ehsys_EF9B5D06(&sp1C, p[4]);
+    p = *(int **)0x8E7354;
+    ehsys_EF9B5D06(&sp1C, p[5]);
+    return sp1C;
+}
+
 /* func_00010C38 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00010C38(int a0, unsigned short a1, int a2, int a3) {
     return func_0000AF00(a0, &D_00023E38 + (a1 + 1) * 6, a2, a3 + 1, 0x88);
+}
+
+/* func_00010C64 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00010C64(int a0, u16 a1, int a2, int a3) {
+    int *p = *(int **)0x8E7354;
+    int *q = *(int **)((char *)p + 0x14);
+    u16 t0 = *(u16 *)((char *)q + 0xF4);
+    return func_0000AF00(a0, &D_00023E94 + a1 * 6, a2, a3 + 1, t0);
 }
 
 /* func_00011E44 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -372,6 +498,14 @@ s32 func_00016580(void) {
         return 0;
     }
     return 1;
+}
+
+/* func_000166C8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000166C8(void) {
+    char *p = &D_8E73B8;
+    if (func_000164C8() == 0) {
+        *(int *)(p + 0x164) += 1;
+    }
 }
 
 /* func_00016B74 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

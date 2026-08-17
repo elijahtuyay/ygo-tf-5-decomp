@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 218 functions matched here. The rest of the module is not
+ * STATUS: 240 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by

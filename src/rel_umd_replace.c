@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 15 functions matched here. The rest of the module is not
+ * STATUS: 16 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -60,9 +60,14 @@ extern int ehsys_EBD1986B();
 extern int ehsys_memset();
 extern int func_00000038();
 extern int func_00000250();
-extern int func_00001018();
 extern int func_000029BC();
 extern int func_000036D4();
+extern s32 ehsys_D3448D59(s32 arg0);
+extern s32 ehsys_1D821C84(void);
+extern s32 ehsys_33ED567B(s32 arg0);
+extern s32 ehsys_D853F15C(s32 arg0);
+extern s32 ehsys_EF9B5D06(s32 *arg0, s32 arg1);
+extern s32 ehsys_get_language(void);
 extern int sceImposeSetUMDPopup();
 extern int sceKernelCreateCallback();
 extern int sceUmdActivate();
@@ -71,6 +76,7 @@ extern int sceUmdRegisterUMDCallBack();
 /* ---- forward declarations ---- */
 s32 func_00000000(s32 arg0);
 s32 func_00000FD0(s32 arg0);
+s32 func_00001018(s32 arg0, s32 arg1);
 s32 func_00002EC8(void);
 s32 func_0000327C(void);
 s32 func_000036B0(void);
@@ -120,6 +126,30 @@ s32 func_00000FD0(s32 arg0) {
     return temp_v0;
 }
 
+/* func_00001018 — 34 words. MATCH 100% (shape: m2c). */
+s32 func_00001018(s32 arg0, s32 arg1) {
+    s32 sp1C;
+    s32 v0;
+    s32 s1;
+    s32 s0;
+
+    sp1C = arg1;
+    v0 = ehsys_D3448D59(arg0);
+    s1 = v0;
+    v0 = ehsys_1D821C84();
+    s0 = v0;
+    v0 = ehsys_get_language();
+    if (v0 == 0) {
+        ehsys_33ED567B(1);
+    } else {
+        ehsys_D853F15C(1);
+    }
+    ehsys_EF9B5D06(&sp1C, arg0);
+    ehsys_33ED567B(s1);
+    ehsys_D853F15C(s0);
+    return sp1C;
+}
+
 /* func_00001164 — 22 words. MATCH 100% (shape: m2c). */
 void func_00001164(void) {
     ehsys_4AA58320(*(s32 *)0xB9D8);
@@ -156,7 +186,7 @@ void func_00002E78(void) {
 
     temp_v0 = ehsys_DFCA450B(4, 0);
     sp1C = temp_v0;
-    sp1C = func_00001018(&D_BAD0, temp_v0);
+    sp1C = func_00001018((s32) &D_BAD0, temp_v0);
     ehsys_14BFFB01(&sp1C, &D_BBF4);
     ehsys_1EC5342B(sp1C);
 }
