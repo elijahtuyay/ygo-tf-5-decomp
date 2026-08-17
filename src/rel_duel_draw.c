@@ -654,6 +654,11 @@ void func_000000B8(void) {
 
 }
 
+/* func_00000300 — 3 words. MATCH 100% (shape: m2c). */
+s32 func_00000300(s32 *arg0) {
+    return arg0[0x3F] != 0;
+}
+
 /* func_00001CEC — 14 words. MATCH 100% (shape: m2c). */
 s32 func_00001CEC(s32 arg0) {
     s32 temp_s0;
@@ -784,6 +789,14 @@ void func_000027F4(s32 arg0, int arg1) {
 void func_00002CBC(s32 arg0, int arg1) {
     func_0000364C(arg1);
     func_000036C0(arg0, arg1);
+}
+
+/* func_000034DC — 8 words. MATCH 100% (shape: m2c). */
+s32 func_000034DC(s32 *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (arg0[116] & (1 << arg1)) != 0;
+    return (temp_v0 ^ 1) & 0xFF;
 }
 
 /* func_000040F0 — 2 words. MATCH 100% (shape: m2c). */
@@ -1166,6 +1179,11 @@ s32 func_0001CA54(void) {
     return (*(s32 *)&D_00091648);
 }
 
+/* func_0001CAB8 — 4 words. MATCH 100% (shape: m2c). */
+void func_0001CAB8(s32 *arg0) {
+    ((s32 *)arg0[6])[3] = 1;
+}
+
 /* func_0001CC70 — 10 words. MATCH 100% (shape: m2c). */
 int func_0001CC70() {
     func_00031A08((*(s32 *)&D_0009164C));
@@ -1189,6 +1207,11 @@ void func_0001CCD8(s32 arg0) {
     if ((*(s32 *)&D_0009164C) != 0) {
         func_00030694((*(s32 *)&D_0009164C), arg0);
     }
+}
+
+/* func_0001CD50 — 3 words. MATCH 100% (shape: m2c). */
+void func_0001CD50(s32 *arg0) {
+    arg0[0x26] = -1;
 }
 
 /* func_0001D2E8 — 12 words. MATCH 100% (shape: m2c). */
