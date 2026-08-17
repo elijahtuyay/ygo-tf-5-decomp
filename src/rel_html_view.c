@@ -59,6 +59,12 @@
  * `ehsys_<NID>` / `ehsys_<name>`, and those names are identical in all 28
  * modules, so anything learned here transfers.
  *
+ * Three engine functions this module uses were identified by reading the EBOOT
+ * (evidence in nids/ehsys.names.csv): ehsys_get_language (334 call sites
+ * project-wide), ehsys_get_button_code (288) and ehsys_frame_sync (172). The
+ * first two explain func_0000039C and the buttonSwap test below; unlike the
+ * sce* names they are inferences, not hash-proven symbols.
+ *
  * Resolution confirmed the whole reading of this module and named the thing it
  * is really doing: `sceUtilityHtmlViewerInitStart` takes a
  * **`pspUtilityHtmlViewerParam`**, a documented SDK struct that is exactly the

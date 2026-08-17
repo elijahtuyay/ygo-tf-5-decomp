@@ -517,7 +517,7 @@ ehsys_4BF558F1 = 0x00001758; // type:func
 ehsys_6595A5B3 = 0x00001760; // type:func
 ehsys_65FA8E18 = 0x00001768; // type:func
 ehsys_8060707A = 0x00001770; // type:func
-ehsys_8171F765 = 0x00001778; // type:func
+ehsys_get_button_code = 0x00001778; // type:func
 ehsys_EFFF02BF = 0x00001780; // type:func
 ehsys_E292693D = 0x00001788; // type:func
 ehsys_4E4F1811 = 0x00001790; // type:func
@@ -1277,7 +1277,7 @@ ehsys_7B8EF3EC = 0x00002F18; // type:func
 ehsys_5A023ABD = 0x00002F20; // type:func
 ehsys_28BE130B = 0x00002F28; // type:func
 ehsys_826AE59C = 0x00002F30; // type:func
-ehsys_F1BC43DB = 0x00002F38; // type:func
+ehsys_frame_sync = 0x00002F38; // type:func
 ehsys_74E51EA4 = 0x00002F40; // type:func
 ehsys_90B7D870 = 0x00002F48; // type:func
 ehsys_7BCFA60E = 0x00002F50; // type:func
@@ -1581,7 +1581,7 @@ ehsys_E8EB3756 = 0x00003898; // type:func
 ehsys_BE54B40C = 0x000038A0; // type:func
 ehsys_78ED2B0F = 0x000038A8; // type:func
 ehsys_55981772 = 0x000038B0; // type:func
-ehsys_31454993 = 0x000038B8; // type:func
+ehsys_get_language = 0x000038B8; // type:func
 ehsys_1F710553 = 0x000038C0; // type:func
 ehsys_0E1394AE = 0x000038C8; // type:func
 ehsys_B82A7187 = 0x000038D0; // type:func
@@ -1760,26 +1760,15 @@ ehsys_224CD64E = 0x00003E18; // type:func
 // rel_html_view.txt by scripts/resolve_nids.py, which never overwrites this file.
 //
 // Convention: s_ = read-only string constant in .data, g_ = mutable global.
-// splat parses everything after `//` on a symbol line as attributes, so any
-// description has to go on its own comment line above the symbol, and `type:`
-// only accepts its own vocabulary (asciz/u32/s32/... — there is no `data`).
+// Everything here is evidence-backed; see src/rel_html_view.c for the reasoning.
 
-// "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php"
-s_download_url = 0x00005E4C; // type:asciz size:0x34
-// "/PSP/SAVEDATA/"
-s_savedata_dir = 0x00005E80; // type:asciz size:0x20
+s_download_url  = 0x00005E4C; // type:data size:0x34  "http://www.konami.jp/gs/game/yugioh_tf5/dl/eu.php"
+s_savedata_dir  = 0x00005E80; // type:data size:0x20  "/PSP/SAVEDATA/"
 
-// 3rd argument of the module-registration call in func_00000000
-g_module_reg = 0x00005EA0; // size:0xC
-// state machine word, 1..4 (func_00000670)
-g_state = 0x00005EAC; // type:s32 size:0x4
-// SceUtilityHtmlViewerParam, built by func_00000470
-g_html_param = 0x00005EB0; // size:0xA8
-// initialurl/homeurl text, built by func_00000414
-g_url_buf = 0x00005F68; // size:0x200
-// dldirname text, built by func_00000420
-g_dl_dir_buf = 0x00006168; // size:0x84
-// points at g_heap; set by func_00000650
-g_heap_ptr = 0x000061EC; // type:u32 size:0x4
-// the 6 MB block passed as param.memaddr
-g_heap = 0x000061F0;
+g_module_reg    = 0x00005EA0; // type:data size:0xC   3rd argument of the module-registration call
+g_state         = 0x00005EAC; // type:data size:0x4   state machine word, 1..4 (func_00000670)
+g_html_param    = 0x00005EB0; // type:data size:0xA8  SceUtilityHtmlViewerParam
+g_url_buf       = 0x00005F68; // type:data size:0x200 initialurl/homeurl text, built by func_00000414
+g_dl_dir_buf    = 0x00006168; // type:data size:0x84  dldirname text, built by func_00000420
+g_heap_ptr      = 0x000061EC; // type:data size:0x4   points at g_heap; set by func_00000650
+g_heap          = 0x000061F0; // type:data            the 6 MB block passed as param.memaddr
