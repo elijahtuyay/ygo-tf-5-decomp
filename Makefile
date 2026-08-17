@@ -125,15 +125,24 @@ $(BIN): $(OUT)
 verify: $(BIN)
 	@expected=$$(grep -F "$(MODULE).prx" checksums.sha1 | cut -d' ' -f1); \
 	actual=$$(sha1sum $(BIN) | cut -d' ' -f1); \
-	if [ "$$expected" = "$$actual" ]; then \
-		echo "OK  $(MODULE).prx matches checksums.sha1 ($$actual)"; \
-	else \
+	total=$$(wc -c < $(PRX)); \
+	code=$$(readelf -SW $(PRX) | awk '$$2==".text"{print strtonum("0x" $$6)}'); \
+	if [ "$$expected" != "$$actual" ]; then \
 		echo "FAIL $(MODULE).prx"; \
 		echo "  expected $$expected"; \
 		echo "  actual   $$actual"; \
-		echo "  original $$(wc -c < $(PRX)) bytes, built $$(wc -c < $(BIN)) bytes"; \
+		echo "  original $$total bytes, built $$(wc -c < $(BIN)) bytes"; \
 		cmp $(PRX) $(BIN) | head -3; \
 		exit 1; \
+	elif [ "$(SRC)" = "1" ]; then \
+		echo "OK  $(MODULE).prx matches checksums.sha1 ($$actual)"; \
+		echo "    $$code of $$total bytes ($$((100 * code / total))%) rebuilt from src/$(MODULE).c;"; \
+		echo "    the rest — import stubs, module tables, .data, ELF metadata — is still"; \
+		echo "    carried over from the shipped module, NOT reconstructed. See README."; \
+	else \
+		echo "OK  $(MODULE).prx matches checksums.sha1 ($$actual)"; \
+		echo "    rebuilt from the DISASSEMBLY: this verifies the splat config's layout,"; \
+		echo "    not the decompilation. Use SRC=1 to test src/$(MODULE).c."; \
 	fi
 
 clean:
