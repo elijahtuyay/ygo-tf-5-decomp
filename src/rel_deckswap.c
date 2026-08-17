@@ -454,6 +454,18 @@ void func_00008D70(void) {
     D_0001F980 = 0;
 }
 
+/* func_00009594 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00009594(void) {
+    extern int ehsys_2012884C();
+    extern s32 D_0001F980;
+    extern int func_000091A8();
+    extern int func_0000A1E4();
+
+    if (func_000091A8(0x15, 0, 2, func_0000A1E4) != 0) {
+        ehsys_2012884C((*(int *)((char *)D_0001F980 + 0x14)));
+    }
+}
+
 /* func_0000A1B8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_0000A1B8(int a0, unsigned short a1, int a2, int a3) {
     return func_0001283C(a0, &D_0001D930 + a1 * 6, a2, a3 + 1, 0xE8, 0);
@@ -626,6 +638,32 @@ s32 func_0000FF30(void) {
         var_s0 = func_0001101C(var_s0);
     }
     return var_s0;
+}
+
+/* func_00010290 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_00010290(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
+    unsigned short temp_a3;
+    unsigned short temp_a2;
+    char *p = (char *)arg0;
+
+    *(s16 *)(p + 0x4) = arg1;
+    *(s16 *)(p + 0x6) = arg2;
+    *(s16 *)(p + 0x8) = 0;
+    *(s32 *)(p + 0x0) = 0x33000000;
+    temp_a3 = (unsigned short)arg1 + (unsigned short)arg3;
+    *(s16 *)(p + 0x10) = temp_a3;
+    *(s16 *)(p + 0x12) = arg2;
+    *(s16 *)(p + 0x14) = 0;
+    *(s32 *)(p + 0xC) = 0x33000000;
+    temp_a2 = (unsigned short)arg2 + 1;
+    *(s16 *)(p + 0x1C) = arg1;
+    *(s16 *)(p + 0x1E) = temp_a2;
+    *(s16 *)(p + 0x20) = 0;
+    *(s32 *)(p + 0x18) = 0x19000000;
+    *(s16 *)(p + 0x28) = temp_a3;
+    *(s16 *)(p + 0x2A) = temp_a2;
+    *(s16 *)(p + 0x2C) = 0;
+    *(s32 *)(p + 0x24) = 0x19000000;
 }
 
 /* func_00010C90 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

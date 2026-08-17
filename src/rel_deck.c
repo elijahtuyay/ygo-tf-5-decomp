@@ -457,6 +457,15 @@ void func_00016ACC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_0001FEBC(arg0, (char *)&D_0002A914 + ((arg1 & 0xFFFF) + 1) * 6, arg2, arg3 + 1, 0x88, 0);
 }
 
+/* func_00016AFC — 14 words. MATCH 100% (shape: manual). */
+s32 func_00016AFC(s32 arg0, u16 arg1, s32 arg2, s32 arg3) {
+    extern char D_0002A958;
+    extern int func_0001FEBC();
+    char *p = *(char **)((*(int *)0xF768B4) + 0x14);
+    u16 val = *(u16 *)(p + 0xF4);
+    return func_0001FEBC(arg0, &D_0002A958 + arg1 * 6, arg2, arg3 + 1, val, 0);
+}
+
 /* func_00017290 — 2 words. MATCH 100% (shape: m2c). */
 void func_00017290(void) {
     func_0001708C();
@@ -580,6 +589,32 @@ void func_0001D4E0(void) {
 /* func_0001D7B4 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_0001D7B4(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+/* func_0001D96C — 0 words. MATCH 100% (shape: twin of func_00010290). */
+void func_0001D96C(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
+
+    unsigned short temp_a3;
+    unsigned short temp_a2;
+    char *p = (char *)arg0;
+
+    *(s16 *)(p + 0x4) = arg1;
+    *(s16 *)(p + 0x6) = arg2;
+    *(s16 *)(p + 0x8) = 0;
+    *(s32 *)(p + 0x0) = 0x33000000;
+    temp_a3 = (unsigned short)arg1 + (unsigned short)arg3;
+    *(s16 *)(p + 0x10) = temp_a3;
+    *(s16 *)(p + 0x12) = arg2;
+    *(s16 *)(p + 0x14) = 0;
+    *(s32 *)(p + 0xC) = 0x33000000;
+    temp_a2 = (unsigned short)arg2 + 1;
+    *(s16 *)(p + 0x1C) = arg1;
+    *(s16 *)(p + 0x1E) = temp_a2;
+    *(s16 *)(p + 0x20) = 0;
+    *(s32 *)(p + 0x18) = 0x19000000;
+    *(s16 *)(p + 0x28) = temp_a3;
+    *(s16 *)(p + 0x2A) = temp_a2;
+    *(s16 *)(p + 0x2C) = 0;
+    *(s32 *)(p + 0x24) = 0x19000000;
 }
 
 /* func_0001F328 — 4 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
@@ -801,6 +836,14 @@ void func_0002365C(void) {
     func_000235F8();
     ehsys_942B03D0(0xE, 0xE);
     ehsys_60B55A50(0xFF000000);
+}
+
+/* func_0002368C — 11 words. MATCH 100% (shape: manual). */
+void func_0002368C(void *arg0) {
+    extern int func_000229F0();
+    func_000229F0();
+    *(s16 *)((char *)arg0 + 0x30) = 0;
+    *(s16 *)((char *)arg0 + 0x32) = 0;
 }
 
 /* func_00023A54 — 2 words. MATCH 100% (shape: m2c). */

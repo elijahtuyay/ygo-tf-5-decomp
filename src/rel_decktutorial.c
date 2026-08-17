@@ -184,6 +184,18 @@ void func_00002488(void) {
     D_00029CCE &= 0xFFEF;
 }
 
+/* func_000024CC — 13 words. MATCH 100% (shape: manual, lever: duplicate the
+ * store in each branch rather than sharing it after the if/else -- sharing
+ * loses a word here, same lesson as rel_story's func_00002420). */
+void func_000024CC(void) {
+    u16 v = D_00029CCE;
+    if (v & 0x20) {
+        D_00029CCE = v & 0xFFDF;
+    } else {
+        D_00029CCE = v | 0x20;
+    }
+}
+
 /* func_00002500 — 22 words. MATCH 100% (shape: manual thunk). */
 void func_00002500(void) {
     s32 sp1C;
@@ -197,6 +209,19 @@ void func_00002500(void) {
 void func_000026B0(void) {
     ehsys_E1139F1A(&D_00029F6C);
     D_00029CCE &= 0xFFBF;
+}
+
+/* func_00002808 — 16 words. MATCH 100% (shape: manual). */
+void func_00002808(void) {
+    extern int ehsys_6367AE39();
+    extern int ehsys_5998BFD7();
+    extern short D_00028E92;
+    extern short D_00029CC2;
+
+    D_00028E92 = 0;
+    D_00029CC2 = 3;
+    ehsys_5998BFD7(1, 0xFF000000, 0x10);
+    ehsys_6367AE39(0x258);
 }
 
 /* func_00002848 — 27 words. MATCH 100% (verified). */
@@ -728,6 +753,32 @@ void func_0001D7AC(void) {
 s32 func_0001DA80(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
+/* func_0001DC38 — 0 words. MATCH 100% (shape: twin of func_00010290). */
+void func_0001DC38(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
+
+    unsigned short temp_a3;
+    unsigned short temp_a2;
+    char *p = (char *)arg0;
+
+    *(s16 *)(p + 0x4) = arg1;
+    *(s16 *)(p + 0x6) = arg2;
+    *(s16 *)(p + 0x8) = 0;
+    *(s32 *)(p + 0x0) = 0x33000000;
+    temp_a3 = (unsigned short)arg1 + (unsigned short)arg3;
+    *(s16 *)(p + 0x10) = temp_a3;
+    *(s16 *)(p + 0x12) = arg2;
+    *(s16 *)(p + 0x14) = 0;
+    *(s32 *)(p + 0xC) = 0x33000000;
+    temp_a2 = (unsigned short)arg2 + 1;
+    *(s16 *)(p + 0x1C) = arg1;
+    *(s16 *)(p + 0x1E) = temp_a2;
+    *(s16 *)(p + 0x20) = 0;
+    *(s32 *)(p + 0x18) = 0x19000000;
+    *(s16 *)(p + 0x28) = temp_a3;
+    *(s16 *)(p + 0x2A) = temp_a2;
+    *(s16 *)(p + 0x2C) = 0;
+    *(s32 *)(p + 0x24) = 0x19000000;
+}
 
 /* func_0001F5A4 — 4 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
 s32 func_0001F5A4(s32 arg0, s32 arg1, s32 arg2) {
@@ -769,6 +820,25 @@ void func_000200B8(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     func_0001A390(arg0, (arg1 & 0xFFFF) | ((arg2 & 0xFFFF) << 0x10), arg3, func_000168C0(0x800A));
 }
 
+/* func_00020A9C — 6 words. MATCH 100% (shape: manual, float field copy). */
+void *func_00020A9C(void *arg0, void *arg1) {
+    *(f32 *)((char *)arg0 + 0x0) = *(f32 *)((char *)arg1 + 0x0);
+    *(f32 *)((char *)arg0 + 0x4) = *(f32 *)((char *)arg1 + 0x4);
+    return arg0;
+}
+
+/* func_00020AB4 — 15 words. MATCH 100% (shape: manual). */
+void func_00020AB4(void) {
+    extern int ehsys_memset();
+    extern int ehsys_5DF04F49();
+    extern char D_0002C114;
+    extern s32 D_0002C26C;
+
+    D_0002C26C = 0;
+    ehsys_5DF04F49(&D_0002C114);
+    ehsys_memset(&D_0002C10C, 0, 0x184);
+}
+
 /* func_000210D8 — bulk-matched thunk into ehsys_3BB2BAC6. */
 s32 func_000210D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
@@ -787,6 +857,15 @@ s32 func_00021100(void) {
 /* func_000211A8 — 4 words. MATCH 100% (shape: m2c). */
 void func_000211A8(void) {
     D_0002C10C = 1;
+}
+
+/* func_00021270 — 13 words. MATCH 100% (shape: manual). */
+s32 func_00021270(void) {
+    extern s32 D_0002C10C;
+    if ((D_0002C10C != 3) && (D_0002C10C != 1)) {
+        return 0;
+    }
+    return 1;
 }
 
 /* func_000218A4 — 9 words. MATCH 100% (shape: m2c). */
