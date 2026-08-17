@@ -51,6 +51,37 @@ s32 func_00000000(s32 arg0) {
     }
     return 0;
 }
+/* func_00000038 — 44 words. MATCH 100% (shape: bool-fold). */
+void func_00000038(void) {
+    extern int ehsys_13A4081A();
+    extern int ehsys_C2E59A21();
+    extern int ehsys_frame_sync();
+    extern int ehsys_sceKernelChangeCurrentThreadAttr();
+    extern int func_00000038();
+    extern int func_000000E8();
+    extern int func_0000018C();
+    extern int func_00000238();
+    extern int func_00000240();
+    extern int func_00003C6C();
+    extern int func_000053AC();
+    extern int func_00005478();
+    extern int func_00005948();
+    ehsys_sceKernelChangeCurrentThreadAttr(0, 0x4000);
+    func_000000E8();
+    ehsys_frame_sync();
+    ehsys_C2E59A21(2, func_00000238, func_00000240);
+    if (func_00003C6C()) {
+        do {
+            func_00005478();
+            ehsys_frame_sync();
+        } while (!func_00005948());
+    }
+    ehsys_C2E59A21(0, NULL, NULL);
+    ehsys_13A4081A(1);
+    ehsys_frame_sync();
+    func_0000018C();
+    func_000053AC();
+}
 
 /* func_000000E8 — 41 words. MATCH 100% (shape: m2c). */
 void func_000000E8(void) {
@@ -377,6 +408,36 @@ void func_0000284C(void) {
     extern int ehsys_81857D14();
     extern int func_0000284C();
     ehsys_81857D14();
+}
+/* func_00002AD4 — 17 words. MATCH 100% (shape: m2c). */
+s32 func_00002AD4(s32 arg0) {
+    extern int func_00002358();
+    extern int func_00002A3C();
+    extern int func_00002AD4();
+    extern int func_00013B2C();
+    s32 sp1C;
+    s32 temp_s0;
+
+    temp_s0 = func_00002358();
+    func_00013B2C((*(int *)((char *)temp_s0 + 0x1C)), func_00002A3C(arg0), &sp1C);
+    return sp1C;
+}
+/* func_0000335C — 22 words. MATCH 100% (shape: bool-fold). */
+s32 func_0000335C(s32 arg0) {
+    extern int ehsys_5D9E6261();
+    extern int ehsys_7DFFA500();
+    extern int func_00002358();
+    extern int func_00002A88();
+    extern int func_0000335C();
+    extern int func_000033B4();
+    s32 temp_v0;
+
+    func_00002358();
+    temp_v0 = ehsys_7DFFA500(arg0, func_00002A88(arg0));
+    if (!func_000033B4(arg0, temp_v0)) {
+        return 0;
+    }
+    return ehsys_5D9E6261(temp_v0);
 }
 
 /* func_00003418 — 8 words. MATCH 100% (shape: m2c). */

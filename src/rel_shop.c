@@ -377,6 +377,16 @@ int func_0000B188(u16 a0) {
 u8 func_0000B1D0(u16 a0) {
     return *((u8 *)&D_0002305C + a0 * 12) & 3;
 }
+/* func_0000B3B4 — 16 words. MATCH 100% (shape: lead-dummy1). */
+s32 func_0000B3B4(s32 unused0, int arg1) {
+    extern int func_0000B1F8();
+    extern int func_0000B350();
+    extern int func_0000B3B4();
+    s32 temp_s0;
+
+    temp_s0 = func_0000B1F8() & 0xFFFF;
+    return (temp_s0 * (func_0000B350(arg1) & 0xFFFF)) & 0xFFFF;
+}
 
 /* func_0000B3F4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 u32 func_0000B3F4(u16 a0) {
