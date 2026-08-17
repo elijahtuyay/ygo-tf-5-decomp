@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 71 functions matched here. The rest of the module is not
+ * STATUS: 75 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -89,8 +89,13 @@ extern int func_00022B70();
 extern int func_000206E0();
 extern int func_000236B8();
 extern int func_000237FC();
+extern int ehsys_3BB2BAC6();
 
 /* ---- forward declarations ---- */
+s32 func_0001C118(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+s32 func_00020C90(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+s32 func_000232D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+s32 func_00023EAC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 s32 func_0000B440(s32 arg0);
 s32 func_0000C858(s32 arg0, s32 arg1, s32 arg2, int arg3);
 s32 func_0000D670(s32 arg0, s32 arg1);
@@ -321,6 +326,11 @@ s32 func_0001AE20(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
+/* func_0001C118 — bulk-matched thunk into ehsys_3BB2BAC6. */
+s32 func_0001C118(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
+}
+
 /* func_0001C134 — 2 words. MATCH 100% (shape: thunk, tail call w/ shifted arg). */
 s32 func_0001C134(s32 arg0) {
     return ehsys_5F00A362(arg0 << 6);
@@ -416,6 +426,11 @@ s32 func_00020B10(s32 arg0, s32 arg1) {
 /* func_00020B1C — 2 words. MATCH 100% (shape: m2c). */
 void func_00020B1C(void) {
 
+}
+
+/* func_00020C90 — bulk-matched thunk into ehsys_3BB2BAC6. */
+s32 func_00020C90(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
 }
 
 /* func_00020CAC — 13 words. MATCH 100% (shape: m2c). */
@@ -539,6 +554,11 @@ void func_00023100(void) {
     func_00023A64(&D_F76D7C);
 }
 
+/* func_000232D8 — bulk-matched thunk into ehsys_3BB2BAC6. */
+s32 func_000232D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
+}
+
 /* func_000235EC — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
 s32 func_000235EC(s32 arg0, s32 arg1) {
     return ehsys_97BB99A5(arg0, arg1, 0, 0);
@@ -616,6 +636,11 @@ void func_00023CE4(void) {
  * $a1 and tail-calls the unprototyped func_00023A6C with &D_F76EA0 in $a0). */
 void func_00023CF0(void *arg0) {
     func_00023A6C(&D_F76EA0, arg0);
+}
+
+/* func_00023EAC — bulk-matched thunk into ehsys_3BB2BAC6. */
+s32 func_00023EAC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
 }
 
 /* func_00024214 — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */

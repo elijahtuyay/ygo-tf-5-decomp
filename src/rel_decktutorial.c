@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 46 functions matched here. The rest of the module is not
+ * STATUS: 48 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -87,8 +87,11 @@ extern int func_0001DA94();
 extern int func_0001DC98();
 extern int func_0001E76C();
 extern int func_0001E8E4();
+extern int ehsys_3BB2BAC6();
 
 /* ---- forward declarations ---- */
+s32 func_0001CB4C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+s32 func_000210D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 int func_0001CB68(int arg0);
 int func_0001FF00(int a0, int a1, int a2, int a3);
 s32 func_0000353C(u16 *arg0, u16 *arg1);
@@ -347,6 +350,11 @@ s32 func_0001B854(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
+/* func_0001CB4C — bulk-matched thunk into ehsys_3BB2BAC6. */
+s32 func_0001CB4C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
+}
+
 /* func_0001CB68 — 2 words. MATCH 100% (shape: thunk, arg0<<6). */
 int func_0001CB68(int arg0) {
     return ehsys_5F00A362(arg0 << 6);
@@ -405,6 +413,11 @@ void func_0002004C(s32 arg0, s32 arg1, s32 arg2, int arg3) {
 /* func_000200B8 — 27 words. MATCH 100% (shape: m2c). */
 void func_000200B8(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     func_0001A390(arg0, (arg1 & 0xFFFF) | ((arg2 & 0xFFFF) << 0x10), arg3, func_000168C0(0x800A));
+}
+
+/* func_000210D8 — bulk-matched thunk into ehsys_3BB2BAC6. */
+s32 func_000210D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
 }
 
 /* func_000210F4 — 3 words. MATCH 100% (shape: m2c). */

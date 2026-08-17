@@ -158,6 +158,7 @@ extern int ehsys_60B55A50();
 extern int ehsys_942B03D0();
 extern int ehsys_98E07D26();
 extern int ehsys_A4AFF8E6();
+extern int ehsys_B2B9FEFA(void);
 extern int ehsys_B89D38DC(); /* called with 3 OR 4 args depending on site (see below) */
 extern int ehsys_B8AD96EA();
 extern int ehsys_BC8E65D7(int, int, int, int, int);
@@ -347,6 +348,11 @@ void func_0000BB8C(void) {
     }
 }
 
+/* func_0000BF34 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+u16 func_0000BF34(s32 a0) {
+    return *(u16 *)((char *)&D_0001E2E0 + (a0 << 5) + 0x20);
+}
+
 /* func_0000C29C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 s32 func_0000C29C(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
@@ -493,6 +499,11 @@ int func_00014FAC(int a0, int a1, int a2) {
 /* func_000169A4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_000169A4(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
+/* func_00016FAC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_00016FAC(void) {
+    return ((s32 *)ehsys_B2B9FEFA())[1];
 }
 
 /* func_00017C9C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

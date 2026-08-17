@@ -72,6 +72,7 @@ extern int ehsys_942B03D0();
 extern int ehsys_98E07D26();
 extern int ehsys_A4AFF8E6();
 extern int ehsys_CC7A2A21(int);
+extern int ehsys_B2B9FEFA(void);
 extern int ehsys_B89D38DC(); /* called with 3 OR 4 args depending on site (see below) */
 extern int ehsys_B8AD96EA();
 extern int ehsys_BC8E65D7(int, int, int, int, int);
@@ -481,6 +482,11 @@ int func_00015074(int a0, int a1, int a2) {
 /* func_00016A6C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00016A6C(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
+/* func_00017074 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_00017074(void) {
+    return ((s32 *)ehsys_B2B9FEFA())[1];
 }
 
 /* func_00017D64 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
