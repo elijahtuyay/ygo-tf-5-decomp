@@ -457,6 +457,13 @@ void func_00001EB8(s32 arg0) {
 s32 (*func_00001EC8(void))() {
     return func_0001C7FC;
 }
+/* func_0000207C — 17 words. MATCH 100% (verified). */
+extern void *func_000020C0(void *arg0, void *arg1);
+void func_0000207C(s32 arg0, int arg1) {
+    ehsys_memset(arg0, 0, 0x1E0);
+    func_000020C0((void *)arg0, (void *)arg1);
+}
+
 /* func_000020C0 — 34 words. MATCH 100% (shape: m2c). */
 void *func_000020C0(void *arg0, void *arg1) {
     extern int func_000020C0();
@@ -488,6 +495,14 @@ void func_00002544(s32 arg0) {
 void func_00002550(s32 arg0, int arg1) {
     func_00002EC8(arg1);
     func_00002F3C(arg0, arg1);
+}
+/* func_00002D58 — 0 words. MATCH 100% (shape: twin of func_000034DC). */
+s32 func_00002D58(s32 *arg0, s32 arg1) {
+
+    s32 temp_v0;
+
+    temp_v0 = (arg0[116] & (1 << arg1)) != 0;
+    return (temp_v0 ^ 1) & 0xFF;
 }
 
 /* func_00002EB0 — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

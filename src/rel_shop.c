@@ -599,6 +599,37 @@ void func_00016B74(void) {
     ehsys_06380DFA();
     ehsys_AB962AE7(0);
 }
+/* func_00016CB0 — 0 words. MATCH 100% (shape: twin of func_00014C6C). */
+int func_00016CB0(int a0, void *a1) {
+
+    int v0 = 0;
+
+    if (a1 == 0) {
+        return v0;
+    }
+    {
+        int count = *(u16 *) a1;
+        u16 *arr = (u16 *) ((char *) a1 + 2);
+        int key = a0 & 0xFFFF;
+        int lo = 0;
+        int hi = count - 1;
+
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            u16 v = arr[mid];
+            if (key == v) {
+                v0 = mid & 0xFFFF;
+                break;
+            }
+            if (v < key) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+    }
+    return v0;
+}
 
 /* func_00016D24 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00016D24(u16 lo, u16 hi, void *arr) {

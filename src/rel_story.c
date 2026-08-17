@@ -359,6 +359,15 @@ void func_00000D60(s32 arg0) {
     }
 }
 
+/* func_00000DA4 — 9 words. MATCH 100% (shape: manual). */
+void func_00000DA4(s32 arg0) {
+    extern s32 D_0002A660;
+    s32 *p = (s32 *)D_0002A660;
+    if ((arg0 >= 0) || (arg0 < 0x26)) {
+        *p = arg0;
+    }
+}
+
 /* func_00000DC8 — 4 words. MATCH 100% (shape: manual). */
 s32 func_00000DC8(void) {
     extern void *D_0002A660;
@@ -519,6 +528,86 @@ u16 func_000025FC(void) {
     return *(u16 *)((char *)func_00002358() + 0x28);
 }
 
+/* func_0000263C — 23 words. MATCH 100% (shape: manual, lever: pointer-global
+ * array — D_0002F128 is an array of 0x5C-byte structs; index*0x5C+base
+ * addressing works fine here despite resembling the D_00034580/84
+ * commutative-addu family). */
+extern s32 D_0002F128;
+extern int ehsys_783340AE();
+void func_0000263C(void) {
+    s32 i;
+    for (i = 0; i < 0x91; i++) {
+        ehsys_783340AE(*(int *)((char *)D_0002F128 + i * 0x5C + 0x1C), 0);
+    }
+}
+
+/* func_00002698 — 28 words. MATCH 100% (shape: manual). */
+extern int ehsys_92675210();
+extern int ehsys_64320906();
+void func_00002698(void) {
+    s32 i;
+    for (i = 0; i < 0x91; i++) {
+        char *e = (char *)D_0002F128 + i * 0x5C;
+        ehsys_92675210(*(int *)(e + 0x1C), 1);
+        ehsys_64320906(*(int *)(e + 0x1C), 0);
+    }
+}
+
+/* func_00002854 — 32 words. MATCH 100% (shape: manual, lever: a float
+ * argument needs an explicit prototype -- `extern int f(int, float);` --
+ * or K&R default-argument-promotion widens the literal to double and the
+ * whole call shape changes). */
+extern int ehsys_8CFD5EC1(int, float);
+extern int ehsys_9F4359AB();
+extern int ehsys_0EB054A9();
+void func_00002854(void) {
+    s32 i;
+    for (i = 0; i < 0x91; i++) {
+        char *e = (char *)D_0002F128 + i * 0x5C;
+        ehsys_8CFD5EC1(*(int *)(e + 0x1C), 2.5f);
+        ehsys_9F4359AB(*(int *)(e + 0x1C), 0);
+        ehsys_0EB054A9(*(int *)(e + 0x1C), 0);
+    }
+}
+
+/* func_000028D4 — 37 words. MATCH 100% (shape: manual, lever: re-read the
+ * field at each call site inside the loop rather than caching it in a
+ * local -- caching forces an extra callee-unsaved register + move per
+ * call that the target does not have). */
+extern int ehsys_481242AF();
+void func_000028D4(void) {
+    s32 i, j;
+    for (i = 0; i < 0x91; i++) {
+        char *e = (char *)D_0002F128 + i * 0x5C;
+        for (j = 0; j < 3; j++) {
+            ehsys_481242AF(*(int *)(e + 0x1C), j, 5);
+        }
+        ehsys_481242AF(*(int *)(e + 0x1C), 3, 1);
+    }
+}
+
+/* func_00002968 — 43 words. MATCH 100% (shape: manual). */
+extern int ehsys_2D976EA8();
+extern int ehsys_C78C87F4();
+extern int ehsys_E7FAA144();
+extern int ehsys_B75B23D0();
+extern int ehsys_F358A88E();
+extern int ehsys_DDAAA4FF();
+extern int ehsys_074A3951();
+void func_00002968(void) {
+    s32 i;
+    for (i = 0; i < 0x91; i++) {
+        char *e = (char *)D_0002F128 + i * 0x5C;
+        ehsys_2D976EA8(*(int *)(e + 0x1C), 0);
+        ehsys_C78C87F4(*(int *)(e + 0x1C), 0xFFFF);
+        ehsys_E7FAA144(*(int *)(e + 0x1C), 0);
+        ehsys_B75B23D0(*(int *)(e + 0x1C), 0);
+        ehsys_F358A88E(*(int *)(e + 0x1C), 0);
+        ehsys_DDAAA4FF(*(int *)(e + 0x1C), 0);
+        ehsys_074A3951(*(int *)(e + 0x1C), 0);
+    }
+}
+
 /* func_00002A14 — 10 words. MATCH 100% (shape: manual). */
 void func_00002A14(s32 unused0, s32 arg1) {
     *(s32 *)((char *)func_00002358() + 0x20) = arg1;
@@ -622,6 +711,31 @@ u8 func_00002E98(void) {
 /* func_00002EB8 — 8 words. MATCH 100% (shape: manual). */
 u8 func_00002EB8(void) {
     return *(u8 *)((char *)func_00002358() + 0x3F);
+}
+
+/* func_00002ED8 — 32 words. MATCH 100% (shape: manual). */
+void func_00002ED8(void) {
+    s32 i;
+    for (i = 0; i < 0x91; i++) {
+        char *e = (char *)D_0002F128 + i * 0x5C;
+        *(u16 *)(e + 0x40) = 0xFDE8;
+        *(u16 *)(e + 0x42) = 0xFDE8;
+        *(u16 *)(e + 0x46) = 0xFDE8;
+        *(u16 *)(e + 0x48) = 0xFDE8;
+        *(u16 *)(e + 0x4A) = 0xFDE8;
+        *(u16 *)(e + 0x28) = 0;
+        *(int *)(e + 0x2C) = 0;
+        *(int *)(e + 0x30) = 0;
+        *(int *)(e + 0x34) = 0;
+        *(int *)(e + 0x38) = 0;
+        *(unsigned char *)(e + 0x3C) = 0;
+        *(unsigned char *)(e + 0x3D) = 0;
+        *(unsigned char *)(e + 0x3E) = 0;
+        *(unsigned char *)(e + 0x3F) = 0;
+        *(u16 *)(e + 0x4C) = 0;
+        *(u16 *)(e + 0x4E) = 0;
+        *(u16 *)(e + 0x50) = 0;
+    }
 }
 
 /* func_00002F58 — 10 words. MATCH 100% (shape: manual). */
@@ -1183,6 +1297,13 @@ s32 func_0000AF30(void) {
     return *(s32 *)((char *)D_00034484 + 0x50);
 }
 
+/* func_0000AF40 — 10 words. MATCH 100% (shape: manual). */
+void func_0000AF40(s32 arg0) {
+    extern s32 D_00034484;
+    char *p = (char *)D_00034484;
+    *(unsigned char *)(p + 0x44) = (*(unsigned char *)(p + 0x44) & ~4) | ((arg0 & 1) << 2);
+}
+
 /* func_0000AF68 — 4 words. MATCH 100% (shape: manual). */
 void func_0000AF68(s32 arg0) {
     extern void *D_00034484;
@@ -1709,6 +1830,30 @@ void func_0000BD38(void) {
     ehsys_memset(D_00034F9C, 0, 0x68);
 }
 
+/* func_0000BD78 — 26 words. MATCH 100% (shape: manual, lever: a store can
+ * land in a jal's delay slot -- it executes BEFORE the callee runs, so
+ * "sb 0,0x65(s0)" ahead of "jal func_00011F04" in the disassembly means
+ * the store happens first in the C source, not last). */
+void func_0000BD78(void) {
+    extern s32 D_00034F9C;
+    extern int func_00002ED8();
+    extern int func_0000B528();
+    extern int func_0000B488();
+    extern int func_0000B4E8();
+    extern int func_0000B4F8();
+    extern int func_0000B548();
+    extern int func_00011F04();
+    void *p = (void *)D_00034F9C;
+    func_00002ED8();
+    func_0000B528(-1);
+    func_0000B488(0);
+    func_0000B4E8(0);
+    func_0000B4F8(0);
+    func_0000B548(0, 0, 0);
+    *(unsigned char *)((char *)p + 0x65) = 0;
+    func_00011F04(0x1E, 0);
+}
+
 /* func_0000C52C — 6 words. MATCH 100% (shape: manual). */
 s32 func_0000C52C(s32 arg0) {
     extern s32 D_00034588[];
@@ -2083,6 +2228,13 @@ void func_00010D1C(void) {
     D_00034590 = 0x79;
 }
 
+/* func_00011634 — 3 words. MATCH 100% (shape: twin-of-func_000116A4, via
+ * find_twins.py same-shape tier). */
+s32 func_00011634(void) {
+    extern s32 D_00034F98;
+    return D_00034F98;
+}
+
 /* func_0001167C — 5 words. MATCH 100% (shape: manual). */
 void func_0001167C(void) {
     extern char D_00034FA0;
@@ -2136,6 +2288,32 @@ void func_00011774(void) {
     extern int ehsys_088F768A();
     extern int func_00011774();
     ehsys_088F768A();
+}
+
+/* func_0001177C — 8 words. MATCH 100% (shape: manual). */
+void func_0001177C(s32 arg0, s32 arg1) {
+    extern s32 D_00034FA4;
+    char *p = (char *)D_00034FA4;
+    if (arg0 != 1) {
+        *(int *)(p + 0x0) = arg1;
+    } else {
+        *(int *)(p + 0x4) = arg1;
+    }
+}
+
+/* func_0001179C — 12 words. MATCH 100% (shape: manual). */
+void func_0001179C(s32 arg0) {
+    extern s32 D_00034FA4;
+    extern int func_000117CC();
+    if ((*(int *)((char *)D_00034FA4 + 0x4)) != arg0) {
+        func_000117CC(arg0);
+    }
+}
+
+/* func_00011998 — 2 words. MATCH 100% (shape: twin-of-func_000119A0). */
+s32 func_00011998(void) {
+    extern int ehsys_DF5CB459();
+    return ehsys_DF5CB459(0x5DC);
 }
 
 /* func_000119A0 — 2 words. MATCH 100% (shape: manual). */
@@ -2203,6 +2381,16 @@ void func_00011C4C(s32 arg0, s32 arg1, s32 arg2) {
     D_00034FD4 = arg2;
 }
 
+/* func_00011C68 — 18 words. MATCH 100% (shape: manual). */
+void func_00011C68(void) {
+    extern s32 D_00034FD0;
+    extern s32 D_00034FCC;
+    extern int ehsys_memset();
+    void *p = (void *)D_00034FD0;
+    ehsys_memset((void *)D_00034FCC, 0, 0xB8);
+    ehsys_memset(p, 0, 0x24);
+}
+
 /* func_00011D00 — 4 words. MATCH 100% (shape: manual). */
 s32 func_00011D00(void) {
     extern void *D_00034FD0;
@@ -2243,6 +2431,29 @@ s32 func_00011D58(s32 arg0) {
     s32 *p = (s32 *)D_00034FD0;
     *p = *p + arg0;
     return func_00013BE4();
+}
+
+/* func_000120D8 — 11 words. MATCH 100% (shape: manual). */
+s32 func_000120D8(void) {
+    extern s32 D_00034FD0;
+    extern int func_00013BE4();
+    int *p = (int *)D_00034FD0;
+    int v = *p;
+    int rem = (v - 1) % 0x13;
+    *p = v + (0x13 - rem);
+    return func_00013BE4(v);
+}
+
+/* func_0001222C — 3 words. MATCH 100% (shape: twin-of-func_000116A4). */
+void func_0001222C(s32 arg0) {
+    extern s32 D_00034FC0;
+    D_00034FC0 = arg0;
+}
+
+/* func_00012238 — 3 words. MATCH 100% (shape: twin-of-func_000116A4). */
+void func_00012238(s32 arg0) {
+    extern s32 D_00034FC4;
+    D_00034FC4 = arg0;
 }
 
 /* func_00012244 — 5 words. MATCH 100% (shape: manual). */
@@ -2378,6 +2589,12 @@ s32 func_00015760(s32 arg0) {
     extern s32 D_0002A55C[];
     extern int field_F560DE58();
     return field_F560DE58(D_0002A55C[arg0]);
+}
+
+/* func_00015778 — 3 words. MATCH 100% (shape: twin-of-func_000116A4). */
+void func_00015778(s32 arg0) {
+    extern s32 D_000351FC;
+    D_000351FC = arg0;
 }
 
 /* func_00015784 — 3 words. MATCH 100% (shape: manual). */

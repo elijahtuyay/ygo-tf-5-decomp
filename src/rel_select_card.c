@@ -584,10 +584,50 @@ int func_00014C6C(int a0, void *a1) {
     }
     return v0;
 }
+/* func_00014D30 — 0 words. MATCH 100% (shape: twin of func_00016D24). */
+int func_00014D30(u16 lo, u16 hi, void *arr) {
+
+    u32 target = (u32) lo | ((u32) hi << 16);
+    int count = *(int *) arr;
+    int idx;
+    for (idx = 0; idx < count; idx++) {
+        if (*(u32 *)((char *) arr + idx * 4 + 4) == target) {
+            return idx;
+        }
+    }
+    return -1;
+}
 
 /* func_00015074 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00015074(int a0, int a1, int a2) {
     return ehsys_B89D38DC(a0 << 6, a1 << 6, (0x1E0 - a0) << 6, a2);
+}
+
+/* func_0001565C -- MATCH 100% (shape: twin-of-rel_shop-func_00017650, via
+ * find_twins.py same-shape tier). */
+struct S1565C {
+    s16 lo;
+    s16 hi;
+    s32 w;
+    s16 f1C;
+    s16 f1E;
+};
+
+int func_0001565C(a0, a1, a2, a3)
+int a0, a1;
+u16 a2;
+void *a3;
+{
+    struct S1565C s;
+    extern s32 D_0001E524;
+    extern u16 D_0001E52A;
+    extern int func_00015310();
+    s.hi = (s16)(a1 >> 16);
+    s.f1C = (s16)(a2 * 17 + 0x33);
+    s.lo = (s16)a1;
+    s.w = D_0001E524;
+    s.f1E = D_0001E52A;
+    return func_00015310(a0, &s, a3);
 }
 
 /* func_00016A6C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

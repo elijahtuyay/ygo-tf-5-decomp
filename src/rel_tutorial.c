@@ -216,6 +216,12 @@ s32 func_00001578(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     return func_00001580(arg0, arg1, arg2, arg3, arg4, 6);
 }
 
+/* func_000014D8 — 8 words. MATCH 100% (shape: twin-of-func_00005BB4, via
+ * find_twins.py same-shape tier). */
+s32 func_000014D8(s32 arg0) {
+    return *(int *)((char *)func_000003EC(arg0) + 0x4);
+}
+
 /* func_00001B00 — 3 words. MATCH 100% (shape: hand). */
 void func_00001B00(s32 arg0, s32 arg1) {
     ehsys_97BB99A5(arg0, arg1, 0, 0);
@@ -327,6 +333,13 @@ s32 arg0;
 s32 func_000026A0(void) {
     return *(s32 *)0x1504C;
 }
+/* func_000028A0 — 0 words. MATCH 100% (shape: twin of func_000151F8). */
+void *func_000028A0(void *a0, void *a1) {
+
+    ((f32 *)a0)[0] = ((f32 *)a1)[0];
+    ((f32 *)a0)[1] = ((f32 *)a1)[1];
+    return a0;
+}
 
 /* func_00002EA0 — 7 words. MATCH 100% (shape: hand). */
 void func_00002EA0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
@@ -367,6 +380,18 @@ s32 func_00003054(void) {
         return 0;
     }
     return 1;
+}
+
+/* func_000031DC — 15 words. MATCH 100% (shape: twin-of-func_00003218-family,
+ * via find_twins.py same-shape tier; lever: materialize the base pointer
+ * via a local before the call, matching the func_0000B748 lesson). */
+void func_000031DC(void) {
+    extern char D_15058;
+    extern int func_00002F9C();
+    char *p = &D_15058;
+    if (func_00002F9C() == 0) {
+        *(int *)(p + 0x164) += 1;
+    }
 }
 
 /* func_00003688 — 9 words. MATCH 100% (shape: m2c). */
@@ -552,6 +577,13 @@ void func_00005970(void) {
 
 }
 
+/* func_00005544 — 2 words. MATCH 100% (shape: twin-of-func_00005834, via
+ * find_twins.py same-shape tier). */
+s32 func_00005544(void) {
+    extern int func_000013C8();
+    return func_000013C8(7);
+}
+
 /* func_00005A14 — 8 words. MATCH 100% (shape: manual, lever: duplicated return). */
 s32 func_00005A14(s32 unused0, s32 arg1) {
     if (arg1 <= 0) {
@@ -615,6 +647,13 @@ void func_00005BA0(void) {
 /* func_00005BA8 — 3 words. MATCH 100% (shape: hand). */
 void func_00005BA8(void *arg0, s32 arg1) {
     ehsys_memset(arg0, 0, arg1);
+}
+
+/* func_00005BB4 — 8 words. MATCH 100% (shape: twin-of-func_000014D8, via
+ * find_twins.py same-shape tier). */
+s32 func_00005BB4(void) {
+    extern void *ehsys_F5E3080C();
+    return *(int *)((char *)ehsys_F5E3080C() + 0x4);
 }
 
 /* func_00005BD4 — 9 words. MATCH 100% (shape: m2c). */
