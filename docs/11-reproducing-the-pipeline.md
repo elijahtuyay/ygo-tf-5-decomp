@@ -253,11 +253,18 @@ This list is the whole reason `rel_movie_viewer` and `rel_html_view` matched;
     makes MWCC materialise an address register the target does not have; the
     original duplicated the store in both branches, exactly as m2c drafts it
     before anyone "simplifies" it.
-42. **Commutative `addu` operand order is fixed by the compiler.** For
-    `base + index * stride` MWCC picks an order independent of source text
-    order, temporaries, statement splitting, or optimisation level. Roughly nine
-    `rel_story` near-misses die on this and it should be treated as a dead end,
-    like lever 27's argument evaluation order.
+42. **Two freshly-loaded globals in one address expression fix their own load
+    order.** This is the precise form of what first looked like a blanket
+    "commutative `addu`" dead end. `base + index * stride` is NOT generally
+    unreachable — six `rel_story` functions with exactly that shape matched once
+    someone tested instead of assuming. What is unreachable is the case where
+    BOTH the base and the index are globals loaded in the same expression
+    (`D_00034580` paired with `D_00034584`): MWCC emits the two loads in its own
+    order regardless of source order, temporaries, loop phrasing or
+    optimisation level. Roughly 96 `rel_story` functions sit behind this, and
+    ten structural variations on the closest one (equal word count, single
+    load-order diff) all produced the identical result. When one operand is a
+    live local instead — a loop induction variable, say — the wall disappears.
 
 43. **Each comparison operator has exactly one right idiom.** Lever 19
     generalises: `==`, `!=`, `<` and `>=` each need their own phrasing
