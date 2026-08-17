@@ -177,6 +177,45 @@ void func_00000B24(void) {
 
 }
 
+/* func_000012A4 — 2 words. MATCH 100% (shape: manual, lever: tail-jump thunk
+ * with a constant materialized in the branch delay slot — m2c drops both the
+ * $t0 passthrough register and the delay-slot immediate). */
+extern int func_000012AC();
+s32 func_000012A4(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_000012AC(arg0, arg1, arg2, arg3, arg4, 4);
+}
+
+/* func_00001550 — 2 words. MATCH 100% (shape: manual). */
+extern int func_00001580();
+s32 func_00001550(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_00001580(arg0, arg1, arg2, arg3, arg4, 1);
+}
+
+/* func_00001558 — 2 words. MATCH 100% (shape: manual). */
+s32 func_00001558(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_00001580(arg0, arg1, arg2, arg3, arg4, 2);
+}
+
+/* func_00001560 — 2 words. MATCH 100% (shape: manual). */
+s32 func_00001560(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_00001580(arg0, arg1, arg2, arg3, arg4, 3);
+}
+
+/* func_00001568 — 2 words. MATCH 100% (shape: manual). */
+s32 func_00001568(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_00001580(arg0, arg1, arg2, arg3, arg4, 4);
+}
+
+/* func_00001570 — 2 words. MATCH 100% (shape: manual). */
+s32 func_00001570(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_00001580(arg0, arg1, arg2, arg3, arg4, 5);
+}
+
+/* func_00001578 — 2 words. MATCH 100% (shape: manual). */
+s32 func_00001578(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    return func_00001580(arg0, arg1, arg2, arg3, arg4, 6);
+}
+
 /* func_00001B00 — 3 words. MATCH 100% (shape: hand). */
 void func_00001B00(s32 arg0, s32 arg1) {
     ehsys_97BB99A5(arg0, arg1, 0, 0);
