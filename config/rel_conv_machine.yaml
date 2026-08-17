@@ -33,10 +33,12 @@ options:
   base_path: ..
   target_path: iso_extracted/PSP_GAME/USRDIR/gmodule/rel_conv_machine.prx
   asm_path: asm/rel_conv_machine
+  asset_path: assets/rel_conv_machine   # per-module, or all 28 overwrite each other
   ld_script_path: build/rel_conv_machine.ld
   symbol_addrs_path: config/symbols/rel_conv_machine.txt   # import stub names (scripts/resolve_nids.py)
   compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (see docs/06)
   find_file_boundaries: True
+  emit_subalign: False   # SUBALIGN(16) would pad every blob and change the file size
   section_order: [".text", ".data", ".rodata", ".bss"]
 
 segments:
