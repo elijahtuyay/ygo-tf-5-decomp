@@ -14,7 +14,7 @@
  * Import names are resolved from the module's NID tables and are identical
  * across all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 27 functions matched here. The rest of the module is not
+ * STATUS: 32 functions matched here. The rest of the module is not
  * yet decompiled; build/auto/<module>.json has the status of every attempt.
  *
  * NOTE: assembled by scripts/assemble_module.py from drafts produced by
@@ -40,7 +40,7 @@ extern char D_00028E9C;
 extern char D_00029540;
 extern char D_00029CC4;
 extern char D_00029CCD;
-extern char D_00029CCE;
+extern u16 D_00029CCE;
 extern char D_00029CD0;
 extern char D_00029CD8;
 extern char D_00029D14;
@@ -134,7 +134,7 @@ void func_00001F98(void) {
 /* func_000020D4 — 17 words. MATCH 100% (shape: m2c). */
 void func_000020D4(void) {
     ehsys_memset(&D_00029CD8, 0, 0x28);
-    D_00029D14 = 0;
+    *(int *)&D_00029D14 = 0;
     D_00029CCE &= 0xFFFB;
 }
 
@@ -152,7 +152,7 @@ void func_0000242C(void) {
 /* func_00002488 — 17 words. MATCH 100% (shape: m2c). */
 void func_00002488(void) {
     ehsys_memset(&D_00029CD8, 0, 0x28);
-    D_00029D18 = 0;
+    *(int *)&D_00029D18 = 0;
     D_00029CCE &= 0xFFEF;
 }
 

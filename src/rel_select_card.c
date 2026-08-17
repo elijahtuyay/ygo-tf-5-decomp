@@ -55,6 +55,7 @@ extern char D_0001E5E0;
 extern char D_0001EB90;
 extern char D_0001F310;
 extern int D_0001E5E4;
+extern unsigned short D_0001EB54;
 extern int D_0001EB58;
 extern int D_0001EB7C;
 extern int ehsys_20E340D9(int, void *);
@@ -64,6 +65,7 @@ extern int ehsys_60B55A50();
 extern int ehsys_942B03D0();
 extern int ehsys_98E07D26();
 extern int ehsys_A4AFF8E6();
+extern int ehsys_CC7A2A21(int);
 extern int ehsys_B89D38DC(); /* called with 3 OR 4 args depending on site (see below) */
 extern int ehsys_B8AD96EA();
 extern int ehsys_BC8E65D7(int, int, int, int, int);
@@ -75,6 +77,7 @@ extern int ehsys_FE91A2EC();
 extern int func_000012A8();
 extern int func_000029A0(void *, int);
 extern int func_0000956C(int);
+extern int func_00014D7C(int);
 extern int func_0000FDBC();
 extern int func_00010FD4();
 extern int func_00011968(int, void *, int, int, int, int);
@@ -109,6 +112,20 @@ void func_0000120C(s32 arg0, int arg1, int arg2, int arg3) {
 /* func_000012A8 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_000012A8(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
+/* func_000012BC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+void func_000012BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 temp_s4;
+    int s4c;
+
+    s4c = (D_0001EB54 == 0) ? 0x99 : 0x98;
+    temp_s4 = ehsys_E58C0FDC(func_0000FDBC(0x8033), s4c);
+    ehsys_B8AD96EA(arg0);
+    ehsys_942B03D0(0xC, 0xC);
+    ehsys_60B55A50(0xFF000000);
+    func_000012A8(arg1, arg2 - 2, arg3, temp_s4);
+    ehsys_A4AFF8E6();
 }
 
 /* func_000017F4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
@@ -161,6 +178,23 @@ int func_00007F00(int a0, int a1, int a2) {
 /* func_00007F20 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00007F20(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
+}
+
+/* func_00008D5C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+int func_00008D5C(s32 arg0, s32 arg1) {
+    u16 code;
+    int shift;
+
+    code = arg0 & 0xFFFF;
+    if ((unsigned int)(code - 0x1386) < 3) {
+        shift = 1;
+    } else {
+        shift = func_00014D7C(ehsys_CC7A2A21(code) & 0xFFFF);
+    }
+    if ((arg1 & (1 << shift)) != 0) {
+        return 1;
+    }
+    return 0;
 }
 
 /* func_00008DBC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

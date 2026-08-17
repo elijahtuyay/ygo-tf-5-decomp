@@ -514,6 +514,15 @@ void func_0000C580(void) {
 
 }
 
+/* func_00013C00 — 9 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_00013C00(int arg0) {
+    int sp1C;
+    int sp18;
+
+    func_0000766C(arg0, &sp1C, &sp18);
+    return 0;
+}
+
 /* func_00015AB0 — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00015AB0(s32 arg0) {
     *(s32 *)0xB31594 = arg0;
@@ -542,6 +551,17 @@ void func_0001BF10(void) {
     ehsys_memset(&D_B31780, 0, 0x201420);
     *(s32 *)0xB32B88 = ehsys_291D6262(&D_B32B90, 0x150000, 0);
     *(s32 *)0xB32B8C = ehsys_47719795(&D_C82B90, 0xB0000, 0);
+}
+
+/* func_0001C54C — 24 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
+s32 func_0001C54C(int arg0, int arg1, int arg2) {
+    s32 temp_s0;
+
+    temp_s0 = ehsys_53D7C1EE();
+    ehsys_strcpy(arg2, &D_000259EC);
+    ehsys_strcat(arg2, temp_s0);
+    ehsys_strcat(arg2, (s32) &D_000258B8);
+    return 1;
 }
 
 /* func_0001C5AC — 3 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

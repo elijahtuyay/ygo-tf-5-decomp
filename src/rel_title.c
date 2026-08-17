@@ -6,21 +6,24 @@
  * Verification: scripts/mwcc_build.sh src/rel_title.c
  *               scripts/mwcc_diff.py asm/rel_title/text.s build/mwcc/rel_title.o
  *
- * Every function below is byte-identical to the shipped module — each was
- * accepted only on a MATCH verdict from scripts/mwcc_diff.py, and the whole
- * file is re-verified after assembly (scripts/assemble_module.py).
- * Functions are in ADDRESS ORDER, which is what the linker needs.
+ * Every function below is byte-identical to the shipped module: each was
+ * accepted only on a MATCH verdict, and the whole file is re-verified after
+ * assembly. Functions are in ADDRESS ORDER, which is what the linker needs.
  *
- * Import names are resolved from the module's NID tables and are identical
- * across all 28 modules — see docs/nids/README.md.
+ * Import names come from the module's NID tables and are identical across
+ * all 28 modules — see docs/nids/README.md.
  *
- * STATUS: 12 functions matched here. The rest of the module is not
- * yet decompiled; build/auto/<module>.json has the status of every attempt.
+ * Externs are declared inside each function on purpose: the same global is
+ * accessed at different widths by different functions, and a single
+ * file-scope declaration would change the load/store width and break the
+ * match. See scripts/assemble_module.py.
  *
- * NOTE: assembled by scripts/assemble_module.py from drafts produced by
- * scripts/auto_decomp.py (m2c + source reshapes + verification). Local names
- * are therefore still m2c's (temp_v0, var_s1); renaming them and adding
- * per-function commentary is safe as long as every edit is re-verified.
+ * STATUS: 12 functions matched. build/auto/rel_title.json has the
+ * status of every attempt, including what the rest of the module still needs.
+ *
+ * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,
+ * so local names are still m2c's (temp_v0, var_s1). Renaming them and adding
+ * commentary is safe as long as every edit is re-verified.
  */
 
 typedef signed char s8;
@@ -35,80 +38,81 @@ typedef float f32;
 typedef double f64;
 #define NULL 0
 
-/* ---- imports and globals ---- */
-extern int ehsys_BC8E65D7();
 
-/* ---- forward declarations ---- */
-void func_0000D420(int a, int b, int c, int d);
-void func_0000F028(int a, int b, int c, int d);
-void func_00017374(void);
-void func_0001A2E4(int a, int b, int c, int d);
-void func_0001D46C(void);
-void func_0001D650(void);
-void func_00029470(int a, int b, int c, int d);
-void func_0002B944(int a, int b, int c, int d);
-void func_00040C30(void);
-void func_00040C38(void);
-void func_00040C40(void);
-void func_00040C48(void);
-
-/* func_0000D420 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+/* func_0000D420 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0000D420(int a, int b, int c, int d) {
+    extern int ehsys_BC8E65D7();
+    extern int func_0000D420();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
-/* func_0000F028 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+/* func_0000F028 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0000F028(int a, int b, int c, int d) {
+    extern int ehsys_BC8E65D7();
+    extern int func_0000F028();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
 /* func_00017374 — 2 words. MATCH 100% (shape: m2c). */
 void func_00017374(void) {
+    extern int func_00017374();
 
 }
 
-/* func_0001A2E4 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+/* func_0001A2E4 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0001A2E4(int a, int b, int c, int d) {
+    extern int ehsys_BC8E65D7();
+    extern int func_0001A2E4();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
 /* func_0001D46C — 2 words. MATCH 100% (shape: m2c). */
 void func_0001D46C(void) {
+    extern int func_0001D46C();
 
 }
 
 /* func_0001D650 — 2 words. MATCH 100% (shape: m2c). */
 void func_0001D650(void) {
+    extern int func_0001D650();
 
 }
 
-/* func_00029470 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+/* func_00029470 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_00029470(int a, int b, int c, int d) {
+    extern int ehsys_BC8E65D7();
+    extern int func_00029470();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
-/* func_0002B944 — 5 words. MATCH 100% (shape: thunk, arg0-2 <<6). */
+/* func_0002B944 — 5 words. MATCH 100% (shape: thunk+1). */
 void func_0002B944(int a, int b, int c, int d) {
+    extern int ehsys_BC8E65D7();
+    extern int func_0002B944();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
 
 /* func_00040C30 — 2 words. MATCH 100% (shape: m2c). */
 void func_00040C30(void) {
+    extern int func_00040C30();
 
 }
 
 /* func_00040C38 — 2 words. MATCH 100% (shape: m2c). */
 void func_00040C38(void) {
+    extern int func_00040C38();
 
 }
 
 /* func_00040C40 — 2 words. MATCH 100% (shape: m2c). */
 void func_00040C40(void) {
+    extern int func_00040C40();
 
 }
 
 /* func_00040C48 — 2 words. MATCH 100% (shape: m2c). */
 void func_00040C48(void) {
+    extern int func_00040C48();
 
 }
 

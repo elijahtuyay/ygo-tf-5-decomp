@@ -51,59 +51,38 @@ def module_blurb(module):
     return ""
 
 
+def decls_for(src, defined, symtab):
+    """The declarations one function needs, as block-scope externs."""
+    out = []
+    for n in sorted(set(re.findall(r"\b\w+\b", src))):
+        if n in defined:
+            # A SIBLING defined later in this file. Declare it here at block
+            # scope in the same K&R form the trial used — otherwise the call sees
+            # the real prototype, arguments get promoted differently, and a
+            # function that matched in isolation regresses.
+            out.append(f"    extern int {n}();")
+            continue
+        if n in symtab:
+            out.append(f"    extern int {n}();" if symtab[n] == "func"
+                       else f"    extern char {n};")
+        elif re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n):
+            out.append(f"    extern char {n};")
+        elif re.match(r"^func_[0-9A-F]{8}$", n):
+            out.append(f"    extern int {n}();")
+    return out
+
+
 def build(module, entries, symtab):
     """Assemble a source file from the given verified functions.
 
-    Each function was verified in a trial file that declared globals with ONE
-    flavour (char / void * / int — see DATA_FLAVOURS in auto_decomp.py). A
-    combined file can only declare each global once, so a function verified
-    against `extern int D_X;` regresses if a neighbour forced `extern char D_X;`.
-    Globals are therefore declared with the flavour the majority of their users
-    needed, and the minority users are dropped by the caller's verify loop."""
+    Declarations go INSIDE each function body, not at file scope. Every function
+    was verified in a trial file with its own declarations, and MWCC lets two
+    functions declare the same symbol with different types at block scope — so
+    this is what keeps a function that matched in isolation matching once its
+    neighbours are added. Declaring them once at file scope forced a single type
+    per symbol and silently regressed roughly half of them.
+    """
     defined = {e["func"] for e in entries}
-    decls, fwd = set(), set()
-    want = {}
-    for e in entries:
-        fl = e.get("flavour", "char")
-        for n in re.findall(r"\b\w+\b", e["src"]):
-            if n not in defined and (n in symtab or re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n)):
-                want.setdefault(n, Counter())[fl] += 1
-    # A global can only be declared once, so a function verified against
-    # `extern void * D_X;` cannot coexist with neighbours that need
-    # `extern char D_X;`. Drop the minority users up front — letting the compile
-    # error decide blames whole regions of the file and throws away far more.
-    keep = []
-    for e in entries:
-        fl = e.get("flavour", "char")
-        conflict = any(want.get(n) and want[n].most_common(1)[0][0] != fl
-                       for n in re.findall(r"\b\w+\b", e["src"])
-                       if n not in defined and (n in symtab or
-                                                re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n)))
-        if not conflict:
-            keep.append(e)
-    entries = keep
-    defined = {e["func"] for e in entries}
-
-    for e in entries:
-        for n in re.findall(r"\b\w+\b", e["src"]):
-            if n in defined:
-                continue
-            if n in symtab:
-                decls.add(f"extern int {n}();" if symtab[n] == "func"
-                          else f"extern {want[n].most_common(1)[0][0]} {n};")
-            elif re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n):
-                decls.add(f"extern {want[n].most_common(1)[0][0]} {n};")
-            elif re.match(r"^func_[0-9A-F]{8}$", n):
-                decls.add(f"extern int {n}();")
-        m = re.match(r"\s*(\w[\w \*]*?)\s*\b" + e["func"] + r"\s*\(([^)]*)\)", e["src"])
-        if m:
-            # K&R form, NO parameter list. Each function was verified in a trial
-            # file where its siblings were declared `extern int f();`; emitting a
-            # prototyped forward declaration here changes how calls to it compile
-            # (argument checking/promotion) and silently regresses functions that
-            # matched in isolation.
-            fwd.add(f"{m.group(1)} {e['func']}();")
-
     head = [
         "/*",
         f" * {module}.prx — reconstructed code (matching decompilation)",
@@ -113,21 +92,24 @@ def build(module, entries, symtab):
         f" * Verification: scripts/mwcc_build.sh src/{module}.c",
         f" *               scripts/mwcc_diff.py asm/{module}/text.s build/mwcc/{module}.o",
         " *",
-        " * Every function below is byte-identical to the shipped module — each was",
-        " * accepted only on a MATCH verdict from scripts/mwcc_diff.py, and the whole",
-        " * file is re-verified after assembly (scripts/assemble_module.py).",
-        " * Functions are in ADDRESS ORDER, which is what the linker needs.",
+        " * Every function below is byte-identical to the shipped module: each was",
+        " * accepted only on a MATCH verdict, and the whole file is re-verified after",
+        " * assembly. Functions are in ADDRESS ORDER, which is what the linker needs.",
         " *",
-        " * Import names are resolved from the module's NID tables and are identical",
-        " * across all 28 modules — see docs/nids/README.md.",
+        " * Import names come from the module's NID tables and are identical across",
+        " * all 28 modules — see docs/nids/README.md.",
         " *",
-        f" * STATUS: {len(entries)} functions matched here. The rest of the module is not",
-        " * yet decompiled; build/auto/<module>.json has the status of every attempt.",
+        " * Externs are declared inside each function on purpose: the same global is",
+        " * accessed at different widths by different functions, and a single",
+        " * file-scope declaration would change the load/store width and break the",
+        " * match. See scripts/assemble_module.py.",
         " *",
-        " * NOTE: assembled by scripts/assemble_module.py from drafts produced by",
-        " * scripts/auto_decomp.py (m2c + source reshapes + verification). Local names",
-        " * are therefore still m2c's (temp_v0, var_s1); renaming them and adding",
-        " * per-function commentary is safe as long as every edit is re-verified.",
+        f" * STATUS: {len(entries)} functions matched. build/auto/{module}.json has the",
+        " * status of every attempt, including what the rest of the module still needs.",
+        " *",
+        " * Assembled by scripts/assemble_module.py from scripts/auto_decomp.py drafts,",
+        " * so local names are still m2c's (temp_v0, var_s1). Renaming them and adding",
+        " * commentary is safe as long as every edit is re-verified.",
         " */",
         "",
         "typedef signed char s8;",
@@ -142,19 +124,35 @@ def build(module, entries, symtab):
         "typedef double f64;",
         "#define NULL 0",
         "",
-        "/* ---- imports and globals ---- */",
     ]
-    body = ["", "/* ---- forward declarations ---- */"] + sorted(fwd) + [""]
-    owner = {}                      # 1-based source line -> function that owns it
-    n = len(head) + len(decls) + len(body)
+    # File-scope forward declarations for the module's OWN functions: a call that
+    # precedes its definition would otherwise be implicitly declared `int f()` and
+    # clash with the real definition. K&R form (empty parens) stays compatible
+    # with every definition and does not change call codegen.
+    fwd = []
+    for e in []:
+        # the exact signature: a K&R declaration is incompatible with a definition
+        # whose parameters are narrower than int (s16/s8 promote), which MWCC
+        # rejects outright
+        m = re.match(r"\s*([\w \*]+?\s+" + e["func"] + r"\s*\([^)]*\))", e["src"], re.S)
+        fwd.append((m.group(1).strip() if m else f"int {e['func']}()") + ";")
+    head += fwd + [""]
+
+    body, owner = [], {}
+    n = len(head)
     for e in sorted(entries, key=lambda e: int(e["func"][5:], 16)):
+        src = e["src"]
+        m = re.search(r"\{", src)
+        if not m:
+            continue
+        injected = src[:m.end()] + "\n" + "\n".join(decls_for(src, defined, symtab)) + src[m.end():]
         chunk = [f"/* {e['func']} — {e['words']} words. MATCH 100% "
-                 f"(shape: {e['shape']}). */", e["src"], ""]
+                 f"(shape: {e['shape']}). */", injected, ""]
         for i in range(sum(len(c.split("\n")) for c in chunk)):
             owner[n + i + 1] = e["func"]
         n += sum(len(c.split("\n")) for c in chunk)
         body += chunk
-    return "\n".join(head + sorted(decls) + body) + "\n", owner
+    return "\n".join(head + body) + "\n", owner
 
 
 def verify_count(module, path):

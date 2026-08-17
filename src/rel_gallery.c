@@ -37,16 +37,27 @@ typedef double f64;
 
 /* ---- imports and globals ---- */
 extern char D_0000A840;
+extern s16 D_0000A318[];
+extern s16 D_000098A0[];
 extern int ehsys_B4471B5E();
 extern int func_00000188();
 extern int func_00003F30();
+extern s32 ehsys_C6C15111(s32 arg0, s16 *arg1, s32 arg2);
+extern void ehsys_E58C0FDC(s32 arg0, s32 arg1);
+extern s32 func_00003D94(s32 *arg0, s32 arg1);
 
 /* ---- forward declarations ---- */
 s32 func_00000150(s32 arg0);
 void func_00000228(void);
+s32 func_00000720(s32 arg0, s32 arg1);
 void func_00001818(void);
+s32 func_00001D00(s32 *arg0);
 void func_00003204(void);
+void func_00003510(s32 *arg0, s32 arg1);
+void func_00003D7C(s32 arg0, s32 *arg1, s32 arg2);
+s32 func_00003D84(s32 *arg0, s32 arg1);
 void func_00003F94(void);
+s32 func_000041DC(s32 *arg0, s32 arg1);
 void func_000042B8(void);
 void func_00004314(void);
 void func_00004394(void);

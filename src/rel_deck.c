@@ -195,6 +195,11 @@ s32 func_0000EB20(void) {
     return 0;
 }
 
+/* func_0001187C — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0001187C(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
 /* func_00012DC4 — 14 words. MATCH 100% (shape: m2c). */
 s32 func_00012DC4(u16 *arg0) {
     u16 temp_v1;
@@ -219,6 +224,20 @@ u32 func_00013070(void) {
 /* func_00013098 — 8 words. MATCH 100% (shape: m2c). */
 s32 func_00013098(void) {
     return func_00013070() != 0;
+}
+
+/* func_00014E50 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_00014E50(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_00015AEC — 6 words. MATCH 100% (shape: m2c; return value forces slt instead of blez). */
+s32 func_00015AEC(s32 *arg0, s32 arg1) {
+    s32 temp = 0 < arg1;
+    if (temp) {
+        *arg0 = arg1;
+    }
+    return temp;
 }
 
 /* func_00015B04 — 4 words. MATCH 100% (shape: m2c). */
@@ -248,9 +267,54 @@ void func_00018638(s32 arg0, int arg1, int arg2, int arg3) {
     ehsys_A4AFF8E6();
 }
 
+/* func_000186D4 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_000186D4(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_00018C44 — 4 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_00018C44(s32 arg0, s32 arg1, s32 arg2) {
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
+}
+
+/* func_0001AE20 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0001AE20(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_0001C134 — 2 words. MATCH 100% (shape: thunk, tail call w/ shifted arg). */
+s32 func_0001C134(s32 arg0) {
+    return ehsys_5F00A362(arg0 << 6);
+}
+
+/* func_0001D4CC — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0001D4CC(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
 /* func_0001D4E0 — 22 words. MATCH 100% (shape: m2c). */
 void func_0001D4E0(void) {
     func_0001E644(func_0001E4CC(func_0001D9CC(func_0001D6AC(func_0001D7C8(func_0001D618(func_0001D538()), (u8) D_0002E120 & 0xF)))));
+}
+
+/* func_0001D7B4 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0001D7B4(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_0001F328 — 4 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0001F328(s32 arg0, s32 arg1, s32 arg2) {
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6);
+}
+
+/* func_0001F890 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_0001F890(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_0001FC98 — 2 words. MATCH 100% (shape: thunk, tail call w/ fixed arg). */
+s32 func_0001FC98(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0, arg1, arg2, arg3, -1);
 }
 
 /* func_0001FCA0 — 27 words. MATCH 100% (shape: m2c). */
@@ -278,6 +342,11 @@ void func_0001FE50(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     func_0001995C(arg0, (arg1 & 0xFFFF) | ((arg2 & 0xFFFF) << 0x10), arg3, func_00015E5C(0x800A));
 }
 
+/* func_00020B10 — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
+s32 func_00020B10(s32 arg0, s32 arg1) {
+    return ehsys_97BB99A5(arg0, arg1, 0, 0);
+}
+
 /* func_00020B1C — 2 words. MATCH 100% (shape: m2c). */
 void func_00020B1C(void) {
 
@@ -299,6 +368,11 @@ void func_00020E5C(void) {
     ehsys_60B55A50(0xFF000000);
 }
 
+/* func_00022134 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_00022134(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
 /* func_00022148 — 16 words. MATCH 100% (shape: m2c). */
 void func_00022148(void) {
     ehsys_D853F15C(1);
@@ -306,6 +380,11 @@ void func_00022148(void) {
     ehsys_C9D9E989(1);
     ehsys_942B03D0(0xF, 0xF);
     ehsys_60B55A50(0xFF000000);
+}
+
+/* func_00022188 — 2 words. MATCH 100% (shape: thunk, tail call w/ fixed arg). */
+s32 func_00022188(void) {
+    return ehsys_C792FA38(0);
 }
 
 /* func_00022264 — 4 words. MATCH 100% (shape: m2c). */
@@ -316,6 +395,11 @@ s32 func_00022264(s32 arg0) {
 /* func_00022274 — 4 words. MATCH 100% (shape: m2c). */
 s32 func_00022274(s32 arg0) {
     return arg0 - *(s32 *)0xF76BB8;
+}
+
+/* func_00022960 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_00022960(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
 /* func_00022974 — 13 words. MATCH 100% (shape: m2c). */
@@ -342,6 +426,16 @@ void func_00022B68(void) {
 /* func_000230F0 — 4 words. MATCH 100% (shape: m2c). */
 void func_000230F0(void) {
     *(s32 *)0xF76D64 = 1;
+}
+
+/* func_00023078 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */
+s32 func_00023078(s32 arg0, s32 arg1, s32 arg2, int arg3) {
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
+
+/* func_000235EC — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
+s32 func_000235EC(s32 arg0, s32 arg1) {
+    return ehsys_97BB99A5(arg0, arg1, 0, 0);
 }
 
 /* func_000235F8 — 13 words. MATCH 100% (shape: m2c). */
@@ -389,6 +483,11 @@ void func_00023A6C(void) {
 /* func_00023C7C — 3 words. MATCH 100% (shape: m2c). */
 void func_00023C7C(void) {
     func_000236B8(&D_F76EA0);
+}
+
+/* func_00024214 — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
+s32 func_00024214(s32 arg0, s32 arg1) {
+    return ehsys_97BB99A5(arg0, arg1, 0, 0);
 }
 
 /* func_00024220 — 18 words. MATCH 100% (shape: m2c). */
