@@ -740,6 +740,17 @@ u8 func_000050F4(void) {
     return !D_000539D4;
 }
 
+/* func_0000510C — 10 words. MATCH 100% (verified). */
+void func_0000510C(s32 *arg0) {
+    extern s32 D_000539DC;
+    char *a1 = (char *)&D_000539D4;
+    s32 v = *arg0;
+    D_000539DC = v;
+    if (v != 0) {
+        *(s32 *)(a1 + 4) = 1;
+    }
+}
+
 /* func_000051F0 — 5 words. MATCH 100% (verified). */
 int func_000051F0(void) {
     return ehsys_memset(&D_000539EC, 0, 0x14);
@@ -1117,6 +1128,38 @@ int func_0000A958(void) {
 void func_0000A9A0(void) {
     func_0000A9C4();
     func_0000A958();
+}
+
+/* func_0000AE44 — 24 words. MATCH 100% (verified). */
+extern s32 ehsys_85F89FE8(s32);
+extern s32 func_0000B9CC(s32, void *);
+extern s32 ehsys_89812D8A(s32);
+void func_0000AE44(void) {
+    extern s32 D_00055044;
+    char *s0 = (char *)&D_00054C20;
+    if (D_00055044 != 0) {
+        s32 v0 = ehsys_DFCA450B(1, 0);
+        v0 = ehsys_85F89FE8(v0);
+        v0 = func_0000B9CC(v0, s0 + 0x448);
+        v0 = ehsys_89812D8A(v0);
+        ehsys_1EC5342B(v0);
+    }
+}
+
+/* func_0000AEA4 — 24 words. MATCH 100% (verified). */
+void func_0000AEA4(void) {
+    extern s32 ehsys_85F89FE8(s32);
+    extern s32 func_0000B9CC(s32, void *);
+    extern s32 ehsys_89812D8A(s32);
+    extern s32 D_00055044;
+    char *s0 = (char *)&D_00054C20;
+    if (D_00055044 != 0) {
+        s32 v0 = ehsys_DFCA450B(1, 0);
+        v0 = ehsys_85F89FE8(v0);
+        v0 = func_0000B9CC(v0, s0 + 0x440);
+        v0 = ehsys_89812D8A(v0);
+        ehsys_1EC5342B(v0);
+    }
 }
 
 /* func_0000AFB8 — 6 words. MATCH 100% (verified). */
@@ -2322,6 +2365,14 @@ void func_00030CA0(void) {
 /* func_00030D28 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_00030D28(s32 *arg0) {
     return arg0[3];
+}
+
+/* func_00030D30 — 9 words. MATCH 100% (verified). */
+void *func_00030D30(s32 a0, s32 a1, s32 a2) {
+    s32 off1 = *(s32 *)((a1 << 3) + a0 + 0x14);
+    s32 p = off1 + a0;
+    s32 off2 = *(s32 *)(p + a2 * 8 + 4);
+    return (void *)(off2 + a0);
 }
 
 /* func_00030D54 — 2 words. MATCH 100% (shape: m2c). */
