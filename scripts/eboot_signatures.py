@@ -31,10 +31,22 @@ Output columns (nids/ehsys_signatures.csv):
     stack_args   1 if the body reads incoming stack args (arity > 8)
     returns      1 if $v0 is written in the body
     leaf         1 if it makes no calls at all
-    sdk_calls    ; separated SDK functions it calls directly (behaviour hint)
+    sdk_calls    ; separated SDK functions it calls DIRECTLY
+    reaches      ; separated SDK libraries it reaches TRANSITIVELY, propagated
+                 up the call graph — the usable behaviour hint, since only ~100
+                 exports call an SDK import directly but ~360 reach one
+    sdk_reexport non-empty when this export is not engine code at all but a
+                 re-exported PSP SDK import, as "Lib:name(paramkinds)"
+
+A NOTE ON THE RE-EXPORTS, which is the most immediately useful thing here: the
+engine re-exports 139 SDK imports under their ORIGINAL SDK NID. ehsys_109F50BC
+is 0x109F50BC is sceIoOpen. So any module calling one of these NIDs is calling
+the PSP SDK function directly through the engine, and the module source should
+name it sceIoOpen rather than ehsys_109F50BC — no address mapping required.
 """
 import argparse
 import csv
+import glob
 import os
 import re
 import struct
@@ -75,17 +87,57 @@ def import_stubs(d):
     return out
 
 
+NID_DB_ENTRY = re.compile(
+    r'\{\s*(0[xX][0-9A-Fa-f]{8})\s*,[^,]*,\s*"([A-Za-z_]\w*)"\s*,'
+    r"\s*'(.)'\s*,\s*\"([^\"]*)\"")
+
+
 def sdk_names():
-    """NID -> name, from nids/sdk.csv (the ones already verified)."""
+    """NID -> (name, ret, params) for PSP SDK functions.
+
+    Two sources. nids/sdk.csv holds the handful already hash-verified by
+    scripts/resolve_nids.py. tools/nid_db/*.cpp are PPSSPP's HLE tables, which
+    carry ~450 more entries INCLUDING a type signature: the trailing
+    {..., 'i', "ix"} fields are the return kind and the parameter kinds, so an
+    engine function that re-exports one of these gets a real prototype rather
+    than just a name.
+    """
     out = {}
+    for path in sorted(glob.glob(os.path.join(ROOT, "tools/nid_db/*.cpp"))):
+        for m in NID_DB_ENTRY.finditer(open(path, errors="replace").read()):
+            out[int(m.group(1), 16)] = (m.group(2), m.group(3), m.group(4))
     p = os.path.join(ROOT, "nids/sdk.csv")
     if os.path.exists(p):
         for r in csv.DictReader(open(p)):
-            try:
-                out[int(r["nid"], 16)] = r["name"]
+            try:  # locally verified names win over the imported database
+                nid = int(r["nid"], 16)
+                out[nid] = (r["name"],) + out.get(nid, ("", "", ""))[1:]
             except Exception:
                 pass
     return out
+
+
+def propagate_behaviour(facts):
+    """Spread SDK-library usage up the call graph to a fixed point.
+
+    Only 63 of the engine's exports call an SDK import DIRECTLY; the rest sit
+    one or more hops above one that does. Knowing that a function eventually
+    reaches IoFileMgrForUser or sceSasCore is most of what you need to name it,
+    so the label is propagated caller-wards until nothing changes. Libraries,
+    not individual functions, are the useful granularity at distance: "this
+    eventually touches file I/O" is informative, "this eventually reaches
+    sceIoLseek" is noise five hops up.
+    """
+    changed, rounds = True, 0
+    while changed and rounds < 100:
+        changed, rounds = False, rounds + 1
+        for f in facts.values():
+            for c in f["callees"]:
+                t = facts.get(c)
+                if t and not t["libs"] <= f["libs"]:
+                    f["libs"] |= t["libs"]
+                    changed = True
+    return rounds
 
 
 def parse_functions():
@@ -130,6 +182,7 @@ def analyse(body, stubs, names):
     """
     written, argc, returns, calls, sdk = set(), 0, 0, 0, []
     written_args, tail_target = set(), None
+    callees, libs = [], set()
     for mnem, ops in body:
         toks = re.findall(r"\$\w+", ops)
         writes = bool(WRITES_FIRST_OPERAND.match(mnem)) and bool(toks)
@@ -155,10 +208,14 @@ def analyse(body, stubs, names):
                 tail_target = v
             if v in stubs:
                 lib, nid = stubs[v].split(":")
-                sdk.append(names.get(int(nid, 16), f"{lib}_{nid[2:]}"))
+                libs.add(lib)
+                sdk.append(names.get(int(nid, 16), (f"{lib}_{nid[2:]}",))[0])
+            elif v is not None:
+                callees.append(v)
         elif mnem == "jalr":
             calls += 1
-    return argc, written_args, tail_target, returns, (1 if calls == 0 else 0), sdk
+    return (argc, written_args, tail_target, returns,
+            (1 if calls == 0 else 0), sdk, callees, libs)
 
 
 def propagate_tail_calls(facts):
@@ -205,12 +262,14 @@ def main():
     # target is often an internal function, and its arity is what we need.
     facts = {}
     for fn, vram, body in parse_functions():
-        argc, warg, tail, returns, leaf, sdk = analyse(body, stubs, names)
+        argc, warg, tail, returns, leaf, sdk, callees, libs = analyse(body, stubs, names)
         facts[vram] = {"func": fn, "words": len(body), "argc": argc,
                        "written_args": warg, "tail_target": tail,
-                       "returns": returns, "leaf": leaf, "sdk": sdk}
-    rounds = propagate_tail_calls(facts)
-    print(f"tail-call arity propagation converged in {rounds} rounds "
+                       "returns": returns, "leaf": leaf, "sdk": sdk,
+                       "callees": callees, "libs": libs}
+    r1 = propagate_tail_calls(facts)
+    r2 = propagate_behaviour(facts)
+    print(f"arity propagation converged in {r1} rounds, behaviour in {r2}, "
           f"over {len(facts)} functions")
 
     rows = []
@@ -223,7 +282,32 @@ def main():
             "words": f["words"], "call_sites": call_sites.get(nid, 0),
             "argc": f["argc"], "stack_args": 0, "returns": f["returns"],
             "leaf": f["leaf"], "sdk_calls": ";".join(dict.fromkeys(f["sdk"])),
+            "reaches": ";".join(sorted(f["libs"])),
+            "sdk_reexport": "",
         })
+
+    # Exports whose address lands in .sceStub.text are not engine functions at
+    # all: the engine RE-EXPORTS a PSP SDK import so modules can reach the OS
+    # through it. Those are free names — the SDK function is already known —
+    # and PPSSPP's tables also give a return kind and parameter kinds.
+    reexports = 0
+    for vram, nid in export.items():
+        if vram not in stubs:
+            continue
+        lib, snid = stubs[vram].split(":")
+        name, ret, params = names.get(int(snid, 16), ("", "", ""))
+        rows.append({
+            "nid": f"0x{nid:08X}", "vram": f"0x{vram:06X}",
+            "func": name or f"{lib}_{snid[2:]}",
+            "words": 0, "call_sites": call_sites.get(nid, 0),
+            "argc": len(params), "stack_args": 0,
+            "returns": 1 if ret and ret != "v" else 0,
+            "leaf": 1, "sdk_calls": name, "reaches": lib,
+            "sdk_reexport": f"{lib}:{name}({params})" if name else lib,
+        })
+        reexports += 1
+    print(f"  re-exported SDK imports resolved: {reexports} "
+          f"({sum(1 for r in rows if r['sdk_reexport'] and r['sdk_calls'])} with a known name)")
 
     rows.sort(key=lambda r: -r["call_sites"])
     out = os.path.join(ROOT, "nids/ehsys_signatures.csv")
