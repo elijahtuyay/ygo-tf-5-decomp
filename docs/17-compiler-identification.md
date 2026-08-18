@@ -94,10 +94,77 @@ Then confirm functionally, in this order:
    rate must **not** collapse as function size grows. If ≥160-word functions
    still never match, the compiler is still wrong.
 
-## Where to look
+## Where it is: the PlayStation 2 line, not the PSP line
 
-The decomp.me PSP set is now exhaustively falsified — all 11 report 3.0.0, so
-none of them is the answer. Candidates worth pursuing:
+**decomp.me's PSP dropdown is exhausted** — it offers exactly 13 entries (GCC
+3.3.3+allegrex, SN 1.2.7503.0, and the 11 MWCC builds), and every MWCC one
+reports 3.0.0. The compiler is not there and never was.
+
+The `decompme/compilers` release, however, carries a **PlayStation 2** line the
+PSP dropdown does not expose. Fingerprinting it:
+
+```
+mwcps2-2.4-001213     ->  MW MIPS C Compiler (2.4.1.01)    MATCHES TARGET
+mwcps2-3.0-011126     ->  MW MIPS C Compiler (2.4.1.01)    MATCHES TARGET
+mwcps2-3.0.3-020716   ->  MW MIPS C Compiler (2.4.1.01)    MATCHES TARGET
+mwcps2-2.3.3-000906   ->  MW MIPS C Compiler (2.3.1.01)    ruled out
+all 11 mwccpsp        ->  MW MIPS C Compiler (3.0.0)       ruled out
+```
+
+This is consistent: the compiler identifies itself as **`MW MIPS C Compiler`**,
+generic MIPS, not "PSP compiler". Metrowerks' PS2 products from 2.4 onward all
+sit on the **2.4.1.01 front-end**; the PSP products moved to 3.0.0. Tag Force 5
+was built on the older front-end.
+
+The `PSP` string in the shipped `.comment` does not contradict this — neither
+our PSP nor our PS2 compilers emit it, so it is contributed by the linker or by
+SDK objects, not by the compiler.
+
+### Status: fingerprint matched, function matching NOT yet confirmed
+
+Compiling `src/rel_movie_viewer.c` with `mwcps2-2.4-001213` currently yields
+only 2-3 of 16 functions versus 15 of 16 on mwccpsp_219. **This does not refute
+the hypothesis**, for three reasons that must be controlled before drawing any
+conclusion:
+
+1. **The C is over-fitted.** Every function in `src/` was iterated for months
+   against 219's codegen using the docs/11 lever catalogue. It encodes 219's
+   preferences. Testing a different compiler against it is biased against that
+   compiler by construction.
+2. **Flags are unexplored.** The PS2 compiler's flag semantics differ;
+   `-sdatathreshold` in particular changes addressing globally.
+3. **Target differences.** mwccps2 targets R5900; the PSP is R4000 Allegrex.
+
+One signal cuts the other way and is worth chasing: with plain `-O4,s`,
+`mwcps2-2.4-001213` compiles `func_00000294` to **114 words against a target of
+116**. Every PSP build produces 129 (+13), and that function has resisted every
+documented lever plus 777,000 permuter iterations. Nothing has ever been that
+close to it.
+
+### How to settle it
+
+Do not judge a candidate compiler on the existing over-fitted sources.
+
+1. Sweep the flag space per candidate, using **word count on a corpus of
+   verified functions** as the objective, not the current `src/` match count.
+2. Test on **trivial functions first** — an empty function and a one-line
+   accessor must match on any ABI-compatible compiler. If they do not, the
+   candidate is structurally wrong (calling convention / ABI) and no flag will
+   save it.
+3. Re-derive one medium function's C **from scratch** against the candidate,
+   without the 219-tuned levers, and see whether it converges more easily.
+4. Then apply the real acceptance criterion: **match rate must stop collapsing
+   with function size.**
+
+### Still unexplored
+
+The `mwcps2-3.0.1b*` beta series (builds 44, 51, 74, 75, 87, 95, 103, 119, 145,
+151, 198, 205, 210) is listed in the release but the names above did not resolve
+to downloadable assets; the exact filenames need to be read off the release
+asset list. That series is numbered like the PSP builds and is the most
+interesting remaining gap.
+
+Other avenues:
 
 - Earlier **CodeWarrior for PSP** releases predating the decomp.me set.
 - The earlier **CodeWarrior for MIPS / embedded** line, from which the PSP
