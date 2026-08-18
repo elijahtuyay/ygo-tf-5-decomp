@@ -198,6 +198,49 @@ Metrowerks moved the front-end from 2.4.1.01 to 3.0.0 somewhere between
 September 2002 and March 2003; the PSP product line as catalogued is entirely
 post-cutoff, so the pre-cutoff PSP releases are the gap.
 
+### COUNTER-EVIDENCE, recorded 2026-08-18 — this thesis is NOT settled
+
+Two findings weaken the conclusion above, and both must be resolved before
+anyone acts on it.
+
+**1. A mature PSP decomp matches large functions with mwccpsp_219.**
+`Xeeynamo/sotn-decomp` decompiles Castlevania: Symphony of the Night for PSP
+(Dracula X Chronicles, **Konami, 2007** — same publisher, same era as Tag
+Force) and ships `bin/mwccpsp_219.tar.gz.sha256`: the exact compiler this
+project uses. Their PSP tree contains matched C files up to 357 KB. So 219
+demonstrably CAN match large PSP functions, which is precisely what this
+document argues it cannot do. Either SOTN was built with a different compiler
+than TF5, or our size ceiling has a cause other than the compiler.
+
+**2. The falsification test used the WRONG LINKER.** The mixed-compiler link
+experiment above — which concluded that two compiler versions produce two
+`.comment` strings, and therefore that TF5's single string proves a single
+compiler — was run with **GNU ld**, not with Metrowerks' `mwldpsp`. If the
+Metrowerks linker emits only one `.comment` (its own, or the first object's),
+the whole argument collapses and `2.4.1.01` could be inherited from a crt0 or
+SDK object after all. This has NOT been tested.
+
+**The decisive experiment, still unrun:** read `.comment` from a Castlevania
+Dracula X Chronicles PSP binary. If it reports `3.0.0`, this document's thesis
+survives — 219 is correct for SOTN, and TF5's `2.4.1.01` is genuinely a
+different toolchain. If it reports `2.4.1.01`, the thesis is dead: `.comment`
+is not diagnostic, 219 is the right compiler, and our size ceiling is caused by
+technique or flags rather than by the compiler binary. Either answer is worth
+more than any further analysis here.
+
+**3. The flag space is barely explored.** sotn-decomp builds PSP with:
+
+    -Op -opt nointrinsics -char unsigned -lang c -fl divbyzerocheck
+    -sdatathreshold 0 -gccinc -Iinclude
+
+This project has only ever tried `-O4,s`, `-O4,p` and `-O2,s` plus
+`-sdatathreshold 0`. `-char unsigned` alone decides `lb` versus `lbu` for every
+plain `char` in the codebase. Tested against `rel_movie_viewer` these flags
+changed nothing (still 15/16, `func_00000294` still +13 words), but they were
+tested only on source already tuned for the current flags, and only on one
+module. The flag space deserves a systematic sweep before the compiler is
+blamed further.
+
 ### Where to hunt next (needs resources outside this repo)
 
 1. **Fingerprint other PSP games.** `readelf -p .comment` on any PSP module
