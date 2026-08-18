@@ -30,8 +30,16 @@ SRC     ?=
 ROOT    := $(CURDIR)
 PRX     := iso_extracted/PSP_GAME/USRDIR/gmodule/$(MODULE).prx
 LD      := build/$(MODULE).ld
-OUT     := build/$(MODULE).elf
-BIN     := build/$(MODULE).prx
+# SRC and non-SRC builds MUST NOT share output paths: they have different
+# prerequisites, so sharing lets a mode switch verify a stale binary from the
+# other mode (both a false FAIL and a false PASS are possible — seen 2026-08-18).
+ifeq ($(SRC),1)
+  OUT   := build/$(MODULE).src.elf
+  BIN   := build/$(MODULE).src.prx
+else
+  OUT   := build/$(MODULE).elf
+  BIN   := build/$(MODULE).prx
+endif
 
 CROSS   := mips-linux-gnu-
 AS      := $(CROSS)as
@@ -160,5 +168,7 @@ verify: $(BIN)
 	fi
 
 clean:
-	rm -rf build/asm/$(MODULE) build/assets/$(MODULE) $(OUT) $(BIN) \
+	rm -rf build/asm/$(MODULE) build/assets/$(MODULE) \
+		build/$(MODULE).elf build/$(MODULE).prx \
+		build/$(MODULE).src.elf build/$(MODULE).src.prx \
 		build/$(MODULE).symbols.ld build/$(MODULE).src.ld build/$(MODULE).srcsyms.ld
