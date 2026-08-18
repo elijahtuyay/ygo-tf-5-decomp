@@ -1,4 +1,17 @@
-# The compiler is wrong: MW MIPS C Compiler 2.4.1.01, not 3.0.0
+# Compiler identification: a fingerprint mismatch, and why it is probably NOT our blocker
+
+> **READ THIS FIRST — conclusion revised 2026-08-19.** This document originally
+> argued that our size ceiling (nothing above 160 instructions has ever matched)
+> was caused by using the wrong compiler. **That argument is now substantially
+> refuted.** `Xeeynamo/sotn-decomp` matches PSP functions far larger than
+> anything we have achieved, using `mwccpsp_3.0.1_219` — our exact compiler.
+> Their `src/dra_psp/menu.c` is 4,466 lines with **zero `INCLUDE_ASM` stubs**
+> and contains a single **822-line** matched function. So 219 is demonstrably
+> capable of large PSP functions, and our ceiling is far more likely a
+> methodology problem than a compiler problem. See "What actually changed" at
+> the end. The `.comment` fingerprint mismatch below is still a real, unexplained
+> fact — but it no longer carries the weight originally placed on it.
+
 
 **Finding, 2026-08-18: every compiler build this project has ever used is the
 wrong compiler.** Not the wrong flags — a different compiler version, from a
@@ -277,3 +290,65 @@ gate and the 3,369 verified matches all remain valid — small functions match o
 both compilers, which is precisely why they matched. Expect the current match
 set to survive a compiler change largely intact, and verify that with
 `scripts/check_regressions.py --all` when a candidate arrives.
+
+
+## What actually changed (2026-08-19)
+
+The decisive evidence came from `Xeeynamo/sotn-decomp`, a mature decompilation
+of Castlevania: Symphony of the Night for PSP (Dracula X Chronicles — Konami,
+2007, the same publisher, console and era as Tag Force 5).
+
+**They use `mwccpsp_3.0.1_219`** (`bin/mwccpsp_219.tar.gz.sha256`) and match
+functions an order of magnitude larger than our best. `src/dra_psp/menu.c`:
+4,466 lines, no `INCLUDE_ASM`, an 822-line `MenuHandle()` plus 238-, 173- and
+144-line functions. Our largest match ever is 153 *instructions*.
+
+That kills the central inference of this document. The size-rate collapse
+(11.3% under 80 instructions, 0% above 160) cannot be blamed on 219 being
+incapable of large functions, because 219 demonstrably is capable.
+
+### What we are missing that they have
+
+None of it requires finding a different compiler:
+
+1. **Real PSP SDK headers.** They build with `-Iinclude/pspsdk`. Correct struct
+   definitions decide load widths and signedness, which is the single most
+   common cause of one-word diffs. We have no SDK headers at all.
+2. **Per-file optimization levels.** `tools/builds/gen.py` defaults to `-Op`
+   and exposes a `PSPO` override *per source file*. That is exactly the
+   multi-TU / mixed-flags reality this project hypothesised as workstream C —
+   they simply implemented it.
+3. **A much fuller flag set:**
+   `-gccinc -lang c -char unsigned -fl divbyzerocheck -opt nointrinsics -sdatathreshold 0`
+   against our `-O4,s -sdatathreshold 0`. `-char unsigned` alone decides `lb`
+   versus `lbu` for every plain `char`.
+4. **`metrowrap` / `mwccgap`** — a wrapper that lets `mwcc` mix C with
+   `INCLUDE_ASM` assembly. This is the hybrid build we said did not exist and
+   that blocks 19 of 28 modules from ever completing.
+5. **Splat config technique:** `migrate_rodata_to_functions`, `disassemble_all`,
+   `asm_jtbl_label_macro`, per-segment symbol generation.
+
+### What remains genuinely unexplained
+
+The fingerprint mismatch is still real: our binaries say `2.4.1.01`, every
+mwccpsp build says `3.0.0`. Two possibilities, neither tested:
+
+- Tag Force 5 really was built with a different compiler than SOTN. Both are
+  Konami PSP titles but three years and probably different studios apart, and
+  the binary formats differ (our Sony PRX modules versus their Metrowerks
+  `mwo_header` overlays and `PS.ELF`).
+- `.comment` is inherited from a crt0 or prebuilt SDK object rather than
+  written by the compiler that built `.text`. **The experiment that supposedly
+  ruled this out used GNU ld, not Metrowerks' linker, so it proves nothing
+  about a Metrowerks-linked binary.**
+
+`readelf -p .comment` on a Dracula X Chronicles PSP binary would separate these,
+and their repo cannot answer it — `assets/`, `asm/` and `disks/` are all
+gitignored, and no issue or PR in the repository ever mentions `2.4.1.01`.
+
+### Revised recommendation
+
+**Stop treating the compiler as the blocker.** Adopt the five items above
+first; they are all available today and none depends on the compiler question.
+If the size ceiling lifts, the mismatch was a red herring. If it does not, the
+compiler hunt resumes with much better evidence than a fingerprint alone.
