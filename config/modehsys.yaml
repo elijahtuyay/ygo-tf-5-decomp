@@ -1,0 +1,75 @@
+# splat config for modehsys — the shared engine in SYSDIR/EBOOT.BIN.
+#
+# This is the 29th and most important binary in the project: every one of the
+# 28 rel_*.prx modules imports libehsys_rel from here, and this module exports
+# exactly 1729 functions to them (confirmed by parsing .lib.ent below). Naming
+# and typing those 1729 pays out in all 28 modules at once.
+#
+# INPUT IS THE DECRYPTED ELF, NOT THE SHIPPED FILE. SYSDIR/EBOOT.BIN is
+# encrypted (~PSP magic); scripts/decrypt_eboot.sh produces build/EBOOT.elf,
+# which is what this config splits. Consequence: the sha1 relink gate for this
+# module verifies against the DECRYPTED image, not against checksums.sha1 —
+# we cannot re-encrypt, and do not need to.
+#
+#   build/EBOOT.elf   1575180 bytes (0x18090C)
+#   sha1              cc92ddd45f550ac1b906842d587c883fba22be34
+#
+# Byte map (file offsets; verified contiguous end to end, only the ELF header
+# and 5 bytes of inter-section padding are unaccounted for as raw blobs):
+#
+#   0x000000-0x000054  ELF header + program headers
+#   0x000054-0x06DED0  .text                     <- 450,172 bytes of engine code
+#   0x06DED0-0x06E968  .sceStub.text             339 import trampolines (8 bytes each)
+#   0x06E968-0x06EC14  .lib.ent* / .lib.stub*    export + import tables
+#   0x06EC14-0x0724E4  .rodata.sceModuleInfo + .rodata.sceResident
+#   0x0724E4-0x07304C  .rodata.sceNid            NIDs of the 339 SDK imports
+#   0x07304C-0x152E84  .data                     917,048 bytes
+#   0x152E84-0x18090C  section header table + .rel.* + .shstrtab + .comment
+#   (.bss is NOBITS, zero size, occupies no file space)
+#
+# Module metadata, parsed from .rodata.sceModuleInfo:
+#   name        modehsys
+#   gp          0x15AE20
+#   exports     libehsys_rel: 1729 functions + 2 variables  (plus 2 syslib funcs)
+#   imports     339 functions across 31 SDK libraries (ThreadManForUser 98,
+#               IoFileMgrForUser 33, sceUtility 23, sceSasCore 18, ...)
+#
+# NUMBERING: as with the 28 modules, vram is "byte offset from the start of the
+# code segment" — segment rom 0x54, vram 0x0 — so func_XXXXXXXX names are
+# file_offset - 0x54. .text and .sceStub.text MUST stay in one contiguous code
+# segment starting at rom 0x54 / vram 0x0 or every derived name shifts.
+
+name: modehsys
+sha1: cc92ddd45f550ac1b906842d587c883fba22be34
+options:
+  platform: psp
+  basename: modehsys
+  base_path: ..
+  target_path: build/EBOOT.elf
+  asm_path: asm/modehsys
+  asset_path: assets/modehsys
+  ld_script_path: build/modehsys.ld
+  symbol_addrs_path: config/symbols/modehsys.txt
+  compiler: GCC          # placeholder to drive the disassembler; the game uses MWCC (docs/17)
+  find_file_boundaries: True
+  add_set_gp_64: False   # Allegrex is 32-bit
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  emit_subalign: False
+  section_order: [".text", ".data", ".rodata", ".bss"]
+
+segments:
+  - [0x0, bin, header]        # ELF header + program headers
+  - name: modehsys
+    type: code
+    start: 0x54
+    vram: 0x0
+    subsegments:
+      - [0x54,     asm, text]          # vram 0x000000-0x06DE7C: the engine
+      - [0x6DED0,  asm, sceStub_text]  # vram 0x06DE7C-0x06E914: 339 import stubs
+      - [0x6E968,  bin, lib_tables]    # .lib.ent* + .lib.stub*
+      - [0x6EC14,  bin, module_info]   # .rodata.sceModuleInfo + .rodata.sceResident
+      - [0x724E4,  bin, sceNid]        # .rodata.sceNid (339 SDK import NIDs)
+      - [0x7304C,  bin, data]          # .data
+      - [0x152E84, bin, elf_meta]      # SHT + .rel.* + .shstrtab + .comment + tail padding
+  - [0x18090C]   # sentinel: total file size
