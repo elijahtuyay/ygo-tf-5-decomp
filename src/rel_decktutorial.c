@@ -274,6 +274,36 @@ int func_000032CC(void) {
 s32 func_0000353C(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
 }
+/* func_0000354C — 0 words. MATCH 100% (shape: twin of func_00002640). */
+s32 func_0000354C(s32 arg0, u16 *arg1, s32 arg2, s32 arg3) {
+
+    s32 lo, hi, stride, key;
+
+    stride = arg3 >> 1;
+    if (arg3 < 0) {
+        stride = (arg3 + 1) >> 1;
+    }
+    hi = arg2 - 1;
+    key = arg0 & 0xFFFF;
+    lo = 0;
+    while (lo <= hi) {
+        s32 mid = (lo + hi) >> 1;
+        u16 val;
+        if (lo + hi < 0) {
+            mid = (lo + hi + 1) >> 1;
+        }
+        val = arg1[mid * stride];
+        if (key == val) {
+            return mid;
+        }
+        if ((s32) val < key) {
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return -1;
+}
 
 /* func_000035C4 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_000035C4(void) {
@@ -681,6 +711,51 @@ s32 func_00019694(s32 arg0, s32 arg1, s32 arg2) {
 s32 func_00019674(s32 arg0, s32 arg1, s32 arg2) {
     extern int ehsys_B89D38DC();
     return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+/* func_000199A0 — 0 words. MATCH 100% (shape: twin of func_00014C6C). */
+int func_000199A0(int a0, void *a1) {
+
+    int v0 = 0;
+
+    if (a1 == 0) {
+        return v0;
+    }
+    {
+        int count = *(u16 *) a1;
+        u16 *arr = (u16 *) ((char *) a1 + 2);
+        int key = a0 & 0xFFFF;
+        int lo = 0;
+        int hi = count - 1;
+
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            u16 v = arr[mid];
+            if (key == v) {
+                v0 = mid & 0xFFFF;
+                break;
+            }
+            if (v < key) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+    }
+    return v0;
+}
+/* func_00019A64 — 0 words. MATCH 100% (shape: twin of func_00014D30). */
+int func_00019A64(u16 lo, u16 hi, void *arr) {
+
+
+    u32 target = (u32) lo | ((u32) hi << 16);
+    int count = *(int *) arr;
+    int idx;
+    for (idx = 0; idx < count; idx++) {
+        if (*(u32 *)((char *) arr + idx * 4 + 4) == target) {
+            return idx;
+        }
+    }
+    return -1;
 }
 
 /* func_0001B854 — 5 words. MATCH 100% (shape: thunk, tail call w/ shifted args). */

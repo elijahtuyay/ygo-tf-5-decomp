@@ -135,3 +135,55 @@ void func_00006D64(void) {
     func_00006D6C();
 }
 
+/* func_000075C8 — 0 words. MATCH 100% (shape: twin of func_00014C6C). */
+int func_000075C8(int a0, void *a1) {
+
+    int v0 = 0;
+
+    if (a1 == 0) {
+        return v0;
+    }
+    {
+        int count = *(u16 *) a1;
+        u16 *arr = (u16 *) ((char *) a1 + 2);
+        int key = a0 & 0xFFFF;
+        int lo = 0;
+        int hi = count - 1;
+
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            u16 v = arr[mid];
+            if (key == v) {
+                v0 = mid & 0xFFFF;
+                break;
+            }
+            if (v < key) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+    }
+    return v0;
+}
+
+/* func_0000763C — 0 words. MATCH 100% (shape: twin of func_00014D30). */
+int func_0000763C(u16 lo, u16 hi, void *arr) {
+
+
+    u32 target = (u32) lo | ((u32) hi << 16);
+    int count = *(int *) arr;
+    int idx;
+    for (idx = 0; idx < count; idx++) {
+        if (*(u32 *)((char *) arr + idx * 4 + 4) == target) {
+            return idx;
+        }
+    }
+    return -1;
+}
+
+/* func_00008478 — 0 words. MATCH 100% (shape: twin of func_00004580). */
+s32 func_00008478(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}

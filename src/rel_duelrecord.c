@@ -336,6 +336,36 @@ s32 func_00004634(s32 arg0, s32 arg1) {
     ((Flags_0000A2F0 *)&D_0000A2F0)->bit0 = 1;
     return temp_s0;
 }
+/* func_000046A4 — 0 words. MATCH 100% (shape: twin of func_00002640). */
+s32 func_000046A4(s32 arg0, u16 *arg1, s32 arg2, s32 arg3) {
+
+    s32 lo, hi, stride, key;
+
+    stride = arg3 >> 1;
+    if (arg3 < 0) {
+        stride = (arg3 + 1) >> 1;
+    }
+    hi = arg2 - 1;
+    key = arg0 & 0xFFFF;
+    lo = 0;
+    while (lo <= hi) {
+        s32 mid = (lo + hi) >> 1;
+        u16 val;
+        if (lo + hi < 0) {
+            mid = (lo + hi + 1) >> 1;
+        }
+        val = arg1[mid * stride];
+        if (key == val) {
+            return mid;
+        }
+        if ((s32) val < key) {
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return -1;
+}
 
 /* func_0000471C — 15 words. MATCH 100%. */
 void func_0000471C(s32 *arg0, s32 arg1) {

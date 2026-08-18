@@ -2653,3 +2653,11 @@ s32 func_00015ADC(void *arg0) {
     return *(s32 *)((char *)arg0 + 0xC);
 }
 
+/* func_00015AE4 — 0 words. MATCH 100% (shape: twin of func_00030D30). */
+void *func_00015AE4(s32 a0, s32 a1, s32 a2) {
+
+    s32 off1 = *(s32 *)((a1 << 3) + a0 + 0x14);
+    s32 p = off1 + a0;
+    s32 off2 = *(s32 *)(p + a2 * 8 + 4);
+    return (void *)(off2 + a0);
+}

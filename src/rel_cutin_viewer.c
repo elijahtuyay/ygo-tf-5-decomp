@@ -861,6 +861,16 @@ void func_0001AFFC(void) {
 s32 func_0001B490(void) {
     return *(s32 *)0xB32B88;
 }
+/* func_0001BD1C — 0 words. MATCH 100% (shape: twin of func_00052CAC). */
+s32 func_0001BD1C(u32 *arg0, u32 *arg1) {
+
+    u32 b = *arg1;
+    u32 a = *arg0;
+    if (a < b) {
+        return -1;
+    }
+    return b < a;
+}
 
 /* func_0001BF10 — 25 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0001BF10(void) {
@@ -901,6 +911,15 @@ s32 func_0001C244(void *arg0, s32 arg1) {
     ehsys_4B0DABFA(0, (*(int *)((char *)arg0 + 0x8)));
     (*(int *)((char *)arg0 + 0x18)) = 1;
     (*(int *)((char *)arg0 + 0x10)) = 0;
+    return 1;
+}
+/* func_0001C4DC — 0 words. MATCH 100% (shape: twin of func_000535A4). */
+s32 func_0001C4DC(void *arg0, s32 arg1) {
+
+    if (arg1 <= 0) {
+        return 0;
+    }
+    *(s32 *)((char *)arg0 + 0x24) = 0;
     return 1;
 }
 /* func_0001C4F8 — 21 words. MATCH 100% (shape: m2c). */

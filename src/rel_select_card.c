@@ -543,6 +543,33 @@ int func_00012BA0(int a0, int a1, int a2, int a3) {
 void func_00012BB4(void) {
     func_000130B8(func_00012F90(func_00012D8C(func_00012CB8(func_00012BFC()), (u8) D_0001EB90 & 0xF)));
 }
+/* func_00012F30 — 0 words. MATCH 100% (shape: twin of func_0001D96C). */
+void func_00012F30(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
+
+
+    unsigned short temp_a3;
+    unsigned short temp_a2;
+    char *p = (char *)arg0;
+
+    *(s16 *)(p + 0x4) = arg1;
+    *(s16 *)(p + 0x6) = arg2;
+    *(s16 *)(p + 0x8) = 0;
+    *(s32 *)(p + 0x0) = 0x33000000;
+    temp_a3 = (unsigned short)arg1 + (unsigned short)arg3;
+    *(s16 *)(p + 0x10) = temp_a3;
+    *(s16 *)(p + 0x12) = arg2;
+    *(s16 *)(p + 0x14) = 0;
+    *(s32 *)(p + 0xC) = 0x33000000;
+    temp_a2 = (unsigned short)arg2 + 1;
+    *(s16 *)(p + 0x1C) = arg1;
+    *(s16 *)(p + 0x1E) = temp_a2;
+    *(s16 *)(p + 0x20) = 0;
+    *(s32 *)(p + 0x18) = 0x19000000;
+    *(s16 *)(p + 0x28) = temp_a3;
+    *(s16 *)(p + 0x2A) = temp_a2;
+    *(s16 *)(p + 0x2C) = 0;
+    *(s32 *)(p + 0x24) = 0x19000000;
+}
 
 /* func_000130A4 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_000130A4(int a0, int a1, int a2, int a3) {
@@ -648,4 +675,32 @@ int func_00017D64(int a0, int a1, int a2, int a3, int a4) {
 /* func_00017D80 -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00017D80(int a0) {
     return ehsys_5F00A362(a0 << 6);
+}
+
+/* func_00017D88 — 0 words. MATCH 100% (shape: twin of func_0001C630). */
+void func_00017D88(u16 *arg0, u16 *arg1, s32 arg2) {
+
+    s32 t1;
+    u16 t0;
+
+    t1 = 0;
+    goto test;
+loop:
+    t0 = *arg0;
+    if (t0 == 0) {
+        *arg1 = 0;
+        return;
+    }
+    if (t0 == 0xA) {
+        *arg1 = 0x20;
+    } else {
+        *arg1 = t0;
+    }
+    t1 += 1;
+    arg0 += 1;
+    arg1 += 1;
+test:
+    if (t1 < arg2) {
+        goto loop;
+    }
 }

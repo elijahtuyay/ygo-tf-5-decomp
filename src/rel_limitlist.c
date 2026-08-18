@@ -187,6 +187,51 @@ s32 func_00003B18(s32 arg0, s32 arg1) {
     ((Flags_B670 *) &D_0000B670)->bit0 = 1;
     return temp_s0;
 }
+/* func_00003BA8 — 0 words. MATCH 100% (shape: twin of func_00014C6C). */
+int func_00003BA8(int a0, void *a1) {
+
+    int v0 = 0;
+
+    if (a1 == 0) {
+        return v0;
+    }
+    {
+        int count = *(u16 *) a1;
+        u16 *arr = (u16 *) ((char *) a1 + 2);
+        int key = a0 & 0xFFFF;
+        int lo = 0;
+        int hi = count - 1;
+
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            u16 v = arr[mid];
+            if (key == v) {
+                v0 = mid & 0xFFFF;
+                break;
+            }
+            if (v < key) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+    }
+    return v0;
+}
+/* func_00003C1C — 0 words. MATCH 100% (shape: twin of func_00014D30). */
+int func_00003C1C(u16 lo, u16 hi, void *arr) {
+
+
+    u32 target = (u32) lo | ((u32) hi << 16);
+    int count = *(int *) arr;
+    int idx;
+    for (idx = 0; idx < count; idx++) {
+        if (*(u32 *)((char *) arr + idx * 4 + 4) == target) {
+            return idx;
+        }
+    }
+    return -1;
+}
 
 /* func_00003DC0 — 8 words. Same shape as func_00000B30/func_00001DB4. MATCH 100%. */
 void func_00003DC0(s32 arg0, s32 arg1, int arg2) {
