@@ -277,7 +277,14 @@ void func_00000184(void) {
   SP7**).
 - In parentheses, the Metrowerks *internal build* (**3.0.1_121 … 3.0.1_219**).
 
-These are **different axes**: `2.4.1.01` should NOT be looked for in the dropdown.
+**SUPERSEDED 2026-08-18 — this claim is FALSIFIED. See `docs/17-compiler-identification.md`.**
+All 11 builds below stamp `MW MIPS C Compiler (3.0.0)` into their own `.comment`,
+the same field where the shipped modules say `(2.4.1.01)`. The fields ARE the same
+axis and they DIFFER, so none of these builds is the compiler that built TF5, and
+the bisection recorded further down searched a set that cannot contain the answer.
+Its conclusion ("the gap is in the C, not the compiler build") does not follow.
+
+~~These are **different axes**: `2.4.1.01` should NOT be looked for in the dropdown.~~
 It's very likely that our compiler is **one of these builds** (same family); it
 needs to be found empirically by matching a real function.
 

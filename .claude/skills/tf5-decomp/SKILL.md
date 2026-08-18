@@ -17,11 +17,23 @@ Project: matching reconstruction of the code of **Yu-Gi-Oh! 5D's Tag Force 5**
 ## Project facts NOT to rediscover every time
 
 - **Original compiler = Metrowerks CodeWarrior `MW MIPS C Compiler (2.4.1.01)`**
-  (from the `.comment` section of every PRX). Matching uses **`mwccpsp`**, not psp-gcc.
-  On decomp.me the PSP builds use the product names **MWCC 1.0 … 1.3 SP7** (internal
-  builds 3.0.1_121…219); `2.4.1.01` is a different numbering axis, do NOT look for it
-  in the list. Locally it runs via **wibo**. Details in `docs/09-first-match.md`.
-- **CONFIRMED config**: compiler **MWCC 1.3 SP7 (mwccpsp_3.0.1_219)**, flags
+  (from the `.comment` section of every PRX). Matching uses **`mwccpsp`**, not psp-gcc,
+  run locally via **wibo**.
+- **WE DO NOT HAVE THE RIGHT COMPILER — established 2026-08-18, see
+  `docs/17-compiler-identification.md`.** All 11 decomp.me PSP builds (products
+  MWCC 1.0…1.3 SP7, internal 3.0.1_121…219) stamp `MW MIPS C Compiler (3.0.0)`
+  into their own `.comment`; all 28 shipped modules say `(2.4.1.01)` plus a `PSP`
+  string ours never emit. An earlier note claiming `2.4.1.01` is "a different
+  numbering axis, do NOT look for it" is **falsified** — it is the same field in
+  the same format, and it differs. Consequence: the exhaustive 11-build bisection
+  in `docs/09` searched a set that cannot contain the answer, and its conclusion
+  ("the gap is in the C, not the build") does not follow.
+  **Test any candidate compiler by compiling anything and reading
+  `readelf -p .comment` — accept only `(2.4.1.01)`.** This is why match rate
+  collapses with function size (11.3% at ≤80 words, 0.08% at 81–160, 0% above
+  160; largest ever matched = 153 words) and why the documented "unreachable
+  codegen" categories exist.
+- **BEST AVAILABLE config** (not the original): **mwccpsp_3.0.1_219**, flags
   **`-O4,s -sdatathreshold 0`** (SIZE, not `,p` — corrected 2026-08-16;
   `func_00000034` is the only function that discriminates: 100% on `,s`, 63/65
   words on `,p`, while the other 15 are byte-identical either way. `-O3,s` gives a
