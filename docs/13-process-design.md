@@ -277,6 +277,12 @@ One module per agent, `src/<module>.c` owned exclusively by its agent for the
 session — the file is the unit of conflict. The orchestrator only merges via
 `check_regressions.py`.
 
+Every offloaded agent reads three companion docs before starting:
+`docs/14-debugging-playbook.md` (how to debug every run),
+`docs/15-matching-playbook.md` (what to look for in a function before
+drafting), and `docs/16-testing-methodology.md` (the gate cadence and
+regression protocol).
+
 Hard rules for every agent prompt, verbatim — each traces to a real incident:
 
 1. Never run anything in the background (`&`, `nohup`, monitor-and-wait). Five
