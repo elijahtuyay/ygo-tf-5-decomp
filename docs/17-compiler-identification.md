@@ -156,6 +156,59 @@ Do not judge a candidate compiler on the existing over-fitted sources.
 4. Then apply the real acceptance criterion: **match rate must stop collapsing
    with function size.**
 
+### The public catalogue is now EXHAUSTED (2026-08-18)
+
+Every Metrowerks MIPS compiler published by `decompme/compilers` has been
+fetched and fingerprinted — 33 of them: the PSP line, the PS2 line, all betas,
+and the bundled `ps2_compilers.tar.xz`. The version string turns out to be a
+**generational marker with a hard cutoff**, not a per-build identifier:
+
+```
+released 1999           mwcps2-2.3-991202                     -> 2.3.1.01
+released 2000-09/2002   mwcps2-2.4, 3.0, 3.0.1, 3.0.3,
+                        mwcps2-3.0b22-{011126,020123,
+                                       020716,020926}         -> 2.4.1.01   <- the game
+released 2003 onward    all mwcps2 3.0b3x / 3.0.1bNN betas
+                        AND ALL ELEVEN mwccpsp PSP BUILDS     -> 3.0.0
+```
+
+Eight public compilers carry the game's fingerprint. **All eight fail
+functionally**: against `src/rel_movie_viewer.c`, across four flag combinations
+each, the best matches 3 of 16 functions — and those three are 2- and 3-word
+bodies that any MIPS compiler emits identically. The fingerprint-mismatched
+`mwccpsp_3.0.1_219` still matches 15 of 16.
+
+Two further facts, both established by experiment rather than inference:
+
+- **The PS2 compilers default to 64-bit MIPS** (R5900). GNU ld refuses to link
+  their output with 32-bit PSP objects at all.
+- **`.comment` is trustworthy as a whole-binary fingerprint.** Linking an
+  object built by 2.3.1.01 with one built by 2.4.1.01 produces a `.comment`
+  containing BOTH strings, concatenated. Every shipped module and the engine
+  contains exactly ONE compiler string in 0x22 bytes. Therefore every object
+  linked into every Tag Force 5 binary came from a compiler reporting
+  2.4.1.01 — this is not a stale string inherited from a prebuilt SDK library
+  or a crt0 object. That alternative hypothesis is **falsified**.
+
+**Conclusion: the compiler that built Tag Force 5 is not publicly catalogued
+where decompilation projects normally look.** It is almost certainly an early
+CodeWarrior for PSP built on the 2.4.1.01 front-end, predating decomp.me's
+earliest PSP entry (MWCC 1.0 / `3.0.1_121`, which already reports 3.0.0).
+Metrowerks moved the front-end from 2.4.1.01 to 3.0.0 somewhere between
+September 2002 and March 2003; the PSP product line as catalogued is entirely
+post-cutoff, so the pre-cutoff PSP releases are the gap.
+
+### Where to hunt next (needs resources outside this repo)
+
+1. **Fingerprint other PSP games.** `readelf -p .comment` on any PSP module
+   takes seconds. Finding other titles reporting 2.4.1.01 identifies which
+   shipped games share this toolchain — and any of those with an existing
+   decompilation has, by definition, a working compiler to ask about.
+2. **Early CodeWarrior for PSP** in SDK archives, BetaArchive, or collector
+   hands: anything predating "MWCC 1.0".
+3. **The PSP decomp community directly.** Any project matching large PSP
+   functions has solved this.
+
 ### Still unexplored
 
 The `mwcps2-3.0.1b*` beta series (builds 44, 51, 74, 75, 87, 95, 103, 119, 145,
