@@ -103,6 +103,18 @@ def sdk_names():
     than just a name.
     """
     out = {}
+    # 1. pspdev/psplibdoc — the community's Sony NID database, ~6300 entries.
+    #    Names only, no signatures, but it resolves 93% of this engine's 339
+    #    SDK imports against PPSSPP's 12%. Clone with scripts/setup_tools.sh.
+    for path in glob.glob(os.path.join(ROOT, "tools/psplibdoc/PSPLibDoc/*/*.csv")):
+        for r in csv.reader(open(path, errors="replace")):
+            if len(r) >= 4 and r[1].strip() in ("fun", "var"):
+                try:
+                    out.setdefault(int(r[2].strip(), 16), (r[3].strip(), "", ""))
+                except ValueError:
+                    pass
+    # 2. PPSSPP's HLE tables add a TYPE SIGNATURE for the subset they cover,
+    #    so they win over a bare psplibdoc name.
     for path in sorted(glob.glob(os.path.join(ROOT, "tools/nid_db/*.cpp"))):
         for m in NID_DB_ENTRY.finditer(open(path, errors="replace").read()):
             out[int(m.group(1), 16)] = (m.group(2), m.group(3), m.group(4))
