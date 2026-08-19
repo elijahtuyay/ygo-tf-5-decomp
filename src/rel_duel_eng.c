@@ -330,6 +330,256 @@ void func_000154B4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
     func_000154D8(arg0, arg1, var_v0);
 }
+/* func_000156FC — 36 words. MATCH 100% (shape: pipeline). */
+void func_000156FC(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 3;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015780 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015780(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 4;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015804 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015804(s32 arg0, s16 arg1) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 5;
+    D_00351860 = 0;
+    D_00351862 = arg1;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015888 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015888(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 6;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_0001590C — 36 words. MATCH 100% (shape: pipeline). */
+void func_0001590C(s32 arg0, s16 arg1) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 7;
+    D_00351860 = arg1;
+    D_00351862 = 0;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015990 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015990(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 7;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015A14 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015A14(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 8;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015B2C — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015B2C(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 9;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015CF0 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015CF0(s32 arg0, s16 arg1) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 0xB;
+    D_00351860 = arg1;
+    D_00351862 = 0;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015D74 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015D74(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 0xF;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
 
 /* func_00016600 — 3 words. MATCH 100% (shape: hand). */
 u16 func_00016600(void) {
