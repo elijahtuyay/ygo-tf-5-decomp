@@ -61,6 +61,11 @@ s32 func_00006A84(void);
 void func_000052C4(void);
 void func_00005C90(void);
 void func_00005EFC(void);
+/* func_00000888 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00000888(int arg0, int arg1, int arg2) {
+
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
 
 /* func_000008A8 — 4 words. MATCH 100% (shape: m2c). */
 s32 func_000008A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
@@ -93,6 +98,11 @@ s32 func_00001C48(s32 arg0) {
     sp1C = arg0;
     ehsys_EF9B5D06(&sp1C, D_0000CA84);
     return sp1C;
+}
+/* func_00001FB0 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00001FB0(int arg0, int arg1, int arg2) {
+
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 
 /* func_00002E24 — 4 words. MATCH 100% (shape: m2c). */

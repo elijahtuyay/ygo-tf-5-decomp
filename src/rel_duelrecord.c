@@ -227,6 +227,37 @@ void func_00001624(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 sp;
     ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, sp, -1, 0);
 }
+/* func_00001640 — 0 words. MATCH 100% (shape: same-shape twin). */
+s32 func_00001640(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+
+    s32 v;
+    s32 temp_s0;
+    s32 temp_s5;
+
+    v = func_00004548(0x1003);
+    if (v == 0) {
+        return arg0;
+    }
+    arg0 = ehsys_9EA6989A(arg0, v);
+    v = ehsys_CABEA834(arg0, -1);
+    v = ehsys_E6E4401F(v, 0, 0);
+    v = ehsys_8EA6B1E7(v, 6, 6, 6, 6);
+    v = ehsys_FDD168CA(v, arg1, arg2, 0, 0x19, 0x2F, 0, 0);
+    temp_s0 = arg2 + arg4 - 6;
+    v = ehsys_FDD168CA(v, arg1, temp_s0, 0, 0x19, 0x3A, 0, 0);
+    v = ehsys_8EA6B1E7(v, 6, 6, 6, 6);
+    temp_s5 = arg1 + arg3 - 6;
+    v = ehsys_FDD168CA(v, temp_s5, arg2, 0, 0x24, 0x2F, 0, 0);
+    v = ehsys_FDD168CA(v, temp_s5, temp_s0, 0, 0x24, 0x3A, 0, 0);
+    v = ehsys_8EA6B1E7(v, 1, 6, arg3 - 0xC, 6);
+    v = ehsys_FDD168CA(v, arg1 + 6, arg2, 0, 0x1F, 0x2F, 0, 0);
+    v = ehsys_FDD168CA(v, arg1 + 6, temp_s0, 0, 0x1F, 0x3A, 0, 0);
+    v = ehsys_8EA6B1E7(v, 6, 1, 6, arg4 - 0xC);
+    v = ehsys_FDD168CA(v, arg1, arg2 + 6, 0, 0x19, 0x35, 0, 0);
+    v = ehsys_FDD168CA(v, temp_s5, arg2 + 6, 0, 0x24, 0x35, 0, 0);
+    v = ehsys_8EA6B1E7(v, 1, 1, arg3 - 0xC, arg4 - 0xC);
+    return ehsys_FDD168CA(v, arg1 + 6, arg2 + 6, 0, 0x1F, 0x35, 0, 0);
+}
 
 /* func_000021E4 — 8 words. MATCH 100%.
  * Reads field [1] out of whatever record ehsys_B2B9FEFA() returns. */

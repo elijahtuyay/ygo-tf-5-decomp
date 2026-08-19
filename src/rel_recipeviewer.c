@@ -119,10 +119,26 @@ void func_00003ED0(void) {
 s32 func_00004580(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
+/* func_000051F0 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_000051F0(int arg0, int arg1, int arg2) {
+
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
 
 /* func_00005210 — 2 words. MATCH 100% (shape: m2c). */
 s32 func_00005210(s32 arg0) {
     return ehsys_5F00A362(arg0 << 6);
+}
+/* func_00005218 — 0 words. MATCH 100% (shape: same-shape twin). */
+s32 func_00005218(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+
+    return ehsys_B89D38DC(arg0 << 6, arg1 << 6, arg2 << 6, arg3);
+}
+/* func_00006644 — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_00006644(void) {
+
+    extern int ehsys_B2B9FEFA(void);
+    return ((int *) ehsys_B2B9FEFA())[1];
 }
 
 /* func_0000695C — 4 words. MATCH 100% (shape: m2c). */
@@ -180,6 +196,11 @@ int func_0000763C(u16 lo, u16 hi, void *arr) {
         }
     }
     return -1;
+}
+/* func_000079F8 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_000079F8(int arg0, int arg1, int arg2) {
+
+    ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 
 /* func_00008478 — 0 words. MATCH 100% (shape: twin of func_00004580). */

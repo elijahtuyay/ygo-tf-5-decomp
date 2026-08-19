@@ -79,6 +79,12 @@ void func_00003DC0(s32 arg0, s32 arg1, int arg2);
 s32 func_00000000(void) {
     return 0;
 }
+/* func_000009E0 — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_000009E0(int arg0, int arg1, int arg2, int arg3) {
+
+    extern int ehsys_BC8E65D7(int, int, int, int, int);
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
+}
 
 /* func_00000B30 — 8 words. Draws a 0x1E0-flipped rect: scales coords by 64
  * and forwards to the draw primitive. MATCH 100% (shape: tail-call). */
@@ -128,6 +134,12 @@ void func_00001D14(s32 arg0, s32 arg1, int arg2, s32 arg3) {
 /* func_00001DB4 — 8 words. Same shape as func_00000B30/func_00003DC0. MATCH 100%. */
 void func_00001DB4(s32 arg0, s32 arg1, int arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
+}
+/* func_00001E9C — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_00001E9C(int arg0, int arg1, int arg2, int arg3) {
+
+    extern int ehsys_BC8E65D7(int, int, int, int, int);
+    return ehsys_BC8E65D7(arg0 << 6, arg1 << 6, arg2 << 6, arg3, -1);
 }
 
 /* func_00002BC8 — 16 words. MATCH 100% (shape: m2c). */
@@ -238,3 +250,9 @@ void func_00003DC0(s32 arg0, s32 arg1, int arg2) {
     ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
 
+/* func_00005790 — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_00005790(void) {
+
+    extern int ehsys_B2B9FEFA(void);
+    return ((int *) ehsys_B2B9FEFA())[1];
+}
