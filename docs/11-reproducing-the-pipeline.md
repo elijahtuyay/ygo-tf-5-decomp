@@ -696,3 +696,41 @@ attempts. Two other blockers seen repeatedly:
   a C problem.
 - **A boolean materialised in four instructions** where MWCC emits three at -O4
   and five at -O2. Neither level reproduces it.
+
+## Why the size cliff exists, measured (2026-08-19)
+
+Match rate by function size: ~11% up to 80 instructions, 0.08% at 81-160, 0%
+beyond. That is not "big functions are harder" — it is a chain of gates, and
+each one fails more often as a function grows.
+
+**Gate 1, compilation.** m2c's output for a larger function is often not valid
+C for MWCC. On a sample of 31 unmatched 81-160 instruction functions, **29
+failed to compile at all** — types and structure never got a chance to matter.
+The failures are a handful of recurring artifact classes, each fixable with a
+targeted rewrite:
+
+| artifact | count | fix |
+|---|---:|---|
+| `GLOBAL.unkNN` (dot form on a scalar) | 12 | rewrite to `*(T *)((char *)&GLOBAL + 0xNN)` — DONE, took compile failures 29 -> 22 |
+| implicit int/pointer conversion | 9 | insert casts |
+| `call of non-function` | 3 | declare the callee |
+| `bitwise`, `saved_reg_s0`, `sp28` | 3 | m2c gave up on a register; draft unusable |
+
+Only the arrow form `p->unkNN` was handled before; the dot form barely appears
+in small functions, which is why it went unnoticed while the pipeline looked
+fine at 11%.
+
+**Gate 2, structure.** Of those that now compile, most fail on word count —
+wrong arity, or control flow m2c rendered differently.
+
+**Gate 3, types.** Only reached once the first two pass. `scripts/gen_types.py`
+now measures every global's type from the width used across the WHOLE module
+(3,344 of 3,526 globals — 95% — are accessed at exactly one width, so the type
+is decided by the binary rather than guessed). This is wired into
+`auto_decomp.py` and matters for the functions that get far enough; it made no
+difference in the medium-function sample precisely because gate 1 stopped
+everything first.
+
+**The lesson for anyone continuing:** measure which gate is failing before
+optimising anything. The type work was the right idea aimed at the wrong gate,
+and only measuring the compile errors revealed that.
