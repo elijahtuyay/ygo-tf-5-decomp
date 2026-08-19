@@ -725,6 +725,27 @@ void func_000070D0(void) {
     ehsys_4F22C9AA(2);
     ehsys_F8CDBCAB();
 }
+/* func_00007124 — 31 words. MATCH 100% (shape: m2c). */
+void func_00007124(void) {
+    extern int D_B31480;
+    extern int D_B314C0;
+    extern int D_B31500;
+    extern int D_B31540;
+    extern int D_B31580;
+    extern int ehsys_1507D27D();
+    extern int ehsys_4F22C9AA();
+    extern int ehsys_5739D1F8();
+    extern int func_00007124();
+    ehsys_4F22C9AA(0);
+    ehsys_5739D1F8((s32) &D_B31480);
+    ehsys_4F22C9AA(1);
+    ehsys_5739D1F8((s32) &D_B314C0);
+    ehsys_4F22C9AA(3);
+    ehsys_5739D1F8((s32) &D_B31500);
+    ehsys_4F22C9AA(2);
+    ehsys_5739D1F8((s32) &D_B31540);
+    ehsys_1507D27D((s32) &D_B31580, (s32) (((int)&D_B31580) + 4), (s32) (((int)&D_B31580) + 8), (s32) (((int)&D_B31580) + 0xC));
+}
 
 /* func_000071A0 — 33 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_000071A0(void) {

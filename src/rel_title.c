@@ -115,6 +115,17 @@ s32 func_00006B40(void) {
     return 1;
 }
 #pragma optimization_level 4
+/* func_00008AAC — 27 words. MATCH 100% (shape: m2c -O2). */
+#pragma optimization_level 2
+void func_00008AAC(void) {
+    extern int ehsys_94A4EC34();
+    extern int ehsys_FFA11C10();
+    extern int func_00008AAC();
+    ehsys_FFA11C10(2, ehsys_94A4EC34(2));
+    ehsys_FFA11C10(0, ehsys_94A4EC34(0));
+    ehsys_FFA11C10(1, ehsys_94A4EC34(1));
+}
+#pragma optimization_level 4
 
 
 /* func_0000D420 — 5 words. MATCH 100% (shape: thunk+1). */
@@ -141,6 +152,21 @@ void func_0000F028(int a, int b, int c, int d) {
     extern int func_0000F028();
     ehsys_BC8E65D7(a << 6, b << 6, c << 6, d, -1);
 }
+/* func_00010DC8 — 35 words. MATCH 100% (shape: m2c -O2). */
+#pragma optimization_level 2
+void func_00010DC8(void) {
+    extern int ehsys_BE3756D0();
+    extern int func_000062A0();
+    extern int func_00010DC8();
+    extern int func_00010E54();
+    func_00010E54();
+    func_000062A0(5, 2, 0, -1);
+    func_000062A0(6, 2, 0, -1);
+    func_000062A0(0xE, 2, 0, 0x10);
+    func_000062A0(0x11, 2, 0, 0x14);
+    ehsys_BE3756D0(0);
+}
+#pragma optimization_level 4
 
 /* func_00017374 — 2 words. MATCH 100% (shape: m2c). */
 void func_00017374(void) {

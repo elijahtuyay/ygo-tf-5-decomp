@@ -258,6 +258,33 @@ void func_00001C30(s32 arg0) {
     ehsys_1EC5342B();
     D_000101D4 = 0;
 }
+/* func_00001C54 — 51 words. MATCH 100% (shape: m2c). */
+void func_00001C54(s32 arg0) {
+    extern int ehsys_1D98951B();
+    extern int ehsys_23E69878();
+    extern int ehsys_399AC68A();
+    extern int ehsys_4175E3DB();
+    extern int ehsys_42110BF9();
+    extern int ehsys_5CBB9E43();
+    extern int ehsys_CABEA834();
+    extern int ehsys_E6E4401F();
+    extern int ehsys_F462EE6E();
+    extern int func_00001C54();
+    ehsys_CABEA834(ehsys_E6E4401F(ehsys_23E69878(ehsys_5CBB9E43(ehsys_F462EE6E(ehsys_F462EE6E(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_42110BF9(ehsys_399AC68A(ehsys_1D98951B(arg0, 0), 0), 0), 0), 3), 1), 0xA), 2), 9), 4), 0, 2, 3, 0, 0), -1), 0, 0), -1);
+}
+/* func_00001D20 — 48 words. MATCH 100% (shape: m2c). */
+void func_00001D20(s32 arg0) {
+    extern int ehsys_1D98951B();
+    extern int ehsys_23E69878();
+    extern int ehsys_399AC68A();
+    extern int ehsys_4175E3DB();
+    extern int ehsys_42110BF9();
+    extern int ehsys_5CBB9E43();
+    extern int ehsys_E6E4401F();
+    extern int ehsys_F462EE6E();
+    extern int func_00001D20();
+    ehsys_E6E4401F(ehsys_23E69878(ehsys_5CBB9E43(ehsys_F462EE6E(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_42110BF9(ehsys_399AC68A(ehsys_1D98951B(arg0, 0), 0), 0), 0), 3), 1), 0xA), 2), 9), 4), 0, 2, 3, 0, 0), -0x30000000), 0, 0);
+}
 
 /* func_00002048 — 18 words. MATCH 100% (shape: m2c). */
 void func_00002048(s32 arg0) {
