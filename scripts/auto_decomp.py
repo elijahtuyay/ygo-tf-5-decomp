@@ -172,6 +172,51 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     return src
 
 
+
+# Field widths read from the target instead of guessed. m2c renders an unknown
+# struct field as `p->unkNN`; the width of that access is not a mystery — the
+# load or store the target performs at that offset states it exactly. Reading it
+# beats trying one global width for every field in the function, which can never
+# be right when a function touches both a byte field and a word field.
+OPCODE_TYPE = {"lb": "char", "lbu": "unsigned char", "lh": "short",
+               "lhu": "unsigned short", "lw": "int",
+               "sb": "unsigned char", "sh": "unsigned short", "sw": "int"}
+LOADSTORE = re.compile(r"\*/\s+(l[bhw]u?|s[bhw])\s+\$\w+,\s*(-?0x[0-9A-Fa-f]+|0)\(\$\w+\)")
+
+
+def field_widths(asm_lines):
+    """{byte offset: C type} for every field the target loads or stores.
+
+    An offset accessed at two different widths is ambiguous (two structs sharing
+    a base register) and is left out, so the caller falls back to the search."""
+    out = {}
+    for line in asm_lines:
+        m = LOADSTORE.search(line)
+        if not m:
+            continue
+        raw = m.group(2)
+        off = int(raw, 16) if raw.startswith(("0x", "-0x")) else int(raw)
+        t = OPCODE_TYPE.get(m.group(1))
+        if t is None:
+            continue
+        if off in out and out[off] != t:
+            out[off] = None
+        else:
+            out.setdefault(off, t)
+    return {k: v for k, v in out.items() if v}
+
+
+def apply_field_widths(src, widths):
+    """Substitute each M2C_W with the width the target proves for that offset."""
+    def repl(m):
+        off = int(m.group(2), 16)
+        t = widths.get(off)
+        return (f"(*({t} *)((char *){m.group(1)} + 0x{m.group(2)}))" if t
+                else m.group(0))
+    return re.sub(r"\(\*\(M2C_W \*\)\(\(char \*\)(\w+) \+ 0x([0-9A-Fa-f]+)\)\)",
+                  repl, src)
+
+
 # ------------------------------------------------------------------- reshapes
 def shape_identity(src):
     return src
@@ -345,6 +390,43 @@ def try_candidate(module, fn, decls, body, workdir, flags=None):
     return ("MATCH" in verdict and "MISMATCH" not in verdict), verdict
 
 
+
+# Prototypes with the REAL argument count, from scripts/gen_context.py. m2c
+# decides how many arguments a call passes by looking at the call site, and it
+# only reliably sees $a0-$a3; arguments five to eight travel in $t0-$t3, and a
+# tail-call trampoline sets some and jumps without touching the rest, so nothing
+# at the call site reveals them. m2c then emits a call with too few arguments
+# and the draft compiles to FEWER instructions than the target. Feeding it real
+# prototypes fixes that at the source.
+#
+# These go ONLY into m2c's context, never into the compiled source: the compiled
+# source keeps K&R `extern int f();` declarations, because a strict prototype
+# makes MWCC reject perfectly good drafts that pass a pointer where the
+# prototype says s32.
+def load_prototypes(module):
+    path = os.path.join(ROOT, "build/ctx", module + ".h")
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    for line in open(path):
+        m = re.match(r"(?:s32|void)\s+(\w+)\(", line)
+        if m:
+            out[m.group(1)] = line.strip()
+    return out
+
+
+def contextualise(decls, protos):
+    """Swap K&R externs for measured prototypes, for m2c's eyes only."""
+    out = []
+    for d in decls:
+        m = re.match(r"extern \w+ ((?:func|ehsys)_[0-9A-F]+)\(\)", d)
+        if m and m.group(1) in protos:
+            out.append(protos[m.group(1)])
+        else:
+            out.append(d)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("module")
@@ -360,6 +442,12 @@ def main():
     workdir = os.path.join(ROOT, "build/auto", mod)
     os.makedirs(workdir, exist_ok=True)
     symtab = symbols(mod)
+    # Real argument counts for every callee (scripts/gen_context.py).
+    # Generated on demand so a fresh clone needs no extra step.
+    if not os.path.exists(os.path.join(ROOT, 'build/ctx', mod + '.h')):
+        subprocess.run([sys.executable, os.path.join(ROOT, 'scripts/gen_context.py'), mod],
+                       capture_output=True, cwd=ROOT)
+    protos = load_prototypes(mod)
 
     results, matched = [], []
     funcs = load_functions(mod)
@@ -376,8 +464,10 @@ def main():
         for flavour in DATA_FLAVOURS:
             decls = referenced(lines, symtab, fn, flavour)
             ctx = os.path.join(workdir, f"{fn}.ctx.c")
-            open(ctx, "w").write(PRELUDE + "\n" + "\n".join(decls) + "\n")
+            open(ctx, "w").write(PRELUDE + "\n"
+                                 + "\n".join(contextualise(decls, protos)) + "\n")
             draft = m2c_draft(mod, fn, ctx, slice_path(mod, fn, lines, workdir))
+            fw = field_widths(lines)
             if not draft:
                 continue
             compiled = False
@@ -388,9 +478,15 @@ def main():
                 ok = False
                 # Only iterate widths when the draft actually has unknown fields,
                 # so functions without them cost nothing extra.
-                widths = FIELD_WIDTHS if "M2C_W" in shaped else FIELD_WIDTHS[:1]
-                for width in widths:
-                    body = shaped.replace("M2C_W", width)
+                # Try the widths the TARGET proves first, then fall back to the
+                # blind search for any offset the asm did not disambiguate.
+                if "M2C_W" in shaped:
+                    exact = apply_field_widths(shaped, fw)
+                    widths = ([("asm", exact)] if "M2C_W" not in exact else []) + \
+                             [(w, shaped.replace("M2C_W", w)) for w in FIELD_WIDTHS]
+                else:
+                    widths = [(FIELD_WIDTHS[0], shaped)]
+                for width, body in widths:
                     for fl in FLAG_SETS:
                         ok, verdict = try_candidate(mod, fn, decls, body, workdir, fl)
                         if ok:

@@ -707,6 +707,19 @@ u8 func_0000494C(int *a0) {
 s32 func_00004970(s32 arg0) {
     return arg0;
 }
+/* func_00004978 — 15 words. MATCH 100% (shape: m2c). */
+s32 func_00004978(s32 arg0) {
+    extern int D_00053878;
+    extern int ehsys_EF9B5D06();
+    extern int func_00004978();
+    extern int func_00005F38();
+    s32 sp1C;
+
+    sp1C = arg0;
+    sp1C = func_00005F38(arg0, 0, 0x80000000);
+    ehsys_EF9B5D06((s32) &sp1C, (s32) &D_00053878);
+    return sp1C;
+}
 
 /* func_00004D28 — 3 words. MATCH 100% (verified). */
 void func_00004D28(int a0) {
@@ -1275,6 +1288,15 @@ s32 func_0000B148(void) {
     char *v1 = (char *)&D_00054C20;
     if (D_0005504C != 0) {
         return func_00030D5C(*(s32 **)(v1 + 0x42C));
+    }
+    return 0;
+}
+/* func_0000B1F4 — 37 words. MATCH 100% (shape: m2c). */
+s32 func_0000B1F4(s32 arg0, s32 arg1) {
+    extern int func_0000B07C();
+    extern int func_0000B1F4();
+    if ((func_0000B07C(arg0, arg1 - 0xF) != -1) && (func_0000B07C(arg0 + 0x18, arg1 - 0xF) != -1) && (func_0000B07C(arg0 + 0x18, arg1 + 0x14) != -1) && (func_0000B07C(arg0, arg1 + 0x14) != -1)) {
+        return 1;
     }
     return 0;
 }
@@ -2042,6 +2064,22 @@ s32 func_00022720(s32 *arg0) {
         return 1;
     }
     return 0;
+}
+/* func_00024670 — 57 words. MATCH 100% (shape: m2c). */
+void func_00024670(s32 arg0, s32 arg1) {
+    extern int ehsys_09794DF0();
+    extern int ehsys_1D98951B();
+    extern int ehsys_23E69878();
+    extern int ehsys_399AC68A();
+    extern int ehsys_4175E3DB();
+    extern int ehsys_42110BF9();
+    extern int ehsys_5CBB9E43();
+    extern int ehsys_9EA6989A();
+    extern int ehsys_C8DF61CD();
+    extern int ehsys_E6E4401F();
+    extern int ehsys_F462EE6E();
+    extern int func_00024670();
+    ehsys_9EA6989A(ehsys_23E69878(ehsys_09794DF0(ehsys_F462EE6E(ehsys_C8DF61CD(ehsys_5CBB9E43(ehsys_F462EE6E(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_F462EE6E(ehsys_E6E4401F(ehsys_42110BF9(ehsys_399AC68A(ehsys_1D98951B(arg0, 0), 0), 0), 0, 0), 9), 1), 0xA), 4), 0, 2, 3, 0, 0), 6, 0, 0xFF), 0), 0, 1), -1), arg1);
 }
 
 /* func_00024850 — bulk-matched thunk into ehsys_BC8E65D7. */
