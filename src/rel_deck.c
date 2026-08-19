@@ -448,6 +448,19 @@ s32 func_00015B04(u16 *arg0, u16 *arg1) {
 void func_00015D20(void) {
     func_00015D28();
 }
+/* func_000169B0 — 34 words. MATCH 100% (shape: pipeline). */
+void func_000169B0(void) {
+
+    extern int ehsys_20E340D9();
+    extern int ehsys_E1139F1A();
+    extern s32 D_0002E0FC;
+    ehsys_E1139F1A((*(int *)((char *)(*(int *)0xF768B4) + 0x14)));
+    ehsys_E1139F1A((*(int *)((char *)(*(int *)0xF768B4) + 0x10)));
+    ehsys_20E340D9(D_0002E0FC, (*(int *)((char *)(*(int *)0xF768B4) + 0x14)));
+    ehsys_20E340D9(D_0002E0FC, (*(int *)((char *)(*(int *)0xF768B4) + 0x10)));
+    ehsys_20E340D9(D_0002E0FC, *(int *)0xF768B4);
+    *(int *)0xF768B4 = NULL;
+}
 
 /* func_00016ACC — 12 words. MATCH 100% (shape: thunk; forwards $a0/$a2). */
 void func_00016ACC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
