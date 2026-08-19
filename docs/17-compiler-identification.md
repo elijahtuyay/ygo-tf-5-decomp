@@ -352,3 +352,16 @@ gitignored, and no issue or PR in the repository ever mentions `2.4.1.01`.
 first; they are all available today and none depends on the compiler question.
 If the size ceiling lifts, the mismatch was a red herring. If it does not, the
 compiler hunt resumes with much better evidence than a fingerprint alone.
+
+
+### Linker re-test, 2026-08-19: the fingerprint evidence is restored
+
+The earlier caveat — that the mixed-compiler `.comment` experiment used GNU ld
+rather than Metrowerks' own linker — has been retested with `mwldps2.exe
+-partial`. Linking a 2.3.1.01 object with a 2.4.1.01 object yields a `.comment`
+carrying BOTH strings, identical to GNU ld's behaviour. **A single string means
+a single compiler.** The "inherited from crt0/SDK object" explanation is dead.
+
+Combined with sotn-decomp matching large PSP functions using 219 (which reports
+3.0.0), the remaining consistent reading is that **Tag Force 5 and Castlevania
+were built with different compilers** — ours predating the 3.0.0 front-end.
