@@ -203,6 +203,16 @@ void func_00004F98(void) {
     temp_s0 = ehsys_6F0D36D3();
     ehsys_1EC5342B((temp_s0 + ehsys_sceGuFinish()) - 8);
 }
+/* func_00004FCC — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00004FCC(void) {
+
+    s32 sp1C;
+    s32 garbage;
+    s32 temp_v0;
+
+    ehsys_4DFEDFFA(temp_v0 = ehsys_DFCA450B(garbage, &sp1C));
+    ehsys_sceGuStart(2, temp_v0, sp1C);
+}
 
 /* func_0000500C — 2 words. MATCH 100% (shape: m2c). */
 void func_0000500C(void) {
@@ -301,6 +311,35 @@ int func_0000D710(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) {
 s32 func_0000F530(void) {
     extern int ehsys_B2B9FEFA();
     return ((s32 *)ehsys_B2B9FEFA())[1];
+}
+/* func_00010888 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00010888(void) {
+
+    s32 sp;
+    ehsys_23E69878(
+        ehsys_5CBB9E43(
+            ehsys_F462EE6E(
+                ehsys_4175E3DB(
+                    ehsys_4175E3DB(
+                        ehsys_E6E4401F(
+                            ehsys_CABEA834(
+                                ehsys_09794DF0(
+                                    ehsys_F462EE6E(
+                                        ehsys_F462EE6E(
+                                            ehsys_42110BF9(
+                                                ehsys_399AC68A(
+                                                    ehsys_1D98951B(sp, 0), 0),
+                                                0),
+                                            9),
+                                        1),
+                                    0, 1),
+                                -1),
+                            0, 0),
+                        1),
+                    0xA),
+                4),
+            0, 2, 3, 0, 0),
+        -1);
 }
 
 /* func_00010DC0 — 4 words. MATCH 100% (shape: hand). */

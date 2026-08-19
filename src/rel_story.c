@@ -2627,6 +2627,17 @@ void func_0001580C(void) {
     extern int func_0001580C();
     func_00011D20();
 }
+/* func_00015854 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00015854(void) {
+
+    extern int ehsys_1078C73B();
+    extern s32 D_00035204;
+    s32 *s0 = &D_00035204;
+    if (*s0 != 0) {
+        ehsys_1078C73B(*s0);
+        *s0 = 0;
+    }
+}
 
 /* func_00015890 — 3 words. MATCH 100% (shape: manual). */
 s32 func_00015890(void) {

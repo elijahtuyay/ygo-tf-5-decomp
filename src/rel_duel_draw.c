@@ -1897,6 +1897,26 @@ void func_000327F8(s32 arg0) {
     func_00014060((s32)buf);
     func_00032744(arg0, buf);
 }
+/* func_0003282C — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_0003282C(f32 a0, f32 a1, f32 a2) {
+
+
+    struct { char pad[12]; } tmp = {0};
+    ((f32 *) &tmp)[0] = a0;
+    ((f32 *) &tmp)[1] = a1;
+    ((f32 *) &tmp)[2] = a2;
+    ehsys_42C464D5(&tmp);
+}
+/* func_00032870 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00032870(f32 a0, f32 a1, f32 a2) {
+
+
+    struct { char pad[12]; } tmp = {0};
+    ((f32 *) &tmp)[0] = a0;
+    ((f32 *) &tmp)[1] = a1;
+    ((f32 *) &tmp)[2] = a2;
+    ehsys_0089B865(&tmp);
+}
 
 /* func_00032B64 — 29 words. MATCH 100% (shape: m2c). */
 void func_00032B64(void) {
