@@ -189,6 +189,37 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # below tries the alternatives.
     src = re.sub(r"([A-Za-z_]\w*)->unk_?([0-9A-Fa-f]+)",
                  lambda m: f"(*(M2C_W *)((char *){m.group(1)} + 0x{m.group(2)}))", src)
+    # m2c declares a temp `void *` when it thinks a register holds a pointer,
+    # then assigns it a plain int load (`temp = *(int *)0xB7AB0C;`), which MWCC
+    # rejects as an illegal implicit conversion. Both are 32 bits and live in
+    # the same register, so declaring the temp `int` makes every use legal —
+    # the later `(char *)temp + 0x10` is then an explicit cast, which is fine.
+    # This was the largest remaining compile failure for medium functions.
+    # ...and the same for any other pointer-typed local m2c invents (`int *sp4C`,
+    # `s32 *temp_v0`). It assigns int-returning calls and raw loads to these, so
+    # every one is an illegal implicit conversion. All are 32 bits in the same
+    # register, and the later uses are explicit casts, so `int` is safe.
+    src = re.sub(r"^(\s*)(?:void|[su]?\d*int|s8|u8|s16|u16|s32|u32|f32|char|short|long)\s*\*(\w+);\s*$",
+                 r"\1int \2;", src, flags=re.M)
+    # A call through a struct field arrives as `(*(int *)(...))(args)`, which is
+    # a call of a non-function. Cast it to a function pointer first.
+    # NOT ATTEMPTED: casting `(*(int *)(...))(args)` to a function pointer.
+    # The inner expression is parenthesised, and a regex cannot tell where it
+    # ends — a non-greedy match happily runs past the closing paren to a later
+    # `))(` on the same line and emits unbalanced output, breaking drafts that
+    # would otherwise compile. docs/11 already recorded this trap for the arrow
+    # form; it applies here too. Worth ~3 functions, needs a real parser.
+
+    # A field access through a dereferenced literal address, which m2c writes
+    # as `(*(int *)0xB7AB0C)->unk0`. Bounded enough to rewrite safely: the left
+    # side is exactly a dereferenced hex constant, so there is no paren
+    # ambiguity to get wrong.
+    src = re.sub(r"\(\*\(int \*\)(0x[0-9A-Fa-f]+)\)->unk_?([0-9A-Fa-f]+)",
+                 lambda m: f"(*(M2C_W *)((char *)*(int *){m.group(1)} + 0x{m.group(2)}))", src)
+    # And the mirror of the void*-temp fix: m2c loads through `*(void **)ADDR`
+    # for the same registers it declared `void *`. Those declarations are now
+    # `int`, so the loads must be `*(int *)` too or the conversion is illegal.
+    src = src.replace("*(void **)", "*(int *)")
     # m2c also renders a field of a GLOBAL it believes is a struct with a dot,
     # `D_00054BD0.unk10`, which MWCC rejects with "not a struct/union/class"
     # because our declaration is a scalar. Same rewrite, taking the address
