@@ -2076,6 +2076,96 @@ int func_00033420(s32 arg0, s32 *arg1, s32 *arg2) {
     *arg1 = p[0];
     *arg2 = p[1];
 }
+/* func_00033794 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_000337F0();
+int func_00033794(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_000337F0, arg1, arg2, 0x56C4, 0);
+    if (h != -1) { func_00031974(h)[2] = arg0; }
+    return h;
+}
+/* func_00033EF4 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00033F50();
+int func_00033EF4(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00033F50, arg1, arg2, 0xC, 0);
+    if (h != -1) { func_00031974(h)[2] = arg0; }
+    return h;
+}
+/* func_000340D0 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0003412C();
+int func_000340D0(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0003412C, arg1, arg2, 0x2B4, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
+/* func_00034644 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_000346A0();
+int func_00034644(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_000346A0, arg1, arg2, 0x24AC, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
+/* func_00035790 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_000357EC();
+int func_00035790(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_000357EC, arg1, arg2, 0x1680, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
+/* func_00036210 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0003626C();
+int func_00036210(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0003626C, arg1, arg2, 0x4A28, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
+/* func_00037100 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0003715C();
+int func_00037100(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0003715C, arg1, arg2, 0xBF8, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
+/* func_00037D0C — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00037D68();
+int func_00037D0C(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00037D68, arg1, arg2, 0x74C, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
+/* func_000387EC — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00038848();
+int func_000387EC(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00038848, arg1, arg2, 0x484, 0);
+    if (h != -1) { func_00031974(h)[0] = arg0; }
+    return h;
+}
 
 /* func_00039128 — 0 words. MATCH 100% (shape: twin of func_00007BB4). */
 void func_00039128(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
@@ -2108,6 +2198,16 @@ void func_00039284(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
         *(s32 *)((char *)p + 4) = arg4;
     }
 }
+/* func_0003D040 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0003D09C();
+int func_0003D040(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0003D09C, arg1, arg2, 0x67CC, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
+}
 
 /* func_0003D878 — 3 words. MATCH 100% (shape: m2c). */
 void func_0003D878(s32 arg0) {
@@ -2127,6 +2227,66 @@ void func_0003DAF8(void) {
 /* func_0003DB00 — 2 words. MATCH 100% (shape: m2c). */
 void func_0003DB00(void) {
 
+}
+/* func_0003DB08 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0003DB64();
+int func_0003DB08(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0003DB64, arg1, arg2, 0x3014, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
+/* func_000401F8 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00040254();
+int func_000401F8(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00040254, arg1, arg2, 0x2230, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
+/* func_000429C0 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00042A1C();
+int func_000429C0(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00042A1C, arg1, arg2, 0x13E8, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
+/* func_00042FDC — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00043038();
+int func_00042FDC(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00043038, arg1, arg2, 0x2DEC, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
+/* func_00043BB8 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00043C14();
+int func_00043BB8(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00043C14, arg1, arg2, 0xAB8, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
+}
+/* func_00044718 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00044774();
+int func_00044718(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00044774, arg1, arg2, 0x710, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
 }
 
 /* func_00045180 — 9 words. MATCH 100% (shape: m2c). */
@@ -2161,6 +2321,26 @@ s32 func_000451A4(int arg0, s32 arg1, int arg2, int arg3) {
         return -1;
     }
 }
+/* func_000452B8 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00045314();
+int func_000452B8(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00045314, arg1, arg2, 0x166C, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
+/* func_00045F9C — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00045FF8();
+int func_00045F9C(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00045FF8, arg1, arg2, 0x18EC, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
+}
 
 /* func_00047030 — 3 words. MATCH 100% (shape: m2c). */
 void func_00047030(s32 arg0) {
@@ -2170,6 +2350,46 @@ void func_00047030(s32 arg0) {
 /* func_000483E4 — 3 words. MATCH 100% (shape: m2c). */
 void func_000483E4(s32 arg0) {
     (*(s32 *)&D_000937A8) = arg0;
+}
+/* func_000483F0 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0004844C();
+int func_000483F0(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0004844C, arg1, arg2, 0x7150, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
+}
+/* func_00049018 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00049074();
+int func_00049018(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00049074, arg1, arg2, 0x158, 0);
+    if (h != -1) { func_00031974(h)[8] = arg0; }
+    return h;
+}
+/* func_000491DC — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00049238();
+int func_000491DC(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00049238, arg1, arg2, 0x24, 0);
+    if (h != -1) { func_00031974(h)[6] = arg0; }
+    return h;
+}
+/* func_0004C3C8 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0004C424();
+int func_0004C3C8(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0004C424, arg1, arg2, 0x430, 0);
+    if (h != -1) { func_00031974(h)[2] = arg0; }
+    return h;
 }
 
 /* func_0004C4A4 — 13 words. MATCH 100% (shape: m2c). */
