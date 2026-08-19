@@ -88,7 +88,31 @@ def symbols(module):
     return out
 
 
-def referenced(asm_lines, symtab, self_name=None, data_type="char"):
+# Global types measured across the WHOLE module by scripts/gen_types.py, rather
+# than guessed per function. 95% of named globals are accessed at exactly one
+# width everywhere they appear, so the type is already decided by the binary.
+# This matters most for big functions: the number of independent type decisions
+# grows with size (median 3 at <=20 instructions, 22 above 160), and a function
+# only matches if EVERY one is right, which is why the match rate collapses from
+# 11% to 0% across that range. Using the measured type removes the guess.
+_TYPE_CACHE = {}
+
+
+def measured_types(module):
+    if module in _TYPE_CACHE:
+        return _TYPE_CACHE[module]
+    out = {}
+    path = os.path.join(ROOT, "include/globals", module + ".h")
+    if os.path.exists(path):
+        for line in open(path):
+            m = re.match(r"extern (\w+) (\w+);", line)
+            if m:
+                out[m.group(2)] = m.group(1)
+    _TYPE_CACHE[module] = out
+    return out
+
+
+def referenced(asm_lines, symtab, self_name=None, data_type="char", types=None):
     """Declarations a candidate needs: imports it calls, globals it touches.
 
     m2c decides on its own whether a global is used as a scalar or a pointer, so
@@ -101,7 +125,7 @@ def referenced(asm_lines, symtab, self_name=None, data_type="char"):
         decls.append(f"extern int {n}();" if symtab[n] == "func" else f"extern {data_type} {n};")
     for n in sorted(set(re.findall(r"\b(?:D|jtbl)_[0-9A-F]{4,8}\b", text))):
         if n not in symtab:
-            decls.append(f"extern {data_type} {n};")
+            decls.append(f"extern {(types or {}).get(n, data_type)} {n};")
     for n in sorted(set(re.findall(r"\bfunc_[0-9A-F]{8}\b", text))):
         if n != self_name:                     # never re-declare the function we define
             decls.append(f"extern int {n}();")
@@ -165,6 +189,14 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # below tries the alternatives.
     src = re.sub(r"([A-Za-z_]\w*)->unk_?([0-9A-Fa-f]+)",
                  lambda m: f"(*(M2C_W *)((char *){m.group(1)} + 0x{m.group(2)}))", src)
+    # m2c also renders a field of a GLOBAL it believes is a struct with a dot,
+    # `D_00054BD0.unk10`, which MWCC rejects with "not a struct/union/class"
+    # because our declaration is a scalar. Same rewrite, taking the address
+    # instead of using the pointer. This is the single biggest compile failure
+    # for medium functions — 12 of 27 in a sample of 81-160 instruction drafts,
+    # where the arrow form barely appears.
+    src = re.sub(r"\b([A-Za-z_]\w*)\.unk_?([0-9A-Fa-f]+)",
+                 lambda m: f"(*(M2C_W *)((char *)&{m.group(1)} + 0x{m.group(2)}))", src)
     # Only the simple `identifier->unkNN` case is rewritten. A parenthesised
     # left-hand side needs balanced-paren handling that a regex cannot do safely —
     # an earlier attempt produced unbalanced output and broke otherwise-valid
@@ -462,7 +494,7 @@ def main():
     for i, (fn, lines, words) in enumerate(todo):
         best, hit = None, False
         for flavour in DATA_FLAVOURS:
-            decls = referenced(lines, symtab, fn, flavour)
+            decls = referenced(lines, symtab, fn, flavour, measured_types(mod))
             ctx = os.path.join(workdir, f"{fn}.ctx.c")
             open(ctx, "w").write(PRELUDE + "\n"
                                  + "\n".join(contextualise(decls, protos)) + "\n")
