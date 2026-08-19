@@ -197,6 +197,16 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # so `func(&D_x)` keeps passing a real address.
     src = re.sub(r"&((?:D|jtbl)_[0-9A-Fa-f]{4,8})(\s*[+-]\s)", r"((int)&\1)\2", src)
     src = rewrite_arrow_fields(src)
+    src = fix_int_derefs(src)
+    # m2c also declares PARAMETERS `void *` when it thinks a register holds a
+    # pointer. The locals were retyped to int above; the parameters must follow
+    # or `arg0 + 0x30` is "illegal operands 'void *' + 'int'".
+    src = re.sub(r"\bvoid \*(arg\d+)\b", r"int \1", src)
+    # NOT DONE: rewriting a bare `*temp_v0` to `*(int *)temp_v0`. Tried, and it
+    # made compile failures WORSE (23 -> 29 on a fixed 60-function sample):
+    # m2c uses those names for genuine pointers too, and forcing the cast broke
+    # drafts that were already valid. Measured, reverted, recorded.
+
     # m2c declares a temp `void *` when it thinks a register holds a pointer,
     # then assigns it a plain int load (`temp = *(int *)0xB7AB0C;`), which MWCC
     # rejects as an illegal implicit conversion. Both are 32 bits and live in
@@ -288,6 +298,50 @@ def apply_field_widths(src, widths):
                   repl, src)
 
 
+
+
+def fix_int_derefs(src):
+    """Restore the pointer cast on a dereference of int address arithmetic.
+
+    Casting `&D_x` to int (above) makes byte offsets scale correctly, but m2c
+    also writes plain `*(base + off)` for a word load. Once base is an int that
+    dereference is illegal, and it became the single largest compile failure
+    (68 of 200 sampled drafts) — a class this pipeline introduced itself while
+    fixing the scaling.
+
+    Rewrite `*(EXPR)` to `*(int *)(EXPR)` when EXPR contains the `(int)&` marker
+    and is not already cast. Uses a paren scanner rather than a regex for the
+    same reason as rewrite_arrow_fields: the expression is parenthesised and its
+    end cannot be found by pattern alone.
+    """
+    out, i = src, 0
+    while True:
+        j = out.find("*(", i)
+        if j < 0:
+            break
+        # skip forms that already carry a cast, e.g. `*(int *)(...)`
+        after = out[j + 2:j + 40]
+        if re.match(r"\s*(?:unsigned |signed )?\w+\s*\*\s*\)", after):
+            i = j + 2
+            continue
+        depth, k = 0, j + 1
+        while k < len(out):
+            if out[k] == "(":
+                depth += 1
+            elif out[k] == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            k += 1
+        if k >= len(out):
+            break
+        inner = out[j + 2:k]
+        if "(int)&" in inner:
+            out = out[:j] + "*(int *)(" + inner + ")" + out[k + 1:]
+            i = j + 9 + len(inner)
+        else:
+            i = j + 2
+    return out
 
 def rewrite_arrow_fields(src):
     """Rewrite `EXPR->unkNN` for ANY left-hand side, not just a bare identifier.
