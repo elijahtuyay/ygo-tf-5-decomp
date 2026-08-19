@@ -187,8 +187,16 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # width is whatever the target's load instruction does, and guessing `lw`
     # everywhere silently dooms every halfword and byte field. shape_field_width
     # below tries the alternatives.
-    src = re.sub(r"([A-Za-z_]\w*)->unk_?([0-9A-Fa-f]+)",
-                 lambda m: f"(*(M2C_W *)((char *){m.group(1)} + 0x{m.group(2)}))", src)
+    # m2c computes an address inside a global as `&D_0034E660 + (i * 0xB3C)`.
+    # That offset is in BYTES, but `&D_x` now has the global's measured type, so
+    # C scales it by the element size and the address is wrong — and assigning
+    # the result to a local is an illegal pointer/int conversion besides.
+    # Casting the base to int makes the arithmetic byte-accurate again and the
+    # result assignable; the arrow rewriter above re-casts to `char *` wherever
+    # the result is used as a base. Only `&D_x` followed by + or - is touched,
+    # so `func(&D_x)` keeps passing a real address.
+    src = re.sub(r"&((?:D|jtbl)_[0-9A-Fa-f]{4,8})(\s*[+-]\s)", r"((int)&\1)\2", src)
+    src = rewrite_arrow_fields(src)
     # m2c declares a temp `void *` when it thinks a register holds a pointer,
     # then assigns it a plain int load (`temp = *(int *)0xB7AB0C;`), which MWCC
     # rejects as an illegal implicit conversion. Both are 32 bits and live in
@@ -278,6 +286,58 @@ def apply_field_widths(src, widths):
                 else m.group(0))
     return re.sub(r"\(\*\(M2C_W \*\)\(\(char \*\)(\w+) \+ 0x([0-9A-Fa-f]+)\)\)",
                   repl, src)
+
+
+
+def rewrite_arrow_fields(src):
+    """Rewrite `EXPR->unkNN` for ANY left-hand side, not just a bare identifier.
+
+    m2c writes a field of a computed address as `(base + i*0x14)->unk34`, which
+    MWCC rejects because nothing declares that struct. The bare-identifier case
+    has always been rewritten; the parenthesised case is the single biggest
+    compile failure left (28 of 300 sampled functions, plus much of the
+    "pointer/array required" class).
+
+    docs/11 records an earlier attempt with a regex that emitted unbalanced
+    parentheses and broke working drafts, because a regex cannot find where a
+    parenthesised expression starts. This scans backwards with a paren counter
+    instead, which can: from the `->` walk left over a balanced group, or over a
+    plain identifier, and take that as the base.
+    """
+    out = src
+    while True:
+        m = re.search(r"->unk_?([0-9A-Fa-f]+)", out)
+        if not m:
+            break
+        off, end = m.group(1), m.end()
+        i = m.start() - 1
+        while i >= 0 and out[i] == " ":
+            i -= 1
+        if i < 0:
+            break
+        if out[i] == ")":
+            depth, j = 0, i
+            while j >= 0:
+                if out[j] == ")":
+                    depth += 1
+                elif out[j] == "(":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j -= 1
+            if j < 0:
+                break
+            start = j
+        else:
+            j = i
+            while j >= 0 and (out[j].isalnum() or out[j] == "_"):
+                j -= 1
+            start = j + 1
+            if start > i:
+                break
+        base = out[start:i + 1]
+        out = out[:start] + f"(*(M2C_W *)((char *){base} + 0x{off}))" + out[end:]
+    return out
 
 
 # ------------------------------------------------------------------- reshapes
