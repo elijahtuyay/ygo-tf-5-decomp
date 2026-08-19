@@ -547,3 +547,33 @@ Note what level 2 and 3 do *not* yet do: the import stubs, module tables, `.data
 and ELF metadata are carried over from the shipped module, not reconstructed.
 Across the 28 modules that is 37% of the bytes. Full 100% additionally requires
 generating those from source declarations (a `psp-prxgen`-style step).
+
+
+### Flag space: swept, and our flags are already right (2026-08-19)
+
+`Xeeynamo/sotn-decomp` builds PSP with a much richer flag set than this project
+has ever used, so all of it was swept across five modules:
+
+| flags | movie_viewer | labo | soundtest | tutoriallist | conv_machine |
+|---|---:|---:|---:|---:|---:|
+| `-O4,s -sdatathreshold 0` (ours) | **15** | **12** | **9** | **22** | **26** |
+| `+ -char unsigned` | 15 | 11 | 9 | 21 | 26 |
+| `+ -opt nointrinsics` | 15 | 12 | 9 | 22 | 26 |
+| `+ -fl divbyzerocheck` | 15 | 12 | 9 | 22 | 26 |
+| `-O4,p -sdatathreshold 0` | 14 | 11 | 7 | 20 | 25 |
+| `-O3,s -sdatathreshold 0` | 15 | 11 | 9 | 22 | 26 |
+| `-Op` / `-O2,s` (global) | 2 | 2 | 0 | 0 | 0 |
+
+Conclusions, all negative but worth not re-testing:
+
+- **`-char unsigned` is WRONG for this game** and actively loses matches
+  (labo 12->11, tutoriallist 22->21). Tag Force uses **signed** char. sotn-decomp
+  needs it; we must not copy it.
+- `-opt nointrinsics` and `-fl divbyzerocheck` change nothing here.
+- `-O4,p` is worse everywhere, re-confirming `,s`.
+- `-O3,s` ties `-O4,s` except in `rel_labo`, so the level is pinned at 4 after all
+  (docs/09 previously said the level was unpinned).
+- `-Op` and `-O2,s` are catastrophic as GLOBAL flags — they are per-translation-unit
+  settings, which is the whole point of workstream C.
+
+**The flag space is no longer an open lead.** `-O4,s -sdatathreshold 0` stands.
