@@ -61,8 +61,12 @@ def normalise(text, base=0):
     # `li a3,3` is `addiu a3,zero,3`; drop the implicit zero so both agree
     # splat prints immediates in hex, objdump in decimal
     def num(tok):
+        # splat prints hex (and negative hex, `-0xFF`), objdump decimal
         try:
-            return str(int(tok, 16) if tok.lower().startswith("0x") else int(tok))
+            neg = tok.startswith("-")
+            body = tok[1:] if neg else tok
+            v = int(body, 16) if body.lower().startswith("0x") else int(body)
+            return str(-v if neg else v)
         except ValueError:
             return tok
     t = " ".join(num(tok) for tok in t.split() if tok not in ("0", "zero"))
