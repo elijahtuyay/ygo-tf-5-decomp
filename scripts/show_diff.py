@@ -33,6 +33,37 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TARGET = re.compile(r"\s*/\* [0-9A-F]+ ([0-9A-F]+) ([0-9A-F]{8}) \*/\s+(\S+)\s*(.*)")
 
 
+
+def normalise(text):
+    """Compare semantically, not textually.
+
+    The two sides use different notations for the same instruction: splat prints
+    `sw $a0, %lo(D_00351854)($v1)` while objdump prints `sw a0,0(v1)` with the
+    relocated symbol appended on its own line. Comparing raw strings marks every
+    relocated instruction as differing and buries the one row that actually
+    matters. Normalise to (mnemonic, registers, symbol) and drop the immediate
+    wherever a relocation supplies it.
+    """
+    t = text.replace("$", "").replace(",", " ")
+    t = re.sub(r"%hi\(([^)]*)\)", r"\1", t)
+    t = re.sub(r"%lo\(([^)]*)\)", r"\1", t)
+    t = re.sub(r"\b0x0\b", "0", t)
+    # objdump leaves a 0 placeholder in the relocated immediate; splat puts the
+    # symbol there instead. Drop bare zeros so the two agree.
+    t = t.replace("(", " ").replace(")", " ")   # `0(v1)` and `SYM(v1)` -> tokens
+    # `li a3,3` is `addiu a3,zero,3`; drop the implicit zero so both agree
+    # splat prints immediates in hex, objdump in decimal
+    def num(tok):
+        try:
+            return str(int(tok, 16) if tok.lower().startswith("0x") else int(tok))
+        except ValueError:
+            return tok
+    t = " ".join(num(tok) for tok in t.split() if tok not in ("0", "zero"))
+    t = re.sub(r"\bli\b", "addiu", t)          # objdump prints addiu x,zero,N as li
+    t = re.sub(r"\bmove\b", "addu", t)         # ...and addu x,y,zero as move
+    t = re.sub(r"\bnop\b", "sll 0 0 0", t)
+    return " ".join(t.split())
+
 def target_insns(module, func):
     out, cur = [], False
     for line in open(os.path.join(ROOT, "asm", module, "text.s"), errors="replace"):
@@ -95,8 +126,16 @@ def main():
         return 1
 
     n = max(len(tgt), len(cand))
-    diff_rows = {i for i in range(n)
-                 if (tgt[i][1] if i < len(tgt) else None) != (cand[i] if i < len(cand) else None)}
+    def same(i):
+        t = normalise(tgt[i][1]) if i < len(tgt) else None
+        c = normalise(cand[i]) if i < len(cand) else None
+        if t is None or c is None:
+            return False
+        # objdump appends the relocated symbol; splat has it inline, so a row
+        # matches if one side's tokens are a subset of the other's
+        return t == c or set(t.split()) == set(c.split())
+
+    diff_rows = {i for i in range(n) if not same(i)}
     show = set()
     for i in diff_rows:
         show.update(range(max(0, i - a.context), min(n, i + a.context + 1)))
@@ -114,7 +153,7 @@ def main():
         skipped = False
         t = tgt[i][1] if i < len(tgt) else ""
         c = cand[i] if i < len(cand) else ""
-        mark = " " if t == c else ">"
+        mark = " " if i not in diff_rows else ">"
         print(f"{mark}{i:>3}  {t:<44}{c}")
     return 0
 
