@@ -4284,6 +4284,17 @@ int func_0016CC78(int a0, int a1, int a2, int a3, int t0, int t1) {
     extern int func_0016CC34();
     return func_001621C4(a1, (*(unsigned short *)((char *)(a0) + 0)), ((int)&func_0016CC34), 0, (*(int *)((char *)(a0) + 8)), 0);
 }
+/* func_0016CD6C — 11 words. MATCH 100% (shape: bitfield-pack). */
+typedef unsigned short u16; typedef unsigned char u8;
+typedef struct {
+ u8 blo : 6; u8 f : 1; u8 bhi : 1; } B_func_0016CD6C;
+typedef struct { u16 hlo : 7; u16 y : 8; u16 hhi : 1; } H_func_0016CD6C;
+extern int func_0007914C();
+int func_0016CD6C(int a, int b, int c, int d, u8 *p, int *q) {
+    B_func_0016CD6C *bp = (B_func_0016CD6C *)(p + 0x1);
+    H_func_0016CD6C *hp = (H_func_0016CD6C *)(p + 0x2);
+    return func_0007914C(*(int *)((char *)q + 0x0), 0x1E11, bp->f + (hp->y << 1));
+}
 /* func_0016CEF8 — 9 words. MATCH 100% (shape: bulk). */
 int func_0016CEF8(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
     extern int func_00161DF0();
@@ -4501,6 +4512,17 @@ int func_0016E744(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
     int local = *(short *)((char *)a0 + 0x2);
     return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DE0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x10);
 }
+/* func_0016ED0C — 11 words. MATCH 100% (shape: bitfield-pack). */
+typedef unsigned short u16; typedef unsigned char u8;
+typedef struct {
+ u8 blo : 6; u8 f : 1; u8 bhi : 1; } B_func_0016ED0C;
+typedef struct { u16 hlo : 7; u16 y : 8; u16 hhi : 1; } H_func_0016ED0C;
+extern int func_0007914C();
+int func_0016ED0C(int a, int b, int c, int d, u8 *p, int *q) {
+    B_func_0016ED0C *bp = (B_func_0016ED0C *)(p + 0x1);
+    H_func_0016ED0C *hp = (H_func_0016ED0C *)(p + 0x2);
+    return func_0007914C(*(int *)((char *)q + 0x0), 0x21DE, bp->f + (hp->y << 1));
+}
 /* func_0016F040 — 14 words. MATCH 100% (shape: hand). */
 int func_0016F040(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
     extern int func_00161DF0();
@@ -4516,6 +4538,17 @@ int func_0016F2BC(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
     extern int func_0016F2BC();
     int local = *(short *)((char *)a0 + 0x2);
     return func_00161DF0(a1, (*(unsigned short *)((char *)(a0) + 0)), a2, ((int)&func_00162DD0), ((int)&local), (*(int *)((char *)(a0) + 8)), 0x4);
+}
+/* func_0016F404 — 11 words. MATCH 100% (shape: bitfield-pack). */
+typedef unsigned short u16; typedef unsigned char u8;
+typedef struct {
+ u8 blo : 6; u8 f : 1; u8 bhi : 1; } B_func_0016F404;
+typedef struct { u16 hlo : 7; u16 y : 8; u16 hhi : 1; } H_func_0016F404;
+extern int func_0007914C();
+int func_0016F404(int a, int b, int c, int d, u8 *p, int *q) {
+    B_func_0016F404 *bp = (B_func_0016F404 *)(p + 0x1);
+    H_func_0016F404 *hp = (H_func_0016F404 *)(p + 0x2);
+    return func_0007914C(*(int *)((char *)q + 0x0), 0x2282, bp->f + (hp->y << 1));
 }
 /* func_0016F574 — 14 words. MATCH 100% (shape: hand). */
 int func_0016F574(int a0, int a1, int a2, int a3, int t0, int t1, int t2) {
@@ -4551,6 +4584,17 @@ int func_0016F550(int a0, int a1, int a2, int a3, int t0, int t1) {
     extern int func_001621C4();
     extern int func_0016F46C();
     return func_001621C4(a1, (*(unsigned short *)((char *)(a0) + 0)), ((int)&func_0016F46C), 0, (*(int *)((char *)(a0) + 8)), 8);
+}
+/* func_0016F730 — 11 words. MATCH 100% (shape: bitfield-pack). */
+typedef unsigned short u16; typedef unsigned char u8;
+typedef struct {
+ u8 blo : 6; u8 f : 1; u8 bhi : 1; } B_func_0016F730;
+typedef struct { u16 hlo : 7; u16 y : 8; u16 hhi : 1; } H_func_0016F730;
+extern int func_0007914C();
+int func_0016F730(int a, int b, int c, int d, u8 *p, int *q) {
+    B_func_0016F730 *bp = (B_func_0016F730 *)(p + 0x1);
+    H_func_0016F730 *hp = (H_func_0016F730 *)(p + 0x2);
+    return func_0007914C(*(int *)((char *)q + 0x0), 0x22ED, bp->f + (hp->y << 1));
 }
 /* func_0016F7D8 — 9 words. MATCH 100% (shape: bulk). */
 int func_0016F7D8(int a0, int a1, int a2, int a3, int t0, int t1) {
@@ -4898,6 +4942,17 @@ int func_0016F8FC(int a0, int a1, int a2, int a3, int t0, int t1) {
     extern int func_0016F83C();
     extern int func_0016F8FC();
     return func_001621C4(a1, (*(unsigned short *)((char *)(a0) + 0)), ((int)&func_0016F83C), ((int)&a2), (*(int *)((char *)(a0) + 8)), 0);
+}
+/* func_0016FD0C — 11 words. MATCH 100% (shape: bitfield-pack). */
+typedef unsigned short u16; typedef unsigned char u8;
+typedef struct {
+ u8 blo : 6; u8 f : 1; u8 bhi : 1; } B_func_0016FD0C;
+typedef struct { u16 hlo : 7; u16 y : 8; u16 hhi : 1; } H_func_0016FD0C;
+extern int func_0007914C();
+int func_0016FD0C(int a, int b, int c, int d, u8 *p, int *q) {
+    B_func_0016FD0C *bp = (B_func_0016FD0C *)(p + 0x1);
+    H_func_0016FD0C *hp = (H_func_0016FD0C *)(p + 0x2);
+    return func_0007914C(*(int *)((char *)q + 0x0), 0x2356, bp->f + (hp->y << 1));
 }
 /* func_00170080 — 12 words. MATCH 100% (shape: hand). */
 int func_00170080(int a0, int a1, int a2, int a3, int t0, int t1) {

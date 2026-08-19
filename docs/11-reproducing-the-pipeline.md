@@ -645,3 +645,29 @@ Families whose only remaining diff is branch-likely selection (`bnezl` where the
 target has `bnez` plus `nop`), or the `byte = (byte & ~1) | (arg & 1)` operand
 order, are the documented dead ends — no loop shape, optimisation level or
 pragma moved either. Recognise and skip.
+
+### Bitfields: `sll N; srl M` is a field read, and MWCC packs LSB-first
+
+A pair of shifts with no mask between them is not arithmetic, it is a bitfield
+read, and the field's position is recoverable arithmetically:
+
+    lhu $v0, 0x2($t0)
+    sll $v0, $v0, 17      -> field LSB   = M - N        (24 - 17 = 7)
+    srl $v0, $v0, 24      -> field width = 32 - M       (32 - 24 = 8)
+
+**MWCC allocates bitfields from the LSB of the storage unit**, so the members
+must be declared in increasing bit order, with explicit padding members either
+side to place the one you want:
+
+    typedef struct { u16 lo : 7; u16 y : 8; u16 hi : 1; } H;   /* y at bits 7..14 */
+    typedef struct { u8  pad : 6; u8 f : 1; u8 top : 1; } B;   /* f at bit 6     */
+
+Declaring them MSB-first produces the right INSTRUCTIONS with the wrong shift
+amounts, which looks like a near-miss and is easy to mistake for a scheduling
+problem. Five `rel_duel_eng` functions matched from this once the order was
+right.
+
+Watch the operand base when reading these out of the disassembly: shift amounts
+print in decimal (`sll $v0, $v0, 17`) while other immediates print in hex with a
+`0x` prefix (`addiu $a1, $zero, 0x1E11`). Parsing a shift as hex silently yields
+the wrong field position.
