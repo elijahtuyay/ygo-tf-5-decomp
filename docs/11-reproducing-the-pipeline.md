@@ -734,3 +734,28 @@ everything first.
 **The lesson for anyone continuing:** measure which gate is failing before
 optimising anything. The type work was the right idea aimed at the wrong gate,
 and only measuring the compile errors revealed that.
+
+### Declare externs at BLOCK scope, always
+
+A generated function that declares its globals at file scope will break the
+whole translation unit, because `src/<module>.c` already carries block-scope
+externs from earlier merges and they frequently disagree:
+
+    line 7790:  extern int D_003268E8;     /* scalar, inside another function */
+    inserted:   extern int D_003268E8[];   /* array, at file scope */
+
+Two block-scope declarations in different functions never conflict; a file-scope
+one conflicts with all of them. This is why `merge_matches.py` injects its
+externs inside the body, and any new generator must do the same. The symptom is
+confusing: the generated function matches perfectly on its own and then
+contributes nothing, because the whole-file verify fails to compile and rolls
+it back.
+
+### gen_types: a store does not carry signedness
+
+`sb` is what MWCC emits for both `char` and `unsigned char`; only a load
+distinguishes them. Letting store opcodes vote on signedness marked every global
+that is stored with `sh` and loaded with `lh` as "seen as s16, u16", i.e.
+ambiguous, when its width was never in doubt. Fixing that took the ambiguous
+count from 182 to 66 and the determined count to 3,460 — and immediately closed
+a 28-instruction function whose only remaining diffs were `sh` rendered as `sb`.
