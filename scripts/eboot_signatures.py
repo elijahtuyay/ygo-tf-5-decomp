@@ -244,6 +244,10 @@ def analyse(body, stubs, names):
             (1 if calls == 0 else 0), sdk, callees, libs, call_args)
 
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gen_context import dominant   # noqa: E402  (one definition, two callers)
+
+
 def call_arg_cap(export):
     """{vram: largest argument count any of the 28 modules sets up}.
 
@@ -258,7 +262,10 @@ def call_arg_cap(export):
             m = re.match(r"ehsys_([0-9A-Fa-f]{8})$", r["name"])
             if m:
                 try:
-                    by_nid[int(m.group(1), 16)] = int(r["max_args"])
+                    # the count the call sites AGREE on, not the maximum any one
+                    # of them reaches — see gen_context.dominant for why
+                    by_nid[int(m.group(1), 16)] = dominant(
+                        r.get("distribution"), int(r["max_args"]))
                 except ValueError:
                     pass
     for vram, nid in export.items():

@@ -170,14 +170,39 @@ def _tail_only(facts, seed=None):
     return argc
 
 
+DIST = re.compile(r"(\d+) args x(\d+)")
+
+
+def dominant(distribution, max_args, floor=0.10):
+    """The largest argument count that a real share of call sites agrees on.
+
+    NOT the maximum. infer_arity records, for example,
+    `4 args x218; 5 args x9; 3 args x5` for func_00040550. The maximum is 5 and
+    it is wrong: the target passes four and a fifth prototype argument costs an
+    extra instruction at every call site. Those nine outliers are measurement
+    noise — a register set near the call for an unrelated reason looks exactly
+    like an argument to a call-site scan.
+
+    Taking the largest count holding at least `floor` of the call sites keeps
+    the genuine 8-argument functions (where the high count IS the bulk) and
+    drops the noise tail.
+    """
+    counts = [(int(n), int(c)) for n, c in DIST.findall(distribution or "")]
+    total = sum(c for _, c in counts)
+    if not total:
+        return max_args
+    keep = [n for n, c in counts if c / total >= floor]
+    return max(keep) if keep else max_args
+
+
 def call_site_cap(module):
-    """{func: largest argument count any call site sets up}, from infer_arity."""
+    """{func: argument count the call sites agree on}, from infer_arity."""
     out = {}
     p = os.path.join(ROOT, "nids/func_arity", module + ".csv")
     if os.path.exists(p):
         for r in csv.DictReader(open(p)):
             try:
-                out[r["name"]] = int(r["max_args"])
+                out[r["name"]] = dominant(r.get("distribution"), int(r["max_args"]))
             except ValueError:
                 pass
     return out

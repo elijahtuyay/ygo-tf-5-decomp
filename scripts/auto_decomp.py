@@ -645,6 +645,12 @@ def main():
     ap.add_argument("module")
     ap.add_argument("--max-words", type=int, default=10**9)
     ap.add_argument("--only")
+    ap.add_argument("--dump", metavar="DIR",
+                    help="on a NEAR MISS, write the closest candidate's source to "
+                         "DIR/<func>.c. The pipeline otherwise throws it away, "
+                         "which makes the near-miss queue impossible to classify "
+                         "in bulk: you can see that a function is one instruction "
+                         "off but not what the instruction is.")
     ap.add_argument("--limit", type=int, default=10**9)
     ap.add_argument("--shard", default="1/1",
                     help="i/N — process every Nth function, so N processes can run "
@@ -673,7 +679,7 @@ def main():
     print(f"{mod}: {len(funcs)} functions, trying {len(todo)}", flush=True)
 
     for i, (fn, lines, words) in enumerate(todo):
-        best, hit = None, False
+        best, hit, best_src = None, False, None
         for flavour in DATA_FLAVOURS:
             decls = referenced(lines, symtab, fn, flavour, measured_types(mod))
             ctx = os.path.join(workdir, f"{fn}.ctx.c")
@@ -719,7 +725,7 @@ def main():
                     hit = True
                     break
                 if best is None or (best == "compile-error" and verdict != "compile-error"):
-                    best = verdict
+                    best, best_src = verdict, body
             # the declaration flavour exists only to make the draft COMPILE; once
             # it does, the other flavours would just recompile the same code
             if hit or compiled:
@@ -729,6 +735,13 @@ def main():
             continue
         if not hit:
             results.append({"func": fn, "words": words, "status": "no-match", "closest": best})
+            if args.dump and best_src:
+                os.makedirs(args.dump, exist_ok=True)
+                open(os.path.join(args.dump, fn + ".c"), "w").write(
+                    f"/* {fn}: {best} */\n"
+                    + "\n".join(referenced(lines, symtab, fn, DATA_FLAVOURS[0],
+                                            measured_types(mod)))
+                    + "\n" + best_src + "\n")
         if (i + 1) % 25 == 0:
             n = sum(1 for r in results if r["status"] == "MATCH")
             print(f"  {i+1}/{len(todo)} tried, {n} matched", flush=True)
