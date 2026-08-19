@@ -254,6 +254,96 @@ s32 func_000197DC(void) {
 extern int func_0001A1A0();
 /* func_0001A344 — 3 words. MATCH 100% (shape: hand). */
 extern int func_0001A1A0();
+/* func_00019C40 — 28 words. MATCH 100% (shape: state-init). */
+void func_00019C40(int arg0, short arg1, short arg2) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = 3;
+    D_00351844 = arg1;
+    D_00351846 = arg2;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
+/* func_00019E90 — 28 words. MATCH 100% (shape: state-init). */
+void func_00019E90(int arg0, short arg1, short arg2) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = 5;
+    D_00351844 = arg1;
+    D_00351846 = arg2;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
+/* func_00019FE0 — 28 words. MATCH 100% (shape: state-init). */
+void func_00019FE0(int arg0, short arg1, short arg2) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = 8;
+    D_00351844 = arg1;
+    D_00351846 = arg2;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
+/* func_0001A050 — 28 words. MATCH 100% (shape: state-init). */
+void func_0001A050(int arg0, short arg1, short arg2) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = 9;
+    D_00351844 = arg1;
+    D_00351846 = arg2;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
+/* func_0001A0C0 — 28 words. MATCH 100% (shape: state-init). */
+void func_0001A0C0(int arg0, short arg1, short arg2) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = 10;
+    D_00351844 = arg1;
+    D_00351846 = arg2;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
+/* func_0001A130 — 28 words. MATCH 100% (shape: state-init). */
+void func_0001A130(int arg0, short arg1, short arg2) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = 11;
+    D_00351844 = arg1;
+    D_00351846 = arg2;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
 int func_0001A344(int a0, int a1, int a2) {
     extern int func_0001A1A0();
     extern int func_0001A344(); return func_0001A1A0(a0, 0x1, 0); }
