@@ -671,3 +671,28 @@ Watch the operand base when reading these out of the disassembly: shift amounts
 print in decimal (`sll $v0, $v0, 17`) while other immediates print in hex with a
 `0x` prefix (`addiu $a1, $zero, 0x1E11`). Parsing a shift as hex silently yields
 the wrong field position.
+
+### Two more idiom families, and where the technique runs out
+
+**Guarded call — 10 functions.** `cond ? action() : 0` is the shape that
+reproduces `beql` with the zero materialised in its delay slot. Writing it as
+`if (!cond) return 0;` produces one word too many, and an explicit
+`r = 1; else r = 0;` temp produces five too many:
+
+    int f(int a, int b) { return guard(a) ? action(a, b) : 0; }
+
+A variant loads a halfword argument for the guard first
+(`guard(p, p[1]) ? action(p, arg1) : 0`).
+
+**Where it stops.** Use `scripts/idiom_families.py`, which flags families whose
+shape contains `beql`/`bnel`. Those have mostly not converged — branch-likely
+selection is a known dead end — so skip to the next family after two failed
+attempts. Two other blockers seen repeatedly:
+
+- **Runtime-relocated globals splat never named.** A family of 8 LCG random
+  generators across four modules is written `lui $v0, (0x0 >> 16)` because the
+  immediate really is zero in the shipped file and the PRX relocates it at load.
+  Nothing can match until those symbols are named; this is a config problem, not
+  a C problem.
+- **A boolean materialised in four instructions** where MWCC emits three at -O4
+  and five at -O2. Neither level reproduces it.
