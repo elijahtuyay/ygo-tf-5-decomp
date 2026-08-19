@@ -34,7 +34,19 @@ import progress  # noqa: E402
 
 def split_asm(module):
     """One .s per function, with the file's header directives preserved."""
-    src = os.path.join(ROOT, "asm", module, "text.s")
+    # Split the PREPARED disassembly, not the raw one. asm/<m>/text.s still
+    # contains Allegrex opcodes gas cannot assemble (`min`, `max`, the VFPU
+    # block); scripts/asm_prepare.py rewrites exactly those into .word with the
+    # identical encoding. Without this every module using them fails to
+    # assemble here even though the normal build handles them fine.
+    src = os.path.join(ROOT, "build/asm", module, "text.s")
+    if not os.path.exists(src):
+        os.makedirs(os.path.dirname(src), exist_ok=True)
+        subprocess.run([sys.executable, os.path.join(ROOT, "scripts/asm_prepare.py"),
+                        os.path.join(ROOT, "asm", module, "text.s"), src, "--",
+                        "mips-linux-gnu-as", "-march=mips32r2", "-mabi=32", "-EL",
+                        "--no-pad-sections", "-I", os.path.join(ROOT, "include"),
+                        "-I", os.path.join(ROOT, "asm", module)], check=True, cwd=ROOT)
     out_dir = os.path.join(ROOT, "build/hybrid/asm", module)
     os.makedirs(out_dir, exist_ok=True)
     lines = open(src, errors="replace").read().splitlines()
@@ -69,7 +81,7 @@ def main():
     funcs = progress.module_functions(module)
     starts = {}
     cur = None
-    for line in open(os.path.join(ROOT, "asm", module, "text.s"), errors="replace"):
+    for line in open(os.path.join(ROOT, "build/asm", module, "text.s"), errors="replace"):
         m = re.match(r"glabel (func_[0-9A-F]+)", line)
         if m:
             cur = m.group(1)
