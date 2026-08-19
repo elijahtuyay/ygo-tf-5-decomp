@@ -47,16 +47,23 @@ INSN = re.compile(r"\s*/\* [0-9A-F]+ ([0-9A-F]+) [0-9A-F]{8} \*/\s+(\S+)\s*(.*)"
 
 
 def parse(module):
-    """{func: (argc_local, written_args, tail_target_name, returns)}"""
+    """{func: (argc_local, written_args, call_args, returns)}
+
+    `call_args` is (callee, arg registers written by this point) for EVERY call
+    the body makes, engine imports included. A register the callee needs that we
+    have not written by then is one we received from our own caller and are
+    forwarding, so it is an incoming argument of ours too. Only tail calls used
+    to be tracked; forwarding through an ordinary `jal` is the common case.
+    """
     path = os.path.join(ROOT, "asm", module, "text.s")
-    out, cur, written, argc, warg, tail, ret = {}, None, set(), 0, set(), None, 0
+    out, cur, written, argc, warg, calls, ret = {}, None, set(), 0, set(), [], 0
     for line in open(path, errors="replace"):
         g = re.match(r"glabel (func_[0-9A-F]+)", line)
         if g:
-            cur, written, argc, warg, tail, ret = g.group(1), set(), 0, set(), None, 0
+            cur, written, argc, warg, calls, ret = g.group(1), set(), 0, set(), [], 0
             continue
         if line.startswith("endlabel") and cur:
-            out[cur] = (argc, warg, tail, ret)
+            out[cur] = (argc, warg, calls, ret)
             cur = None
             continue
         m = INSN.match(line)
@@ -74,26 +81,106 @@ def parse(module):
                 warg.add(toks[0])
             if toks[0] == "$v0":
                 ret = 1
-        if mnem == "j" and ops.startswith("func_"):
-            tail = ops.strip()
+        if mnem in ("j", "jal"):
+            callee = ops.strip().split(",")[0]
+            if callee.startswith(("func_", "ehsys_")):
+                calls.append((callee, frozenset(warg), mnem == "j"))
     return out
 
 
-def solve(facts):
-    """Propagate arity backwards over tail calls to a fixed point."""
+def solve(facts, seed=None, cap=None):
+    """Propagate arity backwards over every call to a fixed point.
+
+    `seed` supplies the arity of callees this module cannot see — the engine
+    imports, measured from modehsys by scripts/eboot_signatures.py. Forwarding
+    an argument into an engine call is invisible without it.
+
+    Monotone (argc only grows), so the fixed point is unique and call cycles and
+    recursion are safe.
+
+    `cap` is what keeps this honest, and it is not optional. Propagating across
+    every call SATURATES without it: a linear read-before-write scan cannot see
+    that a register was set inside a branch, so any callee wanting eight
+    arguments makes its caller appear to want eight too, and that cascades. Run
+    uncapped on rel_duel_eng, 5,401 of 7,487 functions came out at eight
+    arguments, and the fixed sample got worse, not better (58 -> 60 size
+    mismatches).
+
+    So the two estimators are combined instead of trusting either:
+
+      * the body read-before-write count is a LOWER bound and is sound — those
+        registers are demonstrably read before they are written;
+      * the largest argument count any CALL SITE sets up (scripts/infer_arity.py)
+        is an upper bound — no caller passes what it never loads.
+
+    The propagated value is clamped between them. A function whose callers never
+    pass more than three arguments does not take eight, whatever a chain of
+    forwarding inference concluded.
+    """
     argc = {k: v[0] for k, v in facts.items()}
+    argc.update({k: v for k, v in (seed or {}).items() if k not in argc})
     for _ in range(50):
         changed = False
-        for fn, (_, warg, tail, _) in facts.items():
-            if tail not in argc:
-                continue
-            for i in range(argc[tail]):
-                if ARG_REGS[i] not in warg and argc[fn] < i + 1:
-                    argc[fn] = i + 1
-                    changed = True
+        for fn, (_, _, calls, _) in facts.items():
+            for callee, written_here, _tail in calls:
+                if callee not in argc:
+                    continue
+                for i in range(argc[callee]):
+                    if ARG_REGS[i] not in written_here and argc[fn] < i + 1:
+                        argc[fn] = i + 1
+                        changed = True
+        if not changed:
+            break
+    # Where there IS call-site evidence, clamp to it. Where there is none the
+    # function is never called from inside this module, so nothing bounds the
+    # propagation and it saturates; fall back to the conservative tail-call-only
+    # result for those. Capping only the functions with evidence still left
+    # 3,992 of 7,487 at eight arguments in rel_duel_eng.
+    tail_only = _tail_only(facts, seed)
+    for fn, (local, _, _, _) in facts.items():
+        if fn in (cap or {}):
+            argc[fn] = max(local, min(argc[fn], cap[fn]))
+        else:
+            argc[fn] = max(local, tail_only[fn])
+    return argc
+
+
+def _tail_only(facts, seed=None):
+    """The pre-existing conservative estimate: propagate over tail calls only.
+
+    A `j callee` really does leave through the callee, so every argument the
+    callee needs and we did not set must have come from our caller. That
+    inference is safe without any call-site bound, which is why it is the
+    fallback wherever a bound is missing.
+    """
+    argc = {k: v[0] for k, v in facts.items()}
+    argc.update({k: v for k, v in (seed or {}).items() if k not in argc})
+    for _ in range(50):
+        changed = False
+        for fn, (_, _, calls, _) in facts.items():
+            for callee, written_here, tail in calls:
+                if callee not in argc or not tail:
+                    continue
+                for i in range(argc[callee]):
+                    if ARG_REGS[i] not in written_here and argc[fn] < i + 1:
+                        argc[fn] = i + 1
+                        changed = True
         if not changed:
             break
     return argc
+
+
+def call_site_cap(module):
+    """{func: largest argument count any call site sets up}, from infer_arity."""
+    out = {}
+    p = os.path.join(ROOT, "nids/func_arity", module + ".csv")
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p)):
+            try:
+                out[r["name"]] = int(r["max_args"])
+            except ValueError:
+                pass
+    return out
 
 
 def engine_sigs():
@@ -107,7 +194,8 @@ def engine_sigs():
 
 def emit(module):
     facts = parse(module)
-    argc = solve(facts)
+    sigs = engine_sigs()
+    argc = solve(facts, {k: v[0] for k, v in sigs.items()}, call_site_cap(module))
     lines = ["/* generated by scripts/gen_context.py - do not edit */",
              "typedef signed char s8;", "typedef unsigned char u8;",
              "typedef short s16;", "typedef unsigned short u16;",
@@ -118,7 +206,7 @@ def emit(module):
         ret = "s32" if facts[fn][3] else "void"
         args = ", ".join(["s32"] * n) or "void"
         lines.append(f"{ret} {fn}({args});")
-    for name, (n, ret) in sorted(engine_sigs().items()):
+    for name, (n, ret) in sorted(sigs.items()):
         args = ", ".join(["s32"] * n) or "void"
         lines.append(f"{'s32' if ret else 'void'} {name}({args});")
     dst = os.path.join(ROOT, "build/ctx", module + ".h")

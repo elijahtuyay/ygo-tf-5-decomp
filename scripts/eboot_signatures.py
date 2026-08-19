@@ -185,15 +185,25 @@ def analyse(body, stubs, names):
     Returns (argc, written_args, tail_target, returns, leaf, sdk_calls).
 
     `argc` here is only what the BODY proves by reading a register before
-    writing it. That undercounts tail-call trampolines badly: a function that
-    ends `j func_X` after setting only $a2 still receives $a0/$a1 from its own
-    caller and passes them straight through without ever reading them. Those
-    registers are arguments but are invisible to a read-before-write scan, so
-    main() propagates arity backwards across tail calls to a fixed point using
-    `tail_target` and `written_args`.
+    writing it. That undercounts every function that FORWARDS an argument: a
+    function that calls `func_X` after setting only $a2 still receives $a0/$a1
+    from its own caller and passes them straight through without ever reading
+    them. Those registers are arguments but are invisible to a read-before-write
+    scan, so main() propagates arity backwards across calls to a fixed point.
+
+    This applies to `jal` exactly as it does to `j`. Only the tail-call form used
+    to be propagated, and measuring against scripts/infer_arity.py showed what
+    that cost: the body-derived count came out BELOW the call-site-derived one
+    for 473 exports covering 21,627 call sites. Forwarding through an ordinary
+    call is the common case, not the tail-call special case.
+
+    `call_args` therefore holds (target, args written so far) for every call. The
+    snapshot has to be taken AT the call: a register written later in the body
+    says nothing about whether this call received it from our caller.
     """
     written, argc, returns, calls, sdk = set(), 0, 0, 0, []
     written_args, tail_target = set(), None
+    call_args = []
     callees, libs = [], set()
     for mnem, ops in body:
         toks = re.findall(r"\$\w+", ops)
@@ -214,10 +224,14 @@ def analyse(body, stubs, names):
                 v = int(ops.strip().split("_")[1], 16)
             except Exception:
                 v = None
-            # `j func_X` leaves via the callee: a tail call, so the callee's
-            # arguments are supplied partly by us and partly by our caller.
-            if mnem == "j" and v is not None:
-                tail_target = v
+            # Any call's arguments are supplied partly by us and partly by our
+            # caller; whichever this call needs and we have not written by now,
+            # we must have received. `j func_X` additionally leaves via the
+            # callee, which is why tail_target is still tracked separately.
+            if v is not None:
+                call_args.append((v, frozenset(written_args)))
+                if mnem == "j":
+                    tail_target = v
             if v in stubs:
                 lib, nid = stubs[v].split(":")
                 libs.add(lib)
@@ -227,23 +241,61 @@ def analyse(body, stubs, names):
         elif mnem == "jalr":
             calls += 1
     return (argc, written_args, tail_target, returns,
-            (1 if calls == 0 else 0), sdk, callees, libs)
+            (1 if calls == 0 else 0), sdk, callees, libs, call_args)
 
 
-def propagate_tail_calls(facts):
-    """Fixed point: a trampoline receives every argument its tail-call target
-    needs that the trampoline does not itself set."""
+def call_arg_cap(export):
+    """{vram: largest argument count any of the 28 modules sets up}.
+
+    scripts/infer_arity.py measures this from the call sites. It is an upper
+    bound — nothing passes an argument it never loads — and propagate_calls
+    needs one, for the reason documented there.
+    """
+    cap, by_nid = {}, {}
+    p = os.path.join(ROOT, "nids/ehsys_arity.csv")
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p)):
+            m = re.match(r"ehsys_([0-9A-Fa-f]{8})$", r["name"])
+            if m:
+                try:
+                    by_nid[int(m.group(1), 16)] = int(r["max_args"])
+                except ValueError:
+                    pass
+    for vram, nid in export.items():
+        if nid in by_nid:
+            cap[vram] = by_nid[nid]
+    return cap
+
+
+def propagate_calls(facts, cap=None):
+    """Fixed point: a function receives every argument any callee needs that it
+    has not itself set by the time it makes that call.
+
+    Monotone — argc only ever grows — so the fixed point is unique and the
+    iteration order does not matter. Recursion and call cycles are therefore
+    safe: they simply stop contributing once nothing grows.
+    """
+    local = {v: f["argc"] for v, f in facts.items()}
     changed, rounds = True, 0
     while changed and rounds < 50:
         changed, rounds = False, rounds + 1
-        for vram, f in facts.items():
-            tgt = facts.get(f["tail_target"])
-            if not tgt:
-                continue
-            for i in range(tgt["argc"]):
-                if ARG_REGS[i] not in f["written_args"] and f["argc"] < i + 1:
-                    f["argc"] = i + 1
-                    changed = True
+        for f in facts.values():
+            for target, written_here in f["call_args"]:
+                tgt = facts.get(target)
+                if not tgt:
+                    continue
+                for i in range(tgt["argc"]):
+                    if ARG_REGS[i] not in written_here and f["argc"] < i + 1:
+                        f["argc"] = i + 1
+                        changed = True
+    # Clamp to the call-site upper bound, never below what the body proves.
+    # Uncapped, propagating across ordinary calls saturates: a linear
+    # read-before-write scan cannot see a register written inside a branch, so
+    # any eight-argument callee makes its callers look like eight-argument
+    # functions too, and that cascades up the call graph.
+    for vram, bound in (cap or {}).items():
+        if vram in facts:
+            facts[vram]["argc"] = max(local[vram], min(facts[vram]["argc"], bound))
     return rounds
 
 
@@ -274,12 +326,13 @@ def main():
     # target is often an internal function, and its arity is what we need.
     facts = {}
     for fn, vram, body in parse_functions():
-        argc, warg, tail, returns, leaf, sdk, callees, libs = analyse(body, stubs, names)
+        (argc, warg, tail, returns, leaf, sdk,
+         callees, libs, call_args) = analyse(body, stubs, names)
         facts[vram] = {"func": fn, "words": len(body), "argc": argc,
                        "written_args": warg, "tail_target": tail,
                        "returns": returns, "leaf": leaf, "sdk": sdk,
-                       "callees": callees, "libs": libs}
-    r1 = propagate_tail_calls(facts)
+                       "callees": callees, "libs": libs, "call_args": call_args}
+    r1 = propagate_calls(facts, call_arg_cap(export))
     r2 = propagate_behaviour(facts)
     print(f"arity propagation converged in {r1} rounds, behaviour in {r2}, "
           f"over {len(facts)} functions")

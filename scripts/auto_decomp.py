@@ -740,7 +740,11 @@ def main():
 
     n = sum(1 for r in results if r["status"] == "MATCH")
     if args.only:      # a single-function probe must never clobber the module's results
-        print(f"{mod} {args.only}: {'MATCH' if n else 'no match'}")
+        # print the closest verdict too: a probe is almost always run to see WHY
+        # a function fails, and "no match" alone forces a second, slower run.
+        detail = next((r.get("closest") for r in results if r.get("closest")), None)
+        print(f"{mod} {args.only}: {'MATCH' if n else 'no match'}"
+              + (f" [{detail}]" if detail and not n else ""))
         return
     out = {"module": mod, "tried": len(todo), "matched": n, "results": results}
     json.dump(out, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
