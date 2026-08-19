@@ -33,6 +33,19 @@ LD      := build/$(MODULE).ld
 # SRC and non-SRC builds MUST NOT share output paths: they have different
 # prerequisites, so sharing lets a mode switch verify a stale binary from the
 # other mode (both a false FAIL and a false PASS are possible — seen 2026-08-18).
+
+# HYBRID=1: build the module from our C for the functions we have matched, and
+# from ASSEMBLY for everything else, spliced into one object by tools/mwccgap.
+# This is what lets a module be COMPLETED at all: plain SRC=1 replaces the whole
+# .text, so a module only passes once every function matches — impossible for
+# the 19 modules containing hand-written assembly, which can never come from C.
+ifeq ($(HYBRID),1)
+  SRC := 1
+  MWOBJ := build/hybrid/$(MODULE).o
+else
+  MWOBJ := build/mwcc/$(MODULE).o
+endif
+
 ifeq ($(SRC),1)
   OUT   := build/$(MODULE).src.elf
   BIN   := build/$(MODULE).src.prx
@@ -64,14 +77,14 @@ ASSET_OBJS := $(patsubst assets/$(MODULE)/%.bin,build/assets/$(MODULE)/%.bin.o,$
 # globals the ORIGINAL bakes as absolute constants with no relocation, so splat
 # never emitted a name for them (see KNOWN_ADDR in scripts/mwcc_diff.py). Their
 # address is encoded in the name, which is what makes this safe to automate.
-build/$(MODULE).srcsyms.ld: build/mwcc/$(MODULE).o
+build/$(MODULE).srcsyms.ld: $(MWOBJ)
 	@$(CROSS)nm -u $< | grep -oE '\b(jtbl|D)_[0-9A-F]{4,8}\b' | sort -u | awk -F_ \
 		'{ printf "PROVIDE(%s = 0x%s);\n", $$0, $$2 }' > $@
 
 ifeq ($(SRC),1)
   # our compiled C replaces the disassembled .text. The linker script names that
   # object by path, so it needs a variant with the substitution applied.
-  CODE_OBJS := build/mwcc/$(MODULE).o $(filter-out build/asm/$(MODULE)/text.s.o,$(ASM_OBJS))
+  CODE_OBJS := $(MWOBJ) $(filter-out build/asm/$(MODULE)/text.s.o,$(ASM_OBJS))
   LINK_LD   := build/$(MODULE).src.ld
   EXTRA_LD  := build/$(MODULE).srcsyms.ld
 else
@@ -127,11 +140,11 @@ build/mwcc/$(MODULE).o: src/$(MODULE).c
 # identical by scripts/mwcc_diff.py. So the table is placed at its real address
 # as NOLOAD: the symbol resolves correctly and no bytes are emitted twice.
 build/$(MODULE).src.ld: $(LD) $(ASM_SRCS)
-	@sed 's|build/asm/$(MODULE)/text\.s\.o|build/mwcc/$(MODULE).o|' $< \
-		| grep -v 'build/mwcc/$(MODULE)\.o(\.rodata)' > $@.tmp
+	@sed 's|build/asm/$(MODULE)/text\.s\.o|$(MWOBJ)|' $< \
+		| grep -v '$(MWOBJ)(\.rodata)' > $@.tmp
 	@jt=$$(grep -ohE '\bjtbl_[0-9A-F]{8}\b' $(ASM_SRCS) | sort -u | head -1 | sed 's/jtbl_/0x/'); \
 	if [ -n "$$jt" ]; then \
-		awk -v addr="$$jt" -v obj="build/mwcc/$(MODULE).o" \
+		awk -v addr="$$jt" -v obj="$(MWOBJ)" \
 			'/\/DISCARD\//{printf "    .jtbl %s (NOLOAD) : { %s(.rodata) }\n\n", addr, obj} {print}' \
 			$@.tmp > $@; \
 	else mv $@.tmp $@; fi
@@ -172,3 +185,17 @@ clean:
 		build/$(MODULE).elf build/$(MODULE).prx \
 		build/$(MODULE).src.elf build/$(MODULE).src.prx \
 		build/$(MODULE).symbols.ld build/$(MODULE).src.ld build/$(MODULE).srcsyms.ld
+
+
+build/hybrid/$(MODULE).o: src/$(MODULE).c scripts/make_hybrid.py
+	scripts/make_hybrid.py $(MODULE)
+	python3 tools/mwccgap/mwccgap.py build/hybrid/$(MODULE).c $@ \
+		--mwcc-path tools/mwccpsp_3.0.1_219/mwccpsp.exe \
+		--use-wibo --wibo-path tools/wibo-bin/wibo \
+		--as-path $(CROSS)as --as-march mips32r2 --as-mabi 32 \
+		--macro-inc-path include/macro.inc \
+		-Iinclude -O4,s -sdatathreshold 0
+# NOTE: --macro-inc-path is required (the per-function .s files open with
+# .include "macro.inc"), and --as-flags must NOT be used: mwccgap sets its
+# option prefix to "~", so --as-flags' nargs="*" swallows every following
+# -flag and leaves the compiler with none.
