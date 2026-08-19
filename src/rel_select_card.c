@@ -150,6 +150,23 @@ void func_00001058(void) {
         }
     }
 }
+/* func_000010AC — 24 words. MATCH 100% (shape: m2c). */
+void func_000010AC(s32 arg0) {
+    extern int D_0001E5D0;
+    extern int ehsys_EF9B5D06();
+    extern int func_000010AC();
+    s32 temp_a1;
+    s32 var_s1;
+
+    var_s1 = 0;
+    do {
+        temp_a1 = (*(int *)((char *)(D_0001E5D0 + (var_s1 * 4)) + 0x98));
+        if (temp_a1 != 0) {
+            ehsys_EF9B5D06(arg0, temp_a1);
+        }
+        var_s1 += 1;
+    } while (var_s1 < 2);
+}
 
 /* func_0000110C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0000110C(void) {

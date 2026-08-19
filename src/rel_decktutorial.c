@@ -656,6 +656,74 @@ void func_00018880(void) {
     ehsys_20E340D9(D_0002951C, D_0002C108);
     D_0002C108 = 0;
 }
+/* func_00018ED4 — 21 words. MATCH 100% (shape: m2c). */
+void func_00018ED4(void) {
+    extern int D_0002C108;
+    extern int ehsys_39ADDA9F();
+    extern int func_00018ED4();
+    s32 temp_a0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_a0 = (*(int *)((char *)(D_0002C108 + (var_s0 * 4)) + 0x98));
+        if (temp_a0 != 0) {
+            ehsys_39ADDA9F(temp_a0);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 2);
+}
+/* func_00018F28 — 24 words. MATCH 100% (shape: m2c). */
+void func_00018F28(s32 arg0) {
+    extern int D_0002C108;
+    extern int ehsys_EF9B5D06();
+    extern int func_00018F28();
+    s32 temp_a1;
+    s32 var_s1;
+
+    var_s1 = 0;
+    do {
+        temp_a1 = (*(int *)((char *)(D_0002C108 + (var_s1 * 4)) + 0x98));
+        if (temp_a1 != 0) {
+            ehsys_EF9B5D06(arg0, temp_a1);
+        }
+        var_s1 += 1;
+    } while (var_s1 < 2);
+}
+/* func_00018F88 — 21 words. MATCH 100% (shape: m2c). */
+void func_00018F88(void) {
+    extern int D_0002C108;
+    extern int ehsys_B0F320E6();
+    extern int func_00018F88();
+    s32 temp_a0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_a0 = (*(int *)((char *)(D_0002C108 + (var_s0 * 4)) + 0x98));
+        if (temp_a0 != 0) {
+            ehsys_B0F320E6(temp_a0);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 2);
+}
+/* func_00018FDC — 21 words. MATCH 100% (shape: m2c). */
+void func_00018FDC(void) {
+    extern int D_0002C108;
+    extern int ehsys_E1139F1A();
+    extern int func_00018FDC();
+    s32 temp_a0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_a0 = (*(int *)((char *)(D_0002C108 + (var_s0 * 4)) + 0x98));
+        if (temp_a0 != 0) {
+            ehsys_E1139F1A(temp_a0);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 2);
+}
 
 /* func_00019088 — 39 words. MATCH 100% (shape: m2c). */
 void func_00019088(s32 arg0, int arg1, int arg2, int arg3) {
