@@ -505,6 +505,31 @@ void func_00015A14(s32 arg0, s16 arg1, s16 arg2) {
         D_0035184C = 2;
     }
 }
+/* func_00015A98 — 40 words. MATCH 100% (shape: pipeline). */
+void func_00015A98(s32 arg0, s16 arg1, s32 arg2, s32 arg3) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 8;
+    D_00351860 = arg1;
+    D_00351862 = (arg3 & 0xFF) | ((arg2 & 0xFF) << 8);
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
 /* func_00015B2C — 36 words. MATCH 100% (shape: pipeline). */
 void func_00015B2C(s32 arg0, s16 arg1, s16 arg2) {
 
@@ -522,6 +547,31 @@ void func_00015B2C(s32 arg0, s16 arg1, s16 arg2) {
     D_00351858 = 9;
     D_00351860 = arg1;
     D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015BB0 — 40 words. MATCH 100% (shape: pipeline). */
+void func_00015BB0(s32 arg0, s16 arg1, s32 arg2, s32 arg3) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 0xC;
+    D_00351860 = arg1;
+    D_00351862 = (arg2 & 0xFF) | ((arg3 & 0xFF) << 8);
     D_00351850 = 1;
     D_0035185C = 0;
     D_0035184C = 0;
@@ -570,6 +620,107 @@ void func_00015D74(s32 arg0, s16 arg1, s16 arg2) {
     extern unsigned short D_00351862;
     D_00351854 = arg0;
     D_00351858 = 0xF;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00015DF8 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00015DF8(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 0xD;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00016000 — 38 words. MATCH 100% (shape: pipeline). */
+void func_00016000(s16 arg0, s16 arg1) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern int D_00351714;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = D_00351714;
+    D_00351858 = 0x10;
+    D_00351860 = arg0;
+    D_00351862 = arg1;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((D_00351714 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00016310 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00016310(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 0x13;
+    D_00351860 = arg1;
+    D_00351862 = arg2;
+    D_00351850 = 1;
+    D_0035185C = 0;
+    D_0035184C = 0;
+    if ((arg0 == ((D_003268E4 & 1) ^ 1)) && (D_0035173C != 0)) {
+        D_0034CA30 = 0;
+        D_0035184C = 2;
+    }
+}
+/* func_00016394 — 36 words. MATCH 100% (shape: pipeline). */
+void func_00016394(s32 arg0, s16 arg1, s16 arg2) {
+
+    extern s32 D_003268E4;
+    extern s32 D_0034CA30;
+    extern s32 D_0035173C;
+    extern s32 D_0035184C;
+    extern s32 D_00351850;
+    extern s32 D_00351854;
+    extern s32 D_00351858;
+    extern s32 D_0035185C;
+    extern u16 D_00351860;
+    extern unsigned short D_00351862;
+    D_00351854 = arg0;
+    D_00351858 = 0x14;
     D_00351860 = arg1;
     D_00351862 = arg2;
     D_00351850 = 1;
