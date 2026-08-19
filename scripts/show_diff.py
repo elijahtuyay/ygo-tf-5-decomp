@@ -34,7 +34,7 @@ TARGET = re.compile(r"\s*/\* [0-9A-F]+ ([0-9A-F]+) ([0-9A-F]{8}) \*/\s+(\S+)\s*(
 
 
 
-def normalise(text):
+def normalise(text, base=0):
     """Compare semantically, not textually.
 
     The two sides use different notations for the same instruction: splat prints
@@ -44,6 +44,13 @@ def normalise(text):
     matters. Normalise to (mnemonic, registers, symbol) and drop the immediate
     wherever a relocation supplies it.
     """
+    # A branch target is a label in splat (`.L00015778`) and a byte offset in
+    # objdump (`7c <func+0x7c>`). Resolve both to the offset from the start of
+    # the function so they compare equal.
+    text = re.sub(r"\.L([0-9A-F]{6,8})",
+                  lambda m: str(int(m.group(1), 16) - base), text)
+    text = re.sub(r"\b[0-9a-f]+ <\w+\+0x([0-9a-f]+)>", lambda m: str(int(m.group(1), 16)), text)
+    text = re.sub(r"\b([0-9a-f]+) <\w+>", lambda m: str(int(m.group(1), 16)), text)
     t = text.replace("$", "").replace(",", " ")
     t = re.sub(r"%hi\(([^)]*)\)", r"\1", t)
     t = re.sub(r"%lo\(([^)]*)\)", r"\1", t)
@@ -127,8 +134,9 @@ def main():
 
     n = max(len(tgt), len(cand))
     def same(i):
-        t = normalise(tgt[i][1]) if i < len(tgt) else None
-        c = normalise(cand[i]) if i < len(cand) else None
+        base = int(tgt[0][0], 16) if tgt else 0
+        t = normalise(tgt[i][1], base) if i < len(tgt) else None
+        c = normalise(cand[i], base) if i < len(cand) else None
         if t is None or c is None:
             return False
         # objdump appends the relocated symbol; splat has it inline, so a row
