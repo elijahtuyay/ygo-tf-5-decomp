@@ -112,12 +112,48 @@ def measured_types(module):
     return out
 
 
+
+# Width of a named global as used by THIS function. scripts/gen_types.py decides
+# a type from every access across the module and deliberately declines when the
+# module disagrees with itself — a global accessed as both a byte and a halfword
+# is usually two fields sharing a base. Declining is right at module scope but
+# useless here: the function in front of us uses exactly one width, and its own
+# instructions say which. This recovers the ambiguous cases (66 globals, but
+# they appear in far more functions) that would otherwise fall back to `char`
+# and emit `sb` where the target has `sh`.
+LOCAL_GLOBAL_ACCESS = re.compile(
+    r"\*/\s+(l[bhw]u?|s[bhw]|lwc1|swc1)\s+\$\w+,\s*%lo\(([A-Za-z_]\w*)\)")
+LOCAL_WIDTH_TYPE = {"lb": "char", "lbu": "unsigned char", "sb": "unsigned char",
+                    "lh": "short", "lhu": "unsigned short", "sh": "unsigned short",
+                    "lw": "int", "sw": "int", "lwc1": "float", "swc1": "float"}
+
+
+def local_global_types(asm_lines):
+    """{global: C type} from the widths this one function uses."""
+    seen = {}
+    for line in asm_lines:
+        m = LOCAL_GLOBAL_ACCESS.search(line)
+        if not m:
+            continue
+        t = LOCAL_WIDTH_TYPE.get(m.group(1))
+        if t is None:
+            continue
+        prev = seen.get(m.group(2))
+        if prev is None:
+            seen[m.group(2)] = t
+        elif prev != t:
+            seen[m.group(2)] = None          # even locally inconsistent: give up
+    return {k: v for k, v in seen.items() if v}
+
 def referenced(asm_lines, symtab, self_name=None, data_type="char", types=None):
     """Declarations a candidate needs: imports it calls, globals it touches.
 
     m2c decides on its own whether a global is used as a scalar or a pointer, so
     a single declaration flavour cannot satisfy every draft — the caller retries
     with each of DATA_FLAVOURS until one compiles."""
+    # module-wide measured types first, then this function's own usage for the
+    # globals the module could not decide
+    types = dict(local_global_types(asm_lines), **{k: v for k, v in (types or {}).items()})
     text = "".join(asm_lines)
     names = set(re.findall(r"\b\w+\b", text))
     decls = []
