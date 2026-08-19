@@ -577,3 +577,71 @@ Conclusions, all negative but worth not re-testing:
   settings, which is the whole point of workstream C.
 
 **The flag space is no longer an open lead.** `-O4,s -sdatathreshold 0` stands.
+
+## Idiom mining: group unmatched functions by opcode sequence (2026-08-19)
+
+The single most productive technique found so far. It produced 104 matched
+functions in one session, most of them without decompiling anything.
+
+**The method.** Take every unmatched function, reduce it to its sequence of
+mnemonics with all operands discarded, and count how many functions share each
+sequence. Compiler-generated code and hand-written helpers repeat verbatim, so
+the histogram surfaces families:
+
+    126 shape families with >=3 unmatched members, covering 562 functions
+
+Solve the shape ONCE by hand, then extract the per-instance operands (the
+globals, constants and callee names) straight from the disassembly and generate
+the C for every member mechanically. Verify each insertion against the whole
+file as usual.
+
+Ranked by members, the families are worth far more than the same effort spent
+on individual functions: one shape in `rel_cutin_viewer`/`rel_duel_draw` had 35
+members, another 25, another 32.
+
+### Families solved this way
+
+**Struct copy — 32 functions, `scripts/struct_copies.py`.** `*dst = *src` on a
+large struct compiles to a fixed 12-instruction counted loop moving two elements
+per iteration and returning dst. The element type comes from the load opcode and
+the count is twice the iteration count, so the whole function is recoverable
+from the disassembly with no decompilation:
+
+    typedef struct { short x[22]; } S;
+    S *f(S *dst, S *src) { *dst = *src; return dst; }
+
+**Spawn-and-set — 43 functions** (35 plus 8 in an `ori` variant). Create an
+object via a callback and constant, then set one field if creation succeeded:
+
+    int f(int a0, int a1, int a2) {
+        int h = create(&callback, a1, a2, 0x67CC, 0);
+        if (h != -1) { getter(h)[5] = a0; }
+        return h;
+    }
+
+Note `a1`/`a2` pass straight through — they are the function's own arguments,
+invisible at the call site, which is why m2c never gets these right.
+
+**seh-dispatch — 25 functions.** Conditionally transform a short, then tail-call
+with a global and a constant.
+
+### A genuinely new lever: K&R declaration forces sign extension
+
+Solving seh-dispatch turned up a lever worth its own entry:
+
+    extern s16 callee();                    /* K&R    -> emits `seh` at the call */
+    extern s32 other(s16, void *, s32);     /* proto  -> suppresses the `seh`   */
+
+MWCC sign-extends a `short` argument at the call site when the callee is
+declared K&R, and omits it when a prototype says the parameter is already
+`short`. The same function needed BOTH forms in one file: K&R on the first
+callee to produce `seh $a0, $a0`, a prototype on the second to avoid a third
+`seh`. Getting this wrong shows up as a size mismatch of exactly one word, which
+is easy to misread as a scheduling problem.
+
+### Where it stops
+
+Families whose only remaining diff is branch-likely selection (`bnezl` where the
+target has `bnez` plus `nop`), or the `byte = (byte & ~1) | (arg & 1)` operand
+order, are the documented dead ends — no loop shape, optimisation level or
+pragma moved either. Recognise and skip.
