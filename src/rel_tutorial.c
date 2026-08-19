@@ -171,6 +171,16 @@ void func_000005F4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 void func_00000608(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ehsys_3BB2BAC6(arg0 << 6, arg1 << 6, arg2 << 6, arg3 << 6, arg4, -1, 0);
 }
+/* func_000009AC — 16 words. MATCH 100% (shape: m2c asm-fields). */
+void func_000009AC(int arg0) {
+    extern int ehsys_memset();
+    extern int func_000009AC();
+    ehsys_memset(arg0 + 0xE, 0, 0x400);
+    (*(int *)((char *)arg0 + 0x4)) = 0;
+    (*(int *)((char *)arg0 + 0x410)) = 0;
+    (*(int *)((char *)arg0 + 0x414)) = 0;
+    (*(int *)((char *)arg0 + 0x418)) = 0;
+}
 
 /* func_00000B24 — 2 words. MATCH 100% (shape: m2c). */
 void func_00000B24(void) {
