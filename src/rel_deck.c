@@ -701,6 +701,20 @@ void func_0001FDE4(s32 arg0, s32 arg1, s32 arg2, int arg3) {
 void func_0001FE50(s32 arg0, s32 arg1, s32 arg2, int arg3) {
     func_0001995C(arg0, (arg1 & 0xFFFF) | ((arg2 & 0xFFFF) << 0x10), arg3, func_00015E5C(0x800A));
 }
+/* func_00020640 — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_00020640(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+
+    extern int ehsys_4175E3DB();
+    extern int ehsys_23E69878();
+    extern int ehsys_8EA6B1E7();
+    extern int ehsys_FDD168CA();
+    s32 temp_v0;
+
+    temp_v0 = ehsys_4175E3DB(arg0, 9);
+    temp_v0 = ehsys_23E69878(temp_v0, arg5);
+    temp_v0 = ehsys_8EA6B1E7(temp_v0, 1, 1, arg3, arg4);
+    return ehsys_FDD168CA(temp_v0, arg1, arg2, 0, 0, 0, 0, 0);
+}
 
 /* func_00020B10 — 3 words. MATCH 100% (shape: thunk, tail call w/ fixed args). */
 s32 func_00020B10(s32 arg0, s32 arg1) {

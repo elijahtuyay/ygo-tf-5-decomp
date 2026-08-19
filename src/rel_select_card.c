@@ -281,6 +281,31 @@ int func_00007F00(int a0, int a1, int a2) {
 int func_00007F20(int a0, int a1, int a2, int a3) {
     return ehsys_BC8E65D7(a0 << 6, a1 << 6, a2 << 6, a3, -1);
 }
+/* func_00008884 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00008884(void *arg0, s32 arg1) {
+
+    extern char D_0001FC38;
+    extern short D_0001FC3A;
+    extern int D_0001FC40;
+    extern int D_0001FC44;
+    extern int D_0001FC48;
+    extern int D_0001EB7C;
+    extern int ehsys_41AABF28();
+    extern int ehsys_memset();
+    s32 temp_v0;
+    u16 v0;
+
+    ehsys_memset(&D_0001FC38, 0, 0x14);
+    D_0001FC3A = *(u16 *)((char *)arg0 + 0x14);
+    D_0001FC44 = arg1;
+    v0 = *(volatile u16 *)&D_0001FC3A;
+    if (v0 > 0) {
+        D_0001FC40 = ehsys_41AABF28(D_0001EB7C, v0 * 2);
+    }
+    temp_v0 = ehsys_41AABF28(D_0001EB7C, 0x10000);
+    D_0001FC48 = temp_v0;
+    ehsys_memset((void *)temp_v0, 0xFF, 0x10000);
+}
 
 /* func_00008D5C -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 int func_00008D5C(s32 arg0, s32 arg1) {

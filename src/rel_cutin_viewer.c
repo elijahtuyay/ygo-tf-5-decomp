@@ -533,6 +533,12 @@ s32 func_00003494(void *arg0) {
     return *(s32 *)0xB2EEB0;
 }
 #pragma optimization_level 4
+/* func_00003900 — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_00003900(void) {
+
+    extern int ehsys_B2B9FEFA(void);
+    return ((int *) ehsys_B2B9FEFA())[1];
+}
 
 /* func_00003920 — 2 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 s32 func_00003920(void) {
@@ -674,10 +680,38 @@ s32 func_00006D50(s32 arg0) {
     temp_v0 = ehsys_E47E40E4();
     return temp_v0 + arg0;
 }
+/* func_00006D78 — 0 words. MATCH 100% (shape: same-shape twin). */
+int func_00006D78(arg0)
+s32 arg0;
+{
+
+    char buf[0x40];
+    ehsys_3325AA47(buf);
+    func_00007074(buf, buf);
+    ehsys_91EFFDC1(arg0, buf);
+}
 
 /* func_00006DB8 — 12 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00006DB8(s32 arg0) {
     func_00006D78(arg0, func_00001E8C());
+}
+/* func_00006DE8 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00006DE8(f32 a0, f32 a1, f32 a2) {
+
+    struct { char pad[12]; } tmp = {0};
+    ((f32 *) &tmp)[0] = a0;
+    ((f32 *) &tmp)[1] = a1;
+    ((f32 *) &tmp)[2] = a2;
+    ehsys_42C464D5(&tmp);
+}
+/* func_00006E2C — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00006E2C(f32 a0, f32 a1, f32 a2) {
+
+    struct { char pad[12]; } tmp = {0};
+    ((f32 *) &tmp)[0] = a0;
+    ((f32 *) &tmp)[1] = a1;
+    ((f32 *) &tmp)[2] = a2;
+    ehsys_0089B865(&tmp);
 }
 
 /* func_000070D0 — 21 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */

@@ -1833,6 +1833,13 @@ void *func_00018DF8(Vec2_18DF8 *arg0, Vec2_18DF8 *arg1) {
     arg0->f = arg1->f;
     return arg0;
 }
+/* func_00019AF8 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00019AF8(void *a0, f32 a1) {
+
+    ehsys_memset(a0, 0, 0xC);
+    ((f32 *) a0)[0] = a1;
+    ((f32 *) a0)[1] = a1;
+}
 
 /* func_00019C54 — 9 words. MATCH 100% (shape: m2c). */
 void func_00019C54(void) {
