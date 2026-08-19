@@ -254,6 +254,21 @@ s32 func_000197DC(void) {
 extern int func_0001A1A0();
 /* func_0001A344 — 3 words. MATCH 100% (shape: hand). */
 extern int func_0001A1A0();
+/* func_00019AFC — 27 words. MATCH 100% (shape: state-init-4arg). */
+void func_00019AFC(int arg0, int arg1, short arg2, short arg3) {
+
+    extern int D_00351834, D_00351840, D_00351830, D_00351838, D_0035183C;
+    extern short D_00351844, D_00351846;
+    extern int D_003268E8[];
+    D_00351834 = 1;
+    D_00351840 = 0;
+    D_00351830 = 0;
+    D_00351838 = arg0;
+    D_0035183C = arg1;
+    D_00351844 = arg2;
+    D_00351846 = arg3;
+    if (D_003268E8[arg0] == 2) { D_00351830 = 2; }
+}
 /* func_00019C40 — 28 words. MATCH 100% (shape: state-init). */
 void func_00019C40(int arg0, short arg1, short arg2) {
 
