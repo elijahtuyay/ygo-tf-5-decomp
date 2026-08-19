@@ -30,7 +30,8 @@ import subprocess
 import sys
 import tempfile
 
-MAX_ROUNDS = 40
+MAX_ROUNDS = 400   # rel_duel_draw has 121 handwritten VFPU functions and gas
+                   # reports only a subset of errors per pass, so it needs many rounds
 # "file.s:1234: Error: opcode not supported on this processor: ..."
 ERR = re.compile(r"^[^:]+:(\d+): Error: (opcode not supported|unrecognized opcode|invalid operands)")
 # /* rom vram WORD */  mnemonic operands
@@ -42,6 +43,52 @@ def to_word(le_hex):
     return int.from_bytes(bytes.fromhex(le_hex), "little")
 
 
+
+def add_missing_local_labels(lines):
+    """Define any .L label that is branched to but never emitted.
+
+    splat occasionally fails to place a local label on an instruction that a
+    branch elsewhere targets — it happens where it mis-identifies a function
+    boundary and treats the region as data. The reference then survives into the
+    object as an undefined symbol and the module cannot be linked:
+
+        undefined reference to `.L0000B07C'
+
+    Every such label encodes its own vram, and splat prints the vram of every
+    instruction, so the definition can simply be restored at the right line.
+    This affected rel_cutin_viewer and rel_duel_draw, the only two modules that
+    failed the `make MODULE=x` relink gate.
+    """
+    defined, referenced = set(), set()
+    for line in lines:
+        m = re.match(r"\s*(\.L[0-9A-Fa-f]+):", line)
+        if m:
+            defined.add(m.group(1))
+        for r in re.findall(r"(\.L[0-9A-Fa-f]{4,})\b", line):
+            if not re.match(r"\s*" + re.escape(r) + ":", line):
+                referenced.add(r)
+    missing = referenced - defined
+    if not missing:
+        return 0
+    want = {}
+    for label in missing:
+        try:
+            want[int(label[2:], 16)] = label
+        except ValueError:
+            pass
+    added = 0
+    for i, line in enumerate(lines):
+        m = LINE.match(line)
+        if not m:
+            continue
+        vram = int(m.group(3), 16)
+        if vram in want:
+            lines[i] = f"{want[vram]}:\n" + line
+            del want[vram]
+            added += 1
+    return added
+
+
 def main():
     src, dst = sys.argv[1], sys.argv[2]
     assert sys.argv[3] == "--", "usage: asm_prepare.py in.s out.s -- <as> <flags...>"
@@ -49,6 +96,7 @@ def main():
 
     lines = open(src, errors="replace").read().splitlines(keepends=True)
     rewritten = 0
+    restored = add_missing_local_labels(lines)
 
     for _ in range(MAX_ROUNDS):
         with tempfile.NamedTemporaryFile("w", suffix=".s", delete=False,
@@ -71,14 +119,29 @@ def main():
             sys.stderr.write(r.stderr)
             sys.exit("asm_prepare: assembler failed for a reason this cannot fix")
 
+        # gas reports only ~30 errors per invocation, so rewriting just the
+        # lines it named needs one round per 30 instructions — rel_duel_draw
+        # has thousands of VFPU instructions across its 121 handwritten
+        # functions and never converged. Generalise instead: whenever a
+        # mnemonic is rejected once, rewrite EVERY line using that mnemonic.
+        # Rounds then scale with the number of distinct unsupported opcodes
+        # (a few dozen) rather than with the instruction count.
         progress = False
+        bad_mnemonics = set()
         for n in bad:
             m = LINE.match(lines[n - 1])
+            if m:
+                bad_mnemonics.add(m.group(6).split()[0] if m.group(6).split() else "")
+        for i, line in enumerate(lines):
+            m = LINE.match(line)
             if not m:
                 continue
             indent, rom, vram, word, _, insn = m.groups()
-            lines[n - 1] = (f"{indent}/* {rom} {vram} {word} */  "
-                            f".word 0x{to_word(word):08X}  /* {insn.strip()} */\n")
+            parts = insn.split()
+            if not parts or parts[0] not in bad_mnemonics:
+                continue
+            lines[i] = (f"{indent}/* {rom} {vram} {word} */  "
+                        f".word 0x{to_word(word):08X}  /* {insn.strip()} */\n")
             rewritten += 1
             progress = True
         if not progress:
@@ -91,6 +154,9 @@ def main():
     if rewritten:
         print(f"asm_prepare: {os.path.basename(src)}: "
               f"{rewritten} Allegrex instruction(s) emitted as .word")
+    if restored:
+        print(f"asm_prepare: {os.path.basename(src)}: "
+              f"{restored} local label(s) splat failed to emit were restored")
 
 
 if __name__ == "__main__":
