@@ -626,6 +626,12 @@ void func_00003384(s32 *arg0) {
     }
     ehsys_E11E4575(4);
 }
+/* func_000033D4 — 11 words. MATCH 100% (shape: m2c). */
+u8 func_000033D4(s32 arg0, s32 arg1) {
+    extern int D_00042AB4;
+    extern int func_000033D4();
+    return *(int *)(arg0 - 2 + (((int)&D_00042AB4) + ((arg1 - 2) * 0x65)));
+}
 
 /* func_00003478 — 3 words. MATCH 100% (verified). */
 int *func_00003478(void) {
