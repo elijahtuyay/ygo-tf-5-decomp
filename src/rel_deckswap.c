@@ -646,6 +646,24 @@ void func_0000ED10(void) {
         var_s0 += 1;
     } while (var_s0 < 2);
 }
+/* func_0000ED64 — 26 words. MATCH 100% (shape: pipeline). */
+void func_0000ED64(void) {
+
+    extern int ehsys_20E340D9();
+    extern s32 D_0001E89C;
+    extern s32 D_0001F998;
+    s32 temp_a1;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_a1 = (*(int *)((char *)(D_0001F998 + (var_s0 * 4)) + 0x98));
+        if (temp_a1 != 0) {
+            ehsys_20E340D9(D_0001E89C, temp_a1);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 2);
+}
 
 /* func_0000EDBC -- MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_0000EDBC(s32 arg0, int arg1, int arg2, int arg3) {
