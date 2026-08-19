@@ -80,7 +80,45 @@ real prototypes would change argument promotion and could regress matched code.
 Use it to check a callee's arity before guessing one — the single biggest cause
 of SIZE MISMATCH.
 
-## 5. Hybrid C+assembly build — scaffolding done, one step remaining
+## 5. THE HYBRID BUILD WORKS — 7 modules now rebuild byte-exactly
+
+**`make MODULE=rel_soundtest HYBRID=1` prints OK.** That is the first time in
+this project's history that a module has been rebuilt from our source and
+matched the shipped binary's sha1.
+
+Seven modules now do: `rel_cardalbum`, `rel_conv_machine`, `rel_gallery`,
+`rel_labo`, `rel_password`, `rel_soundtest`, `rel_story` — the last of those
+being 640 functions.
+
+`HYBRID=1` compiles the functions we have matched from C and assembles the rest,
+splicing them into one object with `tools/mwccgap`. Plain `SRC=1` replaces the
+whole `.text`, so it can only pass when EVERY function matches — impossible for
+the 19 modules containing hand-written assembly. The hybrid path carries those
+verbatim, which is how every matching decompilation handles them.
+
+### What the wiring needed
+
+Three things, each of which failed silently in a different way:
+
+1. **An `INCLUDE_ASM` macro mwcc accepts.** `include/include_asm.h` has never
+   worked with the real compiler — mwcc rejects GCC-style
+   `__asm__(".include ...")` with `')' expected`. `include/hybrid_asm.h`
+   defines it as a bare extern instead: it parses, and it leaves the function
+   ABSENT from the object, which is exactly what mwccgap requires.
+2. **`--macro-inc-path`**, because the per-function `.s` files open with
+   `.include "macro.inc"` and the assembler otherwise cannot find it.
+3. **Never passing `--as-flags`.** mwccgap sets its option prefix to `~`, so
+   `--as-flags` (nargs="*") greedily swallows every following `-flag` and leaves
+   the compiler with no flags at all — which presents as a compile error with no
+   obvious cause.
+
+`scripts/make_hybrid.py` splits the PREPARED disassembly (`build/asm/<m>/text.s`),
+not the raw one: `asm/<m>/text.s` still contains Allegrex `min`/`max`/VFPU
+opcodes that gas cannot assemble, and `asm_prepare.py` rewrites exactly those.
+Functions are emitted in shipped ADDRESS ORDER, because the linker lays `.text`
+out sequentially and any deviation moves every later function.
+
+## 6. Earlier scaffolding notes
 
 `scripts/make_hybrid.py` generates a module source interleaving matched C with
 `INCLUDE_ASM` for everything else, in shipped address order, and
