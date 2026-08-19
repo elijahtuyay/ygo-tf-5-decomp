@@ -92,6 +92,18 @@ def main():
     c_path = os.path.join(ROOT, "src", module + ".c")
     lines = open(c_path).read().splitlines()
 
+    # Keep only functions that VERIFY. A function can sit in src/<m>.c and still
+    # not match — src/rel_html_view.c deliberately carries a NONMATCHING
+    # func_00000470, and a merge can leave a near-miss behind. Selecting on
+    # "defined in C" then compiles the wrong bytes and the module can never
+    # link byte-exactly. Selecting on the verified baseline instead carries any
+    # such function as assembly, which is what makes the module completable.
+    verified = set()
+    bl = os.path.join(ROOT, "config/progress-baseline.json")
+    if os.path.exists(bl):
+        import json
+        verified = set(json.load(open(bl)).get("modules", {}).get(module, []))
+
     # Locate each C function definition: the line its return type starts on,
     # through to the line before the next definition (or EOF).
     starts_in_file = {}
@@ -99,13 +111,19 @@ def main():
         m = re.match(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;]*$", line)
         if m:
             starts_in_file[m.group(1)] = i
-    have = set(starts_in_file)
-    order = sorted(have, key=lambda f: starts_in_file[f])
+    # Boundaries must be computed over EVERY definition in the file, not just
+    # the ones being kept: a function's block runs to the start of the next
+    # definition, so filtering first would make an excluded function's body get
+    # swallowed into the preceding block and compiled anyway.
+    order = sorted(starts_in_file, key=lambda f: starts_in_file[f])
     bounds = {}
     for k, f in enumerate(order):
         end = starts_in_file[order[k + 1]] if k + 1 < len(order) else len(lines)
         bounds[f] = (starts_in_file[f], end)
     preamble = lines[:starts_in_file[order[0]]] if order else lines
+    have = set(starts_in_file)
+    if verified:
+        have &= verified          # anything unverified falls through to INCLUDE_ASM
 
     missing = sorted(set(funcs) - have, key=lambda f: starts.get(f, 0))
 
