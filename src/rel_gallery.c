@@ -207,6 +207,12 @@ extern int ehsys_B89D38DC();
 s32 func_000032F0(s32 arg0, s32 arg1, s32 arg2) {
     return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
+/* func_000034E0 — 12 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000034E0(void *arg0) {
+    extern char D_0000989C;
+    extern int func_000034E0();
+    return (*(char *)((char *)arg0 + 0x1D)) + ((&D_0000989C)[(*(int *)((char *)arg0 + 0x14))] + ((*(char *)((char *)arg0 + 0x1E)) * 7));
+}
 
 /* func_00003510 — 23 words. MATCH 100% (shape: m2c). */
 void func_00003510(s32 *arg0, s32 arg1) {

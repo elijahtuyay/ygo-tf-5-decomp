@@ -209,6 +209,30 @@ void func_00001A54(void) {
     func_0000371C(0, func_00001A88, 0);
     D_0000B3D0 = 2;
 }
+/* func_00001A88 — 52 words. MATCH 100% (shape: m2c). */
+void func_00001A88(void) {
+    extern int D_0000B3D0;
+    extern int D_B9E0;
+    extern int D_BA50;
+    extern int ehsys_42144DB8();
+    extern int ehsys_D470D0B2();
+    extern int ehsys_FDAFCF3A();
+    extern int ehsys_memset();
+    extern int func_000001C4();
+    extern int func_00001A88();
+    extern int func_000037E4();
+    D_0000B3D0 = 3;
+    *(s32 *)0xB9DC = func_000037E4(7);
+    ehsys_FDAFCF3A(*(int *)0xB9DC, func_000037E4(8));
+    ehsys_42144DB8(*(int *)0xB9DC, 0);
+    ehsys_memset(&D_B9E0, 0, 0x60);
+    *(s32 *)0xBA40 = func_000037E4(9);
+    ehsys_FDAFCF3A(*(int *)0xBA40, func_000037E4(0xA));
+    ehsys_42144DB8(*(int *)0xBA40, 0);
+    ehsys_memset(&D_BA50, 0, 0x60);
+    func_000001C4();
+    ehsys_D470D0B2(1, -0x01000000, 0x10);
+}
 
 /* func_00001B58 — MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00001B58(void) {
