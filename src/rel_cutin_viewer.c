@@ -850,6 +850,16 @@ int func_0000C588(int arg0, int arg1, int arg2) {
 extern int func_000060BC();
 extern int *func_00006294();
 extern void func_0000ECD4();
+/* func_0000E1DC — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_000060BC();
+extern int *func_00006294();
+extern void func_0000E238();
+int func_0000E1DC(int arg0, int arg1, int arg2) {
+
+    int h = func_000060BC(&func_0000E238, arg1, arg2, 0xC8C8, 0);
+    if (h != -1) { func_00006294(h)[4] = arg0; }
+    return h;
+}
 int func_0000EC78(int arg0, int arg1, int arg2) {
 
     int h = func_000060BC(&func_0000ECD4, arg1, arg2, 0x2230, 0);
@@ -860,6 +870,26 @@ int func_0000EC78(int arg0, int arg1, int arg2) {
 extern int func_000060BC();
 extern int *func_00006294();
 extern void func_0001149C();
+/* func_0000F45C — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_000060BC();
+extern int *func_00006294();
+extern void func_0000F5DC();
+int func_0000F45C(int arg0, int arg1, int arg2) {
+
+    int h = func_000060BC(&func_0000F5DC, arg1, arg2, 0xD564, 0);
+    if (h != -1) { func_00006294(h)[5] = arg0; }
+    return h;
+}
+/* func_000104DC — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_000060BC();
+extern int *func_00006294();
+extern void func_00010538();
+int func_000104DC(int arg0, int arg1, int arg2) {
+
+    int h = func_000060BC(&func_00010538, arg1, arg2, 0xE62C, 0);
+    if (h != -1) { func_00006294(h)[5] = arg0; }
+    return h;
+}
 int func_00011440(int arg0, int arg1, int arg2) {
 
     int h = func_000060BC(&func_0001149C, arg1, arg2, 0x13E8, 0);
@@ -880,6 +910,16 @@ int func_00011A5C(int arg0, int arg1, int arg2) {
 extern int func_000060BC();
 extern int *func_00006294();
 extern void func_00012694();
+/* func_00012090 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_000060BC();
+extern int *func_00006294();
+extern void func_000120EC();
+int func_00012090(int arg0, int arg1, int arg2) {
+
+    int h = func_000060BC(&func_000120EC, arg1, arg2, 0xB084, 0);
+    if (h != -1) { func_00006294(h)[4] = arg0; }
+    return h;
+}
 int func_00012638(int arg0, int arg1, int arg2) {
 
     int h = func_000060BC(&func_00012694, arg1, arg2, 0xAB8, 0);

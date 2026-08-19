@@ -2242,6 +2242,16 @@ int func_0003DB08(int arg0, int arg1, int arg2) {
 extern int func_0003176C();
 extern int *func_00031974();
 extern void func_00040254();
+/* func_0003F75C — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0003F7B8();
+int func_0003F75C(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0003F7B8, arg1, arg2, 0xC8C8, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
 int func_000401F8(int arg0, int arg1, int arg2) {
 
     int h = func_0003176C(&func_00040254, arg1, arg2, 0x2230, 0);
@@ -2252,6 +2262,26 @@ int func_000401F8(int arg0, int arg1, int arg2) {
 extern int func_0003176C();
 extern int *func_00031974();
 extern void func_00042A1C();
+/* func_000409DC — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00040B5C();
+int func_000409DC(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00040B5C, arg1, arg2, 0xD564, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
+}
+/* func_00041A5C — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_00041AB8();
+int func_00041A5C(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_00041AB8, arg1, arg2, 0xE62C, 0);
+    if (h != -1) { func_00031974(h)[5] = arg0; }
+    return h;
+}
 int func_000429C0(int arg0, int arg1, int arg2) {
 
     int h = func_0003176C(&func_00042A1C, arg1, arg2, 0x13E8, 0);
@@ -2272,6 +2302,16 @@ int func_00042FDC(int arg0, int arg1, int arg2) {
 extern int func_0003176C();
 extern int *func_00031974();
 extern void func_00043C14();
+/* func_00043610 — 23 words. MATCH 100% (shape: spawn-set). */
+extern int func_0003176C();
+extern int *func_00031974();
+extern void func_0004366C();
+int func_00043610(int arg0, int arg1, int arg2) {
+
+    int h = func_0003176C(&func_0004366C, arg1, arg2, 0xB084, 0);
+    if (h != -1) { func_00031974(h)[4] = arg0; }
+    return h;
+}
 int func_00043BB8(int arg0, int arg1, int arg2) {
 
     int h = func_0003176C(&func_00043C14, arg1, arg2, 0xAB8, 0);
@@ -4399,6 +4439,23 @@ void *func_00064F78(S5_64F78 *arg0, S5_64F78 *arg1) {
     arg0->d = arg1->d;
     arg0->e = arg1->e;
     return arg0;
+}
+/* func_00065004 — 0 words. MATCH 100% (shape: same-shape twin). */
+void func_00065004(s32 arg0, s32 arg1) {
+
+    extern int ehsys_09794DF0();
+    extern int ehsys_1D98951B();
+    extern int ehsys_23E69878();
+    extern int ehsys_399AC68A();
+    extern int ehsys_4175E3DB();
+    extern int ehsys_42110BF9();
+    extern int ehsys_5CBB9E43();
+    extern int ehsys_9EA6989A();
+    extern int ehsys_C8DF61CD();
+    extern int ehsys_E6E4401F();
+    extern int ehsys_F462EE6E();
+    extern int func_00024670();
+    ehsys_9EA6989A(ehsys_23E69878(ehsys_09794DF0(ehsys_F462EE6E(ehsys_C8DF61CD(ehsys_5CBB9E43(ehsys_F462EE6E(ehsys_4175E3DB(ehsys_4175E3DB(ehsys_F462EE6E(ehsys_E6E4401F(ehsys_42110BF9(ehsys_399AC68A(ehsys_1D98951B(arg0, 0), 0), 0), 0, 0), 9), 1), 0xA), 4), 0, 2, 3, 0, 0), 6, 0, 0xFF), 0), 0, 1), -1), arg1);
 }
 
 /* func_000650E8 — 5 words. MATCH 100% (shape: thunk). */
