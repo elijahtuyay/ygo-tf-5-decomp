@@ -14,7 +14,7 @@ typedef short s16;        typedef unsigned short u16;
 typedef int s32;          typedef unsigned int u32;
 typedef float f32;
 
-/* 232 globals with a type the binary determines */
+/* 243 globals with a type the binary determines */
 extern s32 D_00008724;
 extern s32 D_00008728;
 extern s32 D_0000872C;
@@ -22,19 +22,26 @@ extern s32 D_00008730;
 extern s32 D_00008734;
 extern s32 D_00008738;
 extern f32 D_0000B080;
+extern f32 D_0000B084;
+extern f32 D_0000B088;
 extern f32 D_0000B090;
 extern s32 D_0000B098;
 extern f32 D_0000B0A0;
 extern f32 D_0000B0A8;
+extern f32 D_0000B0B0;
 extern f32 D_0000B0B4;
+extern f32 D_0000B0B8;
 extern s32 D_0000B0BC;
 extern s32 D_0000B0C0;
+extern f32 D_0000B0C4;
 extern f32 D_0000B0C8;
+extern f32 D_0000B0D0;
 extern s32 D_0000B0D8;
 extern u16 D_0000E160;
 extern u16 D_0000E162;
 extern f32 D_0000E740;
 extern f32 D_0000E748;
+extern f32 D_00010B40;
 extern s32 D_00010B44;
 extern s32 D_00010B4C;
 extern s32 D_00010B50;
@@ -97,10 +104,14 @@ extern f32 D_00011E80;
 extern s32 D_00011E88;
 extern f32 D_00011E8C;
 extern s32 D_00011E90;
+extern f32 D_00012D90;
 extern s32 D_00012D94;
 extern s32 D_00012D9C;
 extern s32 D_00012DA0;
+extern f32 D_00012DA4;
 extern s32 D_00012DAC;
+extern f32 D_00012DB0;
+extern f32 D_00012DB8;
 extern s32 D_00012DBC;
 extern s32 D_00012DC0;
 extern f32 D_00012DC8;
@@ -247,20 +258,6 @@ extern s32 D_0002E1D0;
 extern s32 D_0002E1D4;
 extern s32 D_0002E1D8;
 extern f32 ehsys_8F3D00D1;
-
-/* 11 accessed at more than one width — a union, or two
- * structs sharing a base. Decide these by hand before using them. */
-/* extern ? D_0000B084;   seen as f32, s32 */
-/* extern ? D_0000B088;   seen as f32, s32 */
-/* extern ? D_0000B0B0;   seen as f32, s32 */
-/* extern ? D_0000B0B8;   seen as f32, s32 */
-/* extern ? D_0000B0C4;   seen as f32, s32 */
-/* extern ? D_0000B0D0;   seen as f32, s32 */
-/* extern ? D_00010B40;   seen as f32, s32 */
-/* extern ? D_00012D90;   seen as f32, s32 */
-/* extern ? D_00012DA4;   seen as f32, s32 */
-/* extern ? D_00012DB0;   seen as f32, s32 */
-/* extern ? D_00012DB8;   seen as f32, s32 */
 
 /* 187 only ever have their ADDRESS taken (arrays,
  * structs, string literals); the element type is not implied. */

@@ -14,7 +14,7 @@ typedef short s16;        typedef unsigned short u16;
 typedef int s32;          typedef unsigned int u32;
 typedef float f32;
 
-/* 112 globals with a type the binary determines */
+/* 114 globals with a type the binary determines */
 extern f32 D_0001D560;
 extern f32 D_0001D568;
 extern s16 D_0001D6E8;
@@ -76,6 +76,7 @@ extern s32 D_0001E338;
 extern s32 D_0001E33C;
 extern u16 D_0001E340;
 extern u16 D_0001E75C;
+extern s16 D_0001E880;
 extern s32 D_0001E884;
 extern u8 D_0001E888;
 extern u16 D_0001E88A;
@@ -111,6 +112,7 @@ extern u8 D_0001E930;
 extern u16 D_0001E932;
 extern u16 D_0001E934;
 extern u16 D_0001E936;
+extern s16 D_0001F964;
 extern s32 D_0001F968;
 extern u16 D_0001F96C;
 extern u16 D_0001F96E;
@@ -128,14 +130,12 @@ extern s32 D_0001F9BC;
 extern s32 D_0001FB48;
 extern s32 D_0001FB4C;
 
-/* 6 accessed at more than one width — a union, or two
+/* 4 accessed at more than one width — a union, or two
  * structs sharing a base. Decide these by hand before using them. */
-/* extern ? D_0001E302;   seen as u16, u8 */
-/* extern ? D_0001E322;   seen as u16, u8 */
-/* extern ? D_0001E342;   seen as u16, u8 */
-/* extern ? D_0001E880;   seen as s16, u16 */
-/* extern ? D_0001E8C0;   seen as u16, u8 */
-/* extern ? D_0001F964;   seen as s16, u16 */
+/* extern ? D_0001E302;   seen as w1, w2 */
+/* extern ? D_0001E322;   seen as w1, w2 */
+/* extern ? D_0001E342;   seen as w1, w2 */
+/* extern ? D_0001E8C0;   seen as w1, w2 */
 
 /* 95 only ever have their ADDRESS taken (arrays,
  * structs, string literals); the element type is not implied. */

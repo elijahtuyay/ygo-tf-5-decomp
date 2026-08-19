@@ -64,7 +64,7 @@ extern s32 D_0000B674;
 
 /* 1 accessed at more than one width — a union, or two
  * structs sharing a base. Decide these by hand before using them. */
-/* extern ? D_0000B0D4;   seen as u16, u8 */
+/* extern ? D_0000B0D4;   seen as w1, w2 */
 
 /* 26 only ever have their ADDRESS taken (arrays,
  * structs, string literals); the element type is not implied. */

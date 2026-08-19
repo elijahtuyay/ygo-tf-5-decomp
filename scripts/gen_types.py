@@ -52,29 +52,65 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # The declared type of a global decides the load width MWCC emits, so the width
 # the ORIGINAL used tells us the declaration. Signedness follows the same rule:
 # `lb` is signed char, `lbu` unsigned.
-OPCODE_TYPE = {
-    "lb": "s8", "sb": "u8", "lbu": "u8",
-    "lh": "s16", "sh": "u16", "lhu": "u16",
-    "lw": "s32", "sw": "s32",
-    "lwc1": "f32", "swc1": "f32",
-}
+# A STORE reveals the width but says nothing about signedness — `sb` is what
+# MWCC emits for both `char` and `unsigned char`. Only a load distinguishes
+# them (`lb` vs `lbu`). Treating stores as if they voted on signedness marks a
+# global that is stored with `sh` and loaded with `lh` as "seen as s16, u16"
+# and therefore ambiguous, when its width was never in doubt. That mistake hid
+# most of the 182 supposedly-ambiguous globals.
+WIDTH = {"lb": 1, "lbu": 1, "sb": 1,
+         "lh": 2, "lhu": 2, "sh": 2,
+         "lw": 4, "sw": 4,
+         "lwc1": 4, "swc1": 4}
+SIGNED_LOAD = {"lb": True, "lbu": False, "lh": True, "lhu": False}
+FLOAT_OPS = {"lwc1", "swc1"}
+BY_WIDTH = {1: ("s8", "u8"), 2: ("s16", "u16"), 4: ("s32", "s32")}
 ACCESS = re.compile(r"\*/\s+(l[bhw]u?|s[bhw]|lwc1|swc1)\s+\$\w+,\s*%lo\(([A-Za-z_]\w*)\)")
 ADDR_OF = re.compile(r"%hi\(([A-Za-z_]\w*)\)")
 
 
 def scan(module):
-    """{global: {types seen}} plus the globals only ever used as an address."""
-    types = collections.defaultdict(set)
+    """{global: {types}} plus the globals only ever used as an address.
+
+    Width comes from every access; signedness only from loads, which are the
+    only instructions that carry it."""
+    widths = collections.defaultdict(set)
+    signed = collections.defaultdict(set)
+    floats = set()
     addressed = set()
     path = os.path.join(ROOT, "asm", module, "text.s")
     for line in open(path, errors="replace"):
         m = ACCESS.search(line)
         if m:
-            t = OPCODE_TYPE.get(m.group(1))
-            if t:
-                types[m.group(2)].add(t)
+            op, name = m.group(1), m.group(2)
+            if op in WIDTH:
+                widths[name].add(WIDTH[op])
+            if op in FLOAT_OPS:
+                floats.add(name)
+            if op in SIGNED_LOAD:
+                signed[name].add(SIGNED_LOAD[op])
         for g in ADDR_OF.findall(line):
             addressed.add(g)
+
+    types = {}
+    for name, w in widths.items():
+        if len(w) != 1:
+            types[name] = {f"w{x}" for x in sorted(w)}   # genuinely ambiguous width
+            continue
+        width = next(iter(w))
+        if name in floats:
+            types[name] = {"f32"}
+            continue
+        sign = signed.get(name, set())
+        if len(sign) > 1:
+            # loaded both signed and unsigned: same width, so the width is safe
+            # but the declaration has to pick one. Prefer the unsigned form,
+            # which is what a store-heavy global usually is.
+            types[name] = {BY_WIDTH[width][1]}
+        elif sign:
+            types[name] = {BY_WIDTH[width][0 if next(iter(sign)) else 1]}
+        else:
+            types[name] = {BY_WIDTH[width][1]}           # stores only
     return types, addressed
 
 

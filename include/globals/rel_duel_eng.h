@@ -14,12 +14,16 @@ typedef short s16;        typedef unsigned short u16;
 typedef int s32;          typedef unsigned int u32;
 typedef float f32;
 
-/* 524 globals with a type the binary determines */
+/* 576 globals with a type the binary determines */
 extern s16 D_000241C8;
 extern u8 D_00024249;
 extern s32 D_00024268;
 extern s32 D_0002428C;
+extern s8 D_0002428F;
+extern s16 D_00024BC4;
 extern u16 D_00024BC6;
+extern s16 D_00024BC8;
+extern s16 D_00024BCA;
 extern s32 D_00024BCC;
 extern s32 D_00024BD0;
 extern u8 D_00024D63;
@@ -130,11 +134,14 @@ extern u16 D_00326F24;
 extern u16 D_00326F26;
 extern u16 D_00326F28;
 extern s32 D_00326F58;
+extern s16 D_00326F5C;
+extern s16 D_00326F5E;
 extern s32 D_00326F60;
 extern s32 D_00326F64;
 extern s32 D_00326F68;
 extern s32 D_00326F6C;
 extern s32 D_00326F70;
+extern s16 D_0032767C;
 extern u16 D_00327680;
 extern u16 D_00327682;
 extern s32 D_00327684;
@@ -145,19 +152,27 @@ extern u16 D_00327694;
 extern u16 D_00327696;
 extern s32 D_0032777C;
 extern s32 D_00327780;
+extern s16 D_00327784;
+extern s16 D_00327786;
 extern s16 D_00327788;
+extern s8 D_0032BC89;
+extern s8 D_0032BC8A;
 extern u8 D_0032BC8B;
 extern u16 D_0032BC8E;
 extern f32 D_0032BC90;
 extern f32 D_0032BC98;
 extern f32 D_0032BCA0;
+extern s16 D_0032BCA6;
 extern s32 D_0032BCA8;
+extern s8 D_0034B0B9;
 extern u8 D_0034B0BB;
 extern u16 D_0034B0BC;
 extern u16 D_0034B0BE;
 extern s32 D_0034B0C4;
 extern s32 D_0034B0C8;
 extern s32 D_0034B0CC;
+extern s16 D_0034B0D0;
+extern s16 D_0034B0D2;
 extern u16 D_0034B124;
 extern u16 D_0034B134;
 extern u16 D_0034B144;
@@ -167,6 +182,7 @@ extern u16 D_0034B174;
 extern u16 D_0034B184;
 extern u16 D_0034B194;
 extern u16 D_0034B1BA;
+extern f32 D_0034B1BC;
 extern f32 D_0034B1C0;
 extern f32 D_0034B1C8;
 extern f32 D_0034B1CC;
@@ -175,25 +191,46 @@ extern f32 D_0034B1D8;
 extern f32 D_0034B1DC;
 extern f32 D_0034B1E0;
 extern s32 D_0034B1E8;
+extern s8 D_0034B1EB;
 extern s32 D_0034B1EC;
+extern s8 D_0034B1EF;
 extern s16 D_0034B218;
 extern u8 D_0034B220;
 extern u8 D_0034B221;
 extern u8 D_0034B223;
 extern u8 D_0034B22C;
 extern s16 D_0034B232;
+extern s16 D_0034BB18;
+extern s16 D_0034BB1A;
+extern s16 D_0034BB1C;
+extern s16 D_0034BB1E;
 extern s16 D_0034BB26;
 extern u8 D_0034BB3F;
+extern s16 D_0034BCC0;
+extern s16 D_0034BCC2;
+extern s16 D_0034BCC4;
+extern s16 D_0034BCC6;
 extern s16 D_0034BCCE;
 extern s32 D_0034BE68;
 extern s32 D_0034BE6C;
+extern s16 D_0034BE70;
+extern s16 D_0034BE72;
+extern s16 D_0034BE74;
+extern s16 D_0034BE76;
+extern s16 D_0034BE78;
+extern s16 D_0034BE7A;
+extern s16 D_0034BE7C;
+extern s16 D_0034BE7E;
 extern u16 D_0034BE80;
 extern u16 D_0034BE82;
 extern u16 D_0034BE84;
 extern u16 D_0034BE86;
 extern u16 D_0034BE88;
 extern u16 D_0034BE8A;
+extern s8 D_0034BE8D;
+extern s8 D_0034BE8E;
 extern u8 D_0034BE8F;
+extern f32 D_0034BE90;
 extern f32 D_0034BE94;
 extern f32 D_0034BE98;
 extern f32 D_0034BEA0;
@@ -204,14 +241,20 @@ extern s32 D_0034BEB0;
 extern s32 D_0034BEB4;
 extern s32 D_0034BEDC;
 extern s32 D_0034BEE0;
+extern s16 D_0034BFA4;
+extern s16 D_0034BFA6;
+extern s16 D_0034BFA8;
+extern s16 D_0034BFAA;
 extern s32 D_0034BFAC;
 extern s32 D_0034BFB0;
 extern s32 D_0034BFB4;
 extern s32 D_0034BFB8;
 extern s32 D_0034BFBC;
 extern s32 D_0034BFC0;
+extern s8 D_0034BFC4;
 extern u8 D_0034BFC5;
 extern u8 D_0034BFC6;
+extern s16 D_0034BFC8;
 extern u16 D_0034BFCA;
 extern u16 D_0034BFCC;
 extern u16 D_0034BFCE;
@@ -221,6 +264,8 @@ extern s32 D_0034BFD8;
 extern s32 D_0034BFDC;
 extern u16 D_0034BFE0;
 extern u16 D_0034BFE2;
+extern s16 D_0034C0C8;
+extern s16 D_0034C0CA;
 extern s32 D_0034C0CC;
 extern s32 D_0034C0D0;
 extern s16 D_0034C0D4;
@@ -232,9 +277,13 @@ extern s16 D_0034C0E0;
 extern s16 D_0034C0E2;
 extern s16 D_0034C0E4;
 extern u16 D_0034C0E6;
+extern s16 D_0034C19C;
 extern u16 D_0034C19E;
 extern u16 D_0034C1A0;
 extern s32 D_0034C1A4;
+extern s16 D_0034C1A8;
+extern s16 D_0034C1AA;
+extern s16 D_0034C1AC;
 extern u16 D_0034C1AE;
 extern s32 D_0034C564;
 extern s16 D_0034C634;
@@ -365,6 +414,7 @@ extern u16 D_0034D704;
 extern u16 D_0034D712;
 extern u16 D_0034D726;
 extern u16 D_0034D728;
+extern u16 D_0034D72C;
 extern u16 D_0034D72E;
 extern s32 D_0034DF30;
 extern s32 D_0034DF34;
@@ -484,6 +534,8 @@ extern s32 D_00351834;
 extern s32 D_00351838;
 extern s32 D_0035183C;
 extern s32 D_00351840;
+extern u16 D_00351844;
+extern u16 D_00351846;
 extern u16 D_0035184A;
 extern s32 D_0035184C;
 extern s32 D_00351850;
@@ -540,111 +592,59 @@ extern s32 D_00359408;
 extern s32 D_0035940C;
 extern s32 D_00359410;
 
-/* 103 accessed at more than one width — a union, or two
+/* 51 accessed at more than one width — a union, or two
  * structs sharing a base. Decide these by hand before using them. */
-/* extern ? D_00024248;   seen as u16, u8 */
-/* extern ? D_0002424A;   seen as u16, u8 */
-/* extern ? D_0002424C;   seen as u16, u8 */
-/* extern ? D_00024250;   seen as u16, u8 */
-/* extern ? D_0002428F;   seen as s8, u8 */
-/* extern ? D_00024BC4;   seen as s16, u16 */
-/* extern ? D_00024BC8;   seen as s16, u16 */
-/* extern ? D_00024BCA;   seen as s16, u16 */
-/* extern ? D_00326F5C;   seen as s16, u16 */
-/* extern ? D_00326F5E;   seen as s16, u16 */
-/* extern ? D_0032767C;   seen as s16, u16 */
-/* extern ? D_00327784;   seen as s16, u16 */
-/* extern ? D_00327786;   seen as s16, u16 */
-/* extern ? D_0032BC88;   seen as f32, s8, u8 */
-/* extern ? D_0032BC89;   seen as s8, u8 */
-/* extern ? D_0032BC8A;   seen as s8, u8 */
-/* extern ? D_0032BC8C;   seen as f32, s32, u8 */
-/* extern ? D_0032BCA4;   seen as s16, s8, u16 */
-/* extern ? D_0032BCA6;   seen as s16, u16 */
-/* extern ? D_0034B0B8;   seen as s16, s8, u8 */
-/* extern ? D_0034B0B9;   seen as s8, u8 */
-/* extern ? D_0034B0BA;   seen as u16, u8 */
-/* extern ? D_0034B0C0;   seen as s32, u16 */
-/* extern ? D_0034B0D0;   seen as s16, u16 */
-/* extern ? D_0034B0D2;   seen as s16, u16 */
-/* extern ? D_0034B1A4;   seen as u16, u8 */
-/* extern ? D_0034B1B8;   seen as f32, u16, u8 */
-/* extern ? D_0034B1BC;   seen as f32, s32 */
-/* extern ? D_0034B1EB;   seen as s8, u8 */
-/* extern ? D_0034B1EF;   seen as s8, u8 */
-/* extern ? D_0034B222;   seen as u16, u8 */
-/* extern ? D_0034BB18;   seen as s16, u16 */
-/* extern ? D_0034BB1A;   seen as s16, u16 */
-/* extern ? D_0034BB1C;   seen as s16, u16 */
-/* extern ? D_0034BB1E;   seen as s16, u16 */
-/* extern ? D_0034BCC0;   seen as s16, u16 */
-/* extern ? D_0034BCC2;   seen as s16, u16 */
-/* extern ? D_0034BCC4;   seen as s16, u16 */
-/* extern ? D_0034BCC6;   seen as s16, u16 */
-/* extern ? D_0034BE70;   seen as s16, u16 */
-/* extern ? D_0034BE72;   seen as s16, u16 */
-/* extern ? D_0034BE74;   seen as s16, u16 */
-/* extern ? D_0034BE76;   seen as s16, u16 */
-/* extern ? D_0034BE78;   seen as s16, u16 */
-/* extern ? D_0034BE7A;   seen as s16, u16 */
-/* extern ? D_0034BE7C;   seen as s16, u16 */
-/* extern ? D_0034BE7E;   seen as s16, u16 */
-/* extern ? D_0034BE8C;   seen as f32, s8, u8 */
-/* extern ? D_0034BE8D;   seen as s8, u8 */
-/* extern ? D_0034BE8E;   seen as s8, u8 */
-/* extern ? D_0034BE90;   seen as f32, s32 */
-/* extern ? D_0034BFA4;   seen as s16, u16 */
-/* extern ? D_0034BFA6;   seen as s16, u16 */
-/* extern ? D_0034BFA8;   seen as s16, u16 */
-/* extern ? D_0034BFAA;   seen as s16, u16 */
-/* extern ? D_0034BFC4;   seen as s8, u8 */
-/* extern ? D_0034BFC8;   seen as s16, u16 */
-/* extern ? D_0034C0C8;   seen as s16, u16 */
-/* extern ? D_0034C0CA;   seen as s16, u16 */
-/* extern ? D_0034C19C;   seen as s16, u16 */
-/* extern ? D_0034C1A2;   seen as u16, u8 */
-/* extern ? D_0034C1A8;   seen as s16, u16 */
-/* extern ? D_0034C1AA;   seen as s16, u16 */
-/* extern ? D_0034C1AC;   seen as s16, u16 */
-/* extern ? D_0034C6C8;   seen as s32, u8 */
-/* extern ? D_0034C6CC;   seen as s32, u8 */
-/* extern ? D_0034C6E4;   seen as s32, u16, u8 */
-/* extern ? D_0034C6E8;   seen as s32, u16, u8 */
-/* extern ? D_0034C6F0;   seen as s32, u16 */
-/* extern ? D_0034D424;   seen as s32, u16 */
-/* extern ? D_0034D428;   seen as s32, u16 */
-/* extern ? D_0034D558;   seen as s32, u16, u8 */
-/* extern ? D_0034D55C;   seen as s32, u16, u8 */
-/* extern ? D_0034D648;   seen as s32, u16 */
-/* extern ? D_0034D64C;   seen as s32, u16 */
-/* extern ? D_0034D650;   seen as s32, u16, u8 */
-/* extern ? D_0034D65C;   seen as s32, u16 */
-/* extern ? D_0034D6D2;   seen as u16, u8 */
-/* extern ? D_0034D6D4;   seen as u16, u8 */
-/* extern ? D_0034D72A;   seen as s16, u16, u8 */
-/* extern ? D_0034D72C;   seen as s16, u16 */
-/* extern ? D_0034E690;   seen as s32, u16 */
-/* extern ? D_0034F1CC;   seen as s32, u16 */
-/* extern ? D_0034FCD8;   seen as s32, u16 */
-/* extern ? D_0034FCF4;   seen as s32, u16 */
-/* extern ? D_0034FCF8;   seen as s32, u16 */
-/* extern ? D_0035170C;   seen as s32, u16 */
-/* extern ? D_00351714;   seen as s16, s32, u8 */
-/* extern ? D_0035171C;   seen as s32, u16 */
-/* extern ? D_00351724;   seen as s32, u16 */
-/* extern ? D_0035172C;   seen as s32, u16 */
-/* extern ? D_00351788;   seen as s32, u16 */
-/* extern ? D_003517B8;   seen as s32, u16 */
-/* extern ? D_003517BC;   seen as s32, u16 */
-/* extern ? D_003517CC;   seen as s32, u16, u8 */
-/* extern ? D_003517D0;   seen as s32, u16 */
-/* extern ? D_003517D4;   seen as s32, u16 */
-/* extern ? D_003517D8;   seen as s32, u8 */
-/* extern ? D_00351844;   seen as s16, u16 */
-/* extern ? D_00351846;   seen as s16, u16 */
-/* extern ? D_00351848;   seen as u16, u8 */
-/* extern ? D_00351862;   seen as u16, u8 */
-/* extern ? D_0035186A;   seen as u16, u8 */
+/* extern ? D_00024248;   seen as w1, w2 */
+/* extern ? D_0002424A;   seen as w1, w2 */
+/* extern ? D_0002424C;   seen as w1, w2 */
+/* extern ? D_00024250;   seen as w1, w2 */
+/* extern ? D_0032BC88;   seen as w1, w4 */
+/* extern ? D_0032BC8C;   seen as w1, w4 */
+/* extern ? D_0032BCA4;   seen as w1, w2 */
+/* extern ? D_0034B0B8;   seen as w1, w2 */
+/* extern ? D_0034B0BA;   seen as w1, w2 */
+/* extern ? D_0034B0C0;   seen as w2, w4 */
+/* extern ? D_0034B1A4;   seen as w1, w2 */
+/* extern ? D_0034B1B8;   seen as w1, w2, w4 */
+/* extern ? D_0034B222;   seen as w1, w2 */
+/* extern ? D_0034BE8C;   seen as w1, w4 */
+/* extern ? D_0034C1A2;   seen as w1, w2 */
+/* extern ? D_0034C6C8;   seen as w1, w4 */
+/* extern ? D_0034C6CC;   seen as w1, w4 */
+/* extern ? D_0034C6E4;   seen as w1, w2, w4 */
+/* extern ? D_0034C6E8;   seen as w1, w2, w4 */
+/* extern ? D_0034C6F0;   seen as w2, w4 */
+/* extern ? D_0034D424;   seen as w2, w4 */
+/* extern ? D_0034D428;   seen as w2, w4 */
+/* extern ? D_0034D558;   seen as w1, w2, w4 */
+/* extern ? D_0034D55C;   seen as w1, w2, w4 */
+/* extern ? D_0034D648;   seen as w2, w4 */
+/* extern ? D_0034D64C;   seen as w2, w4 */
+/* extern ? D_0034D650;   seen as w1, w2, w4 */
+/* extern ? D_0034D65C;   seen as w2, w4 */
+/* extern ? D_0034D6D2;   seen as w1, w2 */
+/* extern ? D_0034D6D4;   seen as w1, w2 */
+/* extern ? D_0034D72A;   seen as w1, w2 */
+/* extern ? D_0034E690;   seen as w2, w4 */
+/* extern ? D_0034F1CC;   seen as w2, w4 */
+/* extern ? D_0034FCD8;   seen as w2, w4 */
+/* extern ? D_0034FCF4;   seen as w2, w4 */
+/* extern ? D_0034FCF8;   seen as w2, w4 */
+/* extern ? D_0035170C;   seen as w2, w4 */
+/* extern ? D_00351714;   seen as w1, w2, w4 */
+/* extern ? D_0035171C;   seen as w2, w4 */
+/* extern ? D_00351724;   seen as w2, w4 */
+/* extern ? D_0035172C;   seen as w2, w4 */
+/* extern ? D_00351788;   seen as w2, w4 */
+/* extern ? D_003517B8;   seen as w2, w4 */
+/* extern ? D_003517BC;   seen as w2, w4 */
+/* extern ? D_003517CC;   seen as w1, w2, w4 */
+/* extern ? D_003517D0;   seen as w2, w4 */
+/* extern ? D_003517D4;   seen as w2, w4 */
+/* extern ? D_003517D8;   seen as w1, w4 */
+/* extern ? D_00351848;   seen as w1, w2 */
+/* extern ? D_00351862;   seen as w1, w2 */
+/* extern ? D_0035186A;   seen as w1, w2 */
 
 /* 1654 only ever have their ADDRESS taken (arrays,
  * structs, string literals); the element type is not implied. */

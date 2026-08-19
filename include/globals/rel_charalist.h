@@ -14,7 +14,7 @@ typedef short s16;        typedef unsigned short u16;
 typedef int s32;          typedef unsigned int u32;
 typedef float f32;
 
-/* 52 globals with a type the binary determines */
+/* 53 globals with a type the binary determines */
 extern f32 D_0000E098;
 extern s16 D_0000E0EC;
 extern s16 D_0000E0EE;
@@ -54,6 +54,7 @@ extern s32 D_00025E14;
 extern u8 D_00025E18;
 extern u16 D_00025E1A;
 extern u16 D_00025E1C;
+extern s16 D_00025E1E;
 extern s32 D_00025E20;
 extern u16 D_00025E26;
 extern s32 D_000261FC;
@@ -67,10 +68,6 @@ extern u8 D_0002791C;
 extern s32 D_0002793C;
 extern s32 D_00027AC8;
 extern s32 D_00027ACC;
-
-/* 1 accessed at more than one width — a union, or two
- * structs sharing a base. Decide these by hand before using them. */
-/* extern ? D_00025E1E;   seen as s16, u16 */
 
 /* 43 only ever have their ADDRESS taken (arrays,
  * structs, string literals); the element type is not implied. */

@@ -28,8 +28,8 @@ extern s32 D_0000AE30;
 
 /* 2 accessed at more than one width — a union, or two
  * structs sharing a base. Decide these by hand before using them. */
-/* extern ? D_0000AE1C;   seen as s32, u16 */
-/* extern ? D_0000AE20;   seen as s32, u16 */
+/* extern ? D_0000AE1C;   seen as w2, w4 */
+/* extern ? D_0000AE20;   seen as w2, w4 */
 
 /* 22 only ever have their ADDRESS taken (arrays,
  * structs, string literals); the element type is not implied. */
