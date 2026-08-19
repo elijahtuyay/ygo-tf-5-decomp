@@ -6393,6 +6393,33 @@ int func_00281260(int arg1, int arg2, int arg3, int arg4, int arg5) {
     extern int func_002810B0();
     return func_002810B0(arg1, 100, 1000, 100, -800);
 }
+/* func_00283588 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003231E4;
+int func_00283588(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003231E4, 0xE);
+}
+/* func_002836A0 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323228;
+int func_002836A0(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323228, 0x7);
+}
+/* func_002836D4 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323238;
+int func_002836D4(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323238, 0x16);
+}
 /* func_00283E94 — 4 words. MATCH 100% (shape: bulk). */
 int func_00283E94(int arg1, int arg2, int arg3) {
 
@@ -6420,6 +6447,15 @@ int func_00283EC4(int arg1, int arg2, int arg3) {
     extern int func_002EED24();
     extern char D_00323450;
     return func_002EED24(arg1, ((int)&D_00323450), 4);
+}
+/* func_00283FC8 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323508;
+int func_00283FC8(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323508, 0xD);
 }
 /* func_00283FFC — 4 words. MATCH 100% (shape: bulk). */
 int func_00283FFC(int arg1, int arg2, int arg3) {
@@ -6487,6 +6523,42 @@ int func_00284200(int arg1, int arg2, int arg3) {
     extern char D_003236A4;
     return func_002EED24(arg1, ((int)&D_003236A4), 25);
 }
+/* func_002842B0 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003236E8;
+int func_002842B0(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003236E8, 0x1);
+}
+/* func_00284334 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323780;
+int func_00284334(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323780, 0x1A);
+}
+/* func_00284368 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003237B4;
+int func_00284368(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003237B4, 0x5);
+}
+/* func_00284420 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323808;
+int func_00284420(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323808, 0x20);
+}
 /* func_00284454 — 22 words. MATCH 100% (shape: m2c). */
 s32 func_00284454(s32 arg0) {
     extern char D_00323848;
@@ -6506,12 +6578,57 @@ int func_002844AC(int arg1, int arg2, int arg3) {
     extern char D_0032385C;
     return func_002EED24(arg1, ((int)&D_0032385C), 3);
 }
+/* func_002844BC — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323864;
+int func_002844BC(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323864, 0x27);
+}
+/* func_002844F0 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003238B4;
+int func_002844F0(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003238B4, 0x1E);
+}
+/* func_00284524 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003238F0;
+int func_00284524(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003238F0, 0x6);
+}
 /* func_002845B4 — 4 words. MATCH 100% (shape: bulk). */
 int func_002845B4(int arg1, int arg2, int arg3) {
 
     extern int func_002EED24();
     extern char D_00323954;
     return func_002EED24(arg1, ((int)&D_00323954), 5);
+}
+/* func_002845C4 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323960;
+int func_002845C4(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323960, 0xE);
+}
+/* func_002845F8 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_0032397C;
+int func_002845F8(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_0032397C, 0x15);
 }
 /* func_00284984 — 4 words. MATCH 100% (shape: bulk). */
 int func_00284984(int arg1, int arg2, int arg3) {
@@ -6548,6 +6665,15 @@ int func_0028510C(int arg1, int arg2, int arg3) {
     extern char D_00323AC4;
     return func_002EED24(arg1, ((int)&D_00323AC4), 14);
 }
+/* func_0028511C — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323AE0;
+int func_0028511C(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323AE0, 0x21);
+}
 /* func_00285150 — 4 words. MATCH 100% (shape: bulk). */
 int func_00285150(int arg1, int arg2, int arg3) {
 
@@ -6555,12 +6681,111 @@ int func_00285150(int arg1, int arg2, int arg3) {
     extern char D_00323B24;
     return func_002EED24(arg1, ((int)&D_00323B24), 10);
 }
+/* func_00285160 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323B38;
+int func_00285160(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323B38, 0x6);
+}
+/* func_00285194 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00323B44;
+int func_00285194(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00323B44, 0x17);
+}
+/* func_0028593C — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00324144;
+int func_0028593C(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00324144, 0xB);
+}
+/* func_00285970 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_0032415C;
+int func_00285970(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_0032415C, 0xF);
+}
+/* func_002859A4 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_0032417C;
+int func_002859A4(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_0032417C, 0xE);
+}
+/* func_00285A1C — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003241C4;
+int func_00285A1C(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003241C4, 0x14);
+}
+/* func_00285A50 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003241EC;
+int func_00285A50(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003241EC, 0x5A);
+}
+/* func_00285A84 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003242A0;
+int func_00285A84(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003242A0, 0x4);
+}
+/* func_00285AB8 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_003242A8;
+int func_00285AB8(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_003242A8, 0x19);
+}
+/* func_00285B84 — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00324340;
+int func_00285B84(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00324340, 0x39);
+}
 /* func_00285C4C — 4 words. MATCH 100% (shape: bulk). */
 int func_00285C4C(int arg1, int arg2, int arg3) {
 
     extern int func_002EED24();
     extern char D_003243F0;
     return func_002EED24(arg1, ((int)&D_003243F0), 47);
+}
+/* func_00285C5C — 13 words. MATCH 100% (shape: seh-dispatch). */
+extern short func_001A3A88();
+extern int func_002EED24(short, void *, int);
+extern int D_00324450;
+int func_00285C5C(short arg0, int arg1) {
+
+    if (arg1) { arg0 = func_001A3A88(arg0); }
+    return func_002EED24(arg0, &D_00324450, 0xB);
 }
 /* func_00285C90 — 4 words. MATCH 100% (shape: bulk). */
 int func_00285C90(int arg1, int arg2, int arg3) {
@@ -7608,6 +7833,10 @@ int func_002F04C0(int arg1, int arg2) {
     extern char D_00351988;
     return func_002F04D4(((int)&D_0035195C), ((int)&D_00351988));
 }
+/* func_002F04D4 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F04D4;
+S_func_002F04D4 *func_002F04D4(S_func_002F04D4 *dst, S_func_002F04D4 *src) { *dst = *src; return dst; }
 /* func_002F0628 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0628(int arg1, int arg2) {
 
@@ -7616,6 +7845,10 @@ int func_002F0628(int arg1, int arg2) {
     extern char D_003519E0;
     return func_002F063C(((int)&D_003519B4), ((int)&D_003519E0));
 }
+/* func_002F063C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F063C;
+S_func_002F063C *func_002F063C(S_func_002F063C *dst, S_func_002F063C *src) { *dst = *src; return dst; }
 /* func_002F076C — 5 words. MATCH 100% (shape: bulk). */
 int func_002F076C(int arg1, int arg2) {
 
@@ -7624,6 +7857,10 @@ int func_002F076C(int arg1, int arg2) {
     extern char D_00351A38;
     return func_002F0780(((int)&D_00351A0C), ((int)&D_00351A38));
 }
+/* func_002F0780 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F0780;
+S_func_002F0780 *func_002F0780(S_func_002F0780 *dst, S_func_002F0780 *src) { *dst = *src; return dst; }
 /* func_002F08CC — 5 words. MATCH 100% (shape: bulk). */
 int func_002F08CC(int arg1, int arg2) {
 
@@ -7632,6 +7869,10 @@ int func_002F08CC(int arg1, int arg2) {
     extern char D_00351A90;
     return func_002F08E0(((int)&D_00351A64), ((int)&D_00351A90));
 }
+/* func_002F08E0 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F08E0;
+S_func_002F08E0 *func_002F08E0(S_func_002F08E0 *dst, S_func_002F08E0 *src) { *dst = *src; return dst; }
 /* func_002F0A50 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F0A50(int arg1, int arg2) {
 
@@ -7700,6 +7941,10 @@ int func_002F10D8(int arg1, int arg2) {
     extern char D_0035233C;
     return func_002F10EC(((int)&D_00351F74), ((int)&D_0035233C));
 }
+/* func_002F10EC — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[484]; } S_func_002F10EC;
+S_func_002F10EC *func_002F10EC(S_func_002F10EC *dst, S_func_002F10EC *src) { *dst = *src; return dst; }
 /* func_002F1278 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1278(int arg1, int arg2) {
 
@@ -7716,6 +7961,10 @@ int func_002F13C0(int arg1, int arg2) {
     extern char D_0035277C;
     return func_002F13D4(((int)&D_00352724), ((int)&D_0035277C));
 }
+/* func_002F13D4 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ int x[22]; } S_func_002F13D4;
+S_func_002F13D4 *func_002F13D4(S_func_002F13D4 *dst, S_func_002F13D4 *src) { *dst = *src; return dst; }
 /* func_002F1524 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1524(int arg1, int arg2) {
 
@@ -7724,6 +7973,10 @@ int func_002F1524(int arg1, int arg2) {
     extern char D_00352800;
     return func_002F1538(((int)&D_003527D4), ((int)&D_00352800));
 }
+/* func_002F1538 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F1538;
+S_func_002F1538 *func_002F1538(S_func_002F1538 *dst, S_func_002F1538 *src) { *dst = *src; return dst; }
 /* func_002F1668 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1668(int arg1, int arg2) {
 
@@ -7732,6 +7985,10 @@ int func_002F1668(int arg1, int arg2) {
     extern char D_00352858;
     return func_002F167C(((int)&D_0035282C), ((int)&D_00352858));
 }
+/* func_002F167C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F167C;
+S_func_002F167C *func_002F167C(S_func_002F167C *dst, S_func_002F167C *src) { *dst = *src; return dst; }
 /* func_002F17AC — 5 words. MATCH 100% (shape: bulk). */
 int func_002F17AC(int arg1, int arg2) {
 
@@ -7740,6 +7997,10 @@ int func_002F17AC(int arg1, int arg2) {
     extern char D_003528B0;
     return func_002F17C0(((int)&D_00352884), ((int)&D_003528B0));
 }
+/* func_002F17C0 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[22]; } S_func_002F17C0;
+S_func_002F17C0 *func_002F17C0(S_func_002F17C0 *dst, S_func_002F17C0 *src) { *dst = *src; return dst; }
 /* func_002F18F0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F18F0(int arg1, int arg2) {
 
@@ -7748,6 +8009,10 @@ int func_002F18F0(int arg1, int arg2) {
     extern char D_00352934;
     return func_002F1904(((int)&D_003528DC), ((int)&D_00352934));
 }
+/* func_002F1904 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ int x[22]; } S_func_002F1904;
+S_func_002F1904 *func_002F1904(S_func_002F1904 *dst, S_func_002F1904 *src) { *dst = *src; return dst; }
 /* func_002F1A60 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1A60(int arg1, int arg2) {
 
@@ -7756,6 +8021,10 @@ int func_002F1A60(int arg1, int arg2) {
     extern char D_00352C78;
     return func_002F1A74(((int)&D_0035298C), ((int)&D_00352C78));
 }
+/* func_002F1A74 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ char x[748]; } S_func_002F1A74;
+S_func_002F1A74 *func_002F1A74(S_func_002F1A74 *dst, S_func_002F1A74 *src) { *dst = *src; return dst; }
 /* func_002F1BBC — 5 words. MATCH 100% (shape: bulk). */
 int func_002F1BBC(int arg1, int arg2) {
 
@@ -7817,6 +8086,10 @@ int func_002F1F74(int arg1, int arg2) {
     extern char D_00352FA8;
     return func_002F1F88(((int)&D_00352F94), ((int)&D_00352FA8));
 }
+/* func_002F1F88 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[10]; } S_func_002F1F88;
+S_func_002F1F88 *func_002F1F88(S_func_002F1F88 *dst, S_func_002F1F88 *src) { *dst = *src; return dst; }
 /* func_002F2070 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2070(int arg1, int arg2) {
 
@@ -7900,6 +8173,10 @@ int func_002F24E0(int arg1, int arg2) {
     extern char D_003531D4;
     return func_002F24F4(((int)&D_00352FE4), ((int)&D_003531D4));
 }
+/* func_002F24F4 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[248]; } S_func_002F24F4;
+S_func_002F24F4 *func_002F24F4(S_func_002F24F4 *dst, S_func_002F24F4 *src) { *dst = *src; return dst; }
 /* func_002F2630 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2630(int arg1, int arg2) {
 
@@ -7908,6 +8185,10 @@ int func_002F2630(int arg1, int arg2) {
     extern char D_003535B4;
     return func_002F2644(((int)&D_003533C4), ((int)&D_003535B4));
 }
+/* func_002F2644 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[248]; } S_func_002F2644;
+S_func_002F2644 *func_002F2644(S_func_002F2644 *dst, S_func_002F2644 *src) { *dst = *src; return dst; }
 /* func_002F2780 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2780(int arg1, int arg2) {
 
@@ -7916,6 +8197,10 @@ int func_002F2780(int arg1, int arg2) {
     extern char D_00353820;
     return func_002F2794(((int)&D_003537A4), ((int)&D_00353820));
 }
+/* func_002F2794 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[62]; } S_func_002F2794;
+S_func_002F2794 *func_002F2794(S_func_002F2794 *dst, S_func_002F2794 *src) { *dst = *src; return dst; }
 /* func_002F28D0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F28D0(int arg1, int arg2) {
 
@@ -7924,6 +8209,10 @@ int func_002F28D0(int arg1, int arg2) {
     extern char D_00353AC8;
     return func_002F28E4(((int)&D_0035389C), ((int)&D_00353AC8));
 }
+/* func_002F28E4 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F28E4;
+S_func_002F28E4 *func_002F28E4(S_func_002F28E4 *dst, S_func_002F28E4 *src) { *dst = *src; return dst; }
 /* func_002F2A20 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2A20(int arg1, int arg2) {
 
@@ -7932,6 +8221,10 @@ int func_002F2A20(int arg1, int arg2) {
     extern char D_00353F20;
     return func_002F2A34(((int)&D_00353CF4), ((int)&D_00353F20));
 }
+/* func_002F2A34 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F2A34;
+S_func_002F2A34 *func_002F2A34(S_func_002F2A34 *dst, S_func_002F2A34 *src) { *dst = *src; return dst; }
 /* func_002F2B88 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2B88(int arg1, int arg2) {
 
@@ -7940,6 +8233,10 @@ int func_002F2B88(int arg1, int arg2) {
     extern char D_0035433C;
     return func_002F2B9C(((int)&D_0035414C), ((int)&D_0035433C));
 }
+/* func_002F2B9C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[248]; } S_func_002F2B9C;
+S_func_002F2B9C *func_002F2B9C(S_func_002F2B9C *dst, S_func_002F2B9C *src) { *dst = *src; return dst; }
 /* func_002F2D08 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2D08(int arg1, int arg2) {
 
@@ -7948,6 +8245,10 @@ int func_002F2D08(int arg1, int arg2) {
     extern char D_0035471C;
     return func_002F2D1C(((int)&D_0035452C), ((int)&D_0035471C));
 }
+/* func_002F2D1C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[248]; } S_func_002F2D1C;
+S_func_002F2D1C *func_002F2D1C(S_func_002F2D1C *dst, S_func_002F2D1C *src) { *dst = *src; return dst; }
 /* func_002F2E88 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F2E88(int arg1, int arg2) {
 
@@ -7956,6 +8257,10 @@ int func_002F2E88(int arg1, int arg2) {
     extern char D_00354988;
     return func_002F2E9C(((int)&D_0035490C), ((int)&D_00354988));
 }
+/* func_002F2E9C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[62]; } S_func_002F2E9C;
+S_func_002F2E9C *func_002F2E9C(S_func_002F2E9C *dst, S_func_002F2E9C *src) { *dst = *src; return dst; }
 /* func_002F3008 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F3008(int arg1, int arg2) {
 
@@ -7964,6 +8269,10 @@ int func_002F3008(int arg1, int arg2) {
     extern char D_00354C30;
     return func_002F301C(((int)&D_00354A04), ((int)&D_00354C30));
 }
+/* func_002F301C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F301C;
+S_func_002F301C *func_002F301C(S_func_002F301C *dst, S_func_002F301C *src) { *dst = *src; return dst; }
 /* func_002F3188 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F3188(int arg1, int arg2) {
 
@@ -7972,6 +8281,10 @@ int func_002F3188(int arg1, int arg2) {
     extern char D_00355088;
     return func_002F319C(((int)&D_00354E5C), ((int)&D_00355088));
 }
+/* func_002F319C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F319C;
+S_func_002F319C *func_002F319C(S_func_002F319C *dst, S_func_002F319C *src) { *dst = *src; return dst; }
 /* func_002F3740 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F3740(int arg1, int arg2) {
 
@@ -7980,6 +8293,10 @@ int func_002F3740(int arg1, int arg2) {
     extern char D_003554A4;
     return func_002F3754(((int)&D_003552B4), ((int)&D_003554A4));
 }
+/* func_002F3754 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[248]; } S_func_002F3754;
+S_func_002F3754 *func_002F3754(S_func_002F3754 *dst, S_func_002F3754 *src) { *dst = *src; return dst; }
 /* func_002F38BC — 4 words. MATCH 100% (shape: m2c). */
 s32 *func_002F38BC(s32 *arg0, s32 *arg1) {
     extern int func_002F38BC();
@@ -7994,6 +8311,10 @@ int func_002F38CC(int arg1, int arg2) {
     extern char D_00355E94;
     return func_002F38E0(((int)&D_00355694), ((int)&D_00355E94));
 }
+/* func_002F38E0 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ int x[512]; } S_func_002F38E0;
+S_func_002F38E0 *func_002F38E0(S_func_002F38E0 *dst, S_func_002F38E0 *src) { *dst = *src; return dst; }
 /* func_002F3B58 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F3B58(int arg1, int arg2) {
 
@@ -8018,6 +8339,10 @@ int func_002F4470(int arg1, int arg2) {
     extern char D_003570D4;
     return func_002F4484(((int)&D_003568D4), ((int)&D_003570D4));
 }
+/* func_002F4484 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ int x[512]; } S_func_002F4484;
+S_func_002F4484 *func_002F4484(S_func_002F4484 *dst, S_func_002F4484 *src) { *dst = *src; return dst; }
 /* func_002F4548 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4548(int arg1, int arg2) {
 
@@ -8026,6 +8351,10 @@ int func_002F4548(int arg1, int arg2) {
     extern char D_00357CD4;
     return func_002F455C(((int)&D_003578D4), ((int)&D_00357CD4));
 }
+/* func_002F455C — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[512]; } S_func_002F455C;
+S_func_002F455C *func_002F455C(S_func_002F455C *dst, S_func_002F455C *src) { *dst = *src; return dst; }
 /* func_002F4664 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4664(int arg1, int arg2) {
 
@@ -8034,6 +8363,10 @@ int func_002F4664(int arg1, int arg2) {
     extern char D_00358114;
     return func_002F4678(((int)&D_003580D4), ((int)&D_00358114));
 }
+/* func_002F4678 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ char x[64]; } S_func_002F4678;
+S_func_002F4678 *func_002F4678(S_func_002F4678 *dst, S_func_002F4678 *src) { *dst = *src; return dst; }
 /* func_002F4718 — 11 words. MATCH 100% (shape: hand). */
 void func_002F4718(int a0) {
     extern int func_002EF7C0();
@@ -8168,6 +8501,10 @@ int func_002F4AD4(int arg1, int arg2) {
     extern char D_003583A8;
     return func_002F4AE8(((int)&D_0035817C), ((int)&D_003583A8));
 }
+/* func_002F4AE8 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F4AE8;
+S_func_002F4AE8 *func_002F4AE8(S_func_002F4AE8 *dst, S_func_002F4AE8 *src) { *dst = *src; return dst; }
 /* func_002F4CA0 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4CA0(int arg1, int arg2) {
 
@@ -8176,6 +8513,10 @@ int func_002F4CA0(int arg1, int arg2) {
     extern char D_00358800;
     return func_002F4CB4(((int)&D_003585D4), ((int)&D_00358800));
 }
+/* func_002F4CB4 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F4CB4;
+S_func_002F4CB4 *func_002F4CB4(S_func_002F4CB4 *dst, S_func_002F4CB4 *src) { *dst = *src; return dst; }
 /* func_002F4E5C — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4E5C(int arg1, int arg2) {
 
@@ -8184,6 +8525,10 @@ int func_002F4E5C(int arg1, int arg2) {
     extern char D_00358C58;
     return func_002F4E70(((int)&D_00358A2C), ((int)&D_00358C58));
 }
+/* func_002F4E70 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ short x[278]; } S_func_002F4E70;
+S_func_002F4E70 *func_002F4E70(S_func_002F4E70 *dst, S_func_002F4E70 *src) { *dst = *src; return dst; }
 /* func_002F4FF4 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F4FF4(int arg1, int arg2) {
 
@@ -8192,6 +8537,10 @@ int func_002F4FF4(int arg1, int arg2) {
     extern char D_00358EA4;
     return func_002F5008(((int)&D_00358E84), ((int)&D_00358EA4));
 }
+/* func_002F5008 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ char x[32]; } S_func_002F5008;
+S_func_002F5008 *func_002F5008(S_func_002F5008 *dst, S_func_002F5008 *src) { *dst = *src; return dst; }
 /* func_002F5150 — 5 words. MATCH 100% (shape: bulk). */
 int func_002F5150(int arg1, int arg2) {
 
@@ -8200,6 +8549,10 @@ int func_002F5150(int arg1, int arg2) {
     extern char D_00358F1C;
     return func_002F5164(((int)&D_00358EC4), ((int)&D_00358F1C));
 }
+/* func_002F5164 — 12 words. MATCH 100% (shape: struct-copy). */
+typedef struct {
+ int x[22]; } S_func_002F5164;
+S_func_002F5164 *func_002F5164(S_func_002F5164 *dst, S_func_002F5164 *src) { *dst = *src; return dst; }
 /* func_002F5208 — 22 words. MATCH 100% (shape: m2c). */
 void *func_002F5208(s32 arg0, s32 arg1) {
     extern char D_0034E660;

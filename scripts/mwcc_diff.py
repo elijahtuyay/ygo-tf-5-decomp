@@ -187,6 +187,16 @@ def compare(tgt, cand, name, target_path=None, obj_path=None, func_vram=None):
             if csym is not None:  # only candidate has a reloc: check known-address bake-in
                 addr = KNOWN_ADDR.get(csym)
                 if addr is None:
+                    # splat names an unnamed global after the address it lives at,
+                    # so D_00B2EE90 IS 0x00B2EE90 — no table needed. The Makefile
+                    # already relies on this to PROVIDE() these symbols to the
+                    # linker, so trusting it here is consistent, not a loosening:
+                    # the computed immediate is still compared against the target
+                    # word below, and a wrong address fails.
+                    m_auto = re.match(r"(?:D|jtbl)_([0-9A-Fa-f]{4,8})$", csym)
+                    if m_auto:
+                        addr = int(m_auto.group(1), 16)
+                if addr is None:
                     diffs.append(f"  [{i}] candidate has reloc {ckind} {csym} (unknown addr) but "
                                  f"target raw word=0x{tword:08x} {tmnem} {top}")
                     continue
