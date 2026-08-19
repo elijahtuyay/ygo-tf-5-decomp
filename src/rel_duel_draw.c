@@ -814,6 +814,19 @@ int func_0000258C() {
 int func_00002598(s32 arg0) {
     return func_000034A0((*(s32 *)&D_0007EB38), arg0);
 }
+/* func_000025A8 — 24 words. MATCH 100% (shape: pipeline). */
+void func_000025A8(s32 arg0) {
+
+    extern int ehsys_C6C15111();
+    extern char D_00076F38;
+    extern char D_0007EB50;
+    extern char D_0007EB54;
+    extern int func_00052C30();
+    s32 temp_v1;
+
+    temp_v1 = arg0 * 0x1E0;
+    ehsys_C6C15111(func_00052C30(*(int *)(((int)&D_0007EB50) + temp_v1), *(int *)(((int)&D_0007EB54) + temp_v1)), &D_00076F38, 0);
+}
 
 /* func_00002600 — 8 words. MATCH 100% (shape: hand). */
 s32 func_00002600(s32 arg0) {
