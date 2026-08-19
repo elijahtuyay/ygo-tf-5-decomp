@@ -697,6 +697,30 @@ u8 func_00002D7C(void) {
 u8 func_00002D9C(void) {
     return *(u8 *)((char *)func_00002358() + 0x16);
 }
+/* func_00002DBC — 47 words. MATCH 100% (shape: m2c asm-fields). */
+void func_00002DBC(void) {
+    extern int D_0001FF24;
+    extern int D_0002F128;
+    extern int ehsys_D4DE5DD8();
+    extern int func_000018F8();
+    extern int func_00002DBC();
+    s32 var_s1;
+    s32 var_v1;
+    int temp_s0;
+    var_s1 = 0;
+    do {
+        temp_s0 = D_0002F128 + (var_s1 * 0x5C);
+        if (func_000018F8((*(int *)((char *)temp_s0 + 0x1C))) != 0) {
+            var_v1 = 0;
+        } else if ((ehsys_D4DE5DD8() % 3) != 0) {
+            var_v1 = 0;
+        } else {
+            var_v1 = ehsys_D4DE5DD8() % 10;
+        }
+        var_s1 += 1;
+        (*(unsigned char *)((char *)temp_s0 + 0x17)) = (s8) (&D_0001FF24)[var_v1];
+    } while (var_s1 < 0x91);
+}
 
 /* func_00002E78 — 8 words. MATCH 100% (shape: manual). */
 u8 func_00002E78(void) {
@@ -1829,6 +1853,18 @@ void func_0000BD38(void) {
     extern int ehsys_memset();
     ehsys_memset(D_00034F9C, 0, 0x68);
 }
+/* func_0000BD4C — 11 words. MATCH 100% (shape: m2c). */
+void func_0000BD4C(void) {
+    extern int D_00034580;
+    extern int D_00034584;
+    extern int D_00034590;
+    extern int D_00034594;
+    extern int func_0000BD4C();
+    D_00034580 = 0;
+    D_00034584 = 1;
+    D_00034590 = 0x74;
+    D_00034594 = 0;
+}
 
 /* func_0000BD78 — 26 words. MATCH 100% (shape: manual, lever: a store can
  * land in a jal's delay slot -- it executes BEFORE the callee runs, so
@@ -2245,6 +2281,13 @@ s32 func_00011634(void) {
     extern s32 D_00034F98;
     return D_00034F98;
 }
+/* func_00011640 — 15 words. MATCH 100% (shape: m2c unsigned short-fields). */
+void func_00011640(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int func_0000B330();
+    extern int func_0000B418();
+    extern int func_00011640();
+    func_0000B418((s32) (*(unsigned short *)((char *)((arg3 * 0xA) + func_0000B330(arg0, arg1, arg2)) + 0x8)));
+}
 
 /* func_0001167C — 5 words. MATCH 100% (shape: manual). */
 void func_0001167C(void) {
@@ -2626,6 +2669,16 @@ void func_0001580C(void) {
     extern int func_00011D20();
     extern int func_0001580C();
     func_00011D20();
+}
+/* func_00015814 — 16 words. MATCH 100% (shape: m2c). */
+void func_00015814(void) {
+    extern int D_00035204;
+    extern int D_00035230;
+    extern int ehsys_1856E536();
+    extern int ehsys_memset();
+    extern int func_00015814();
+    ehsys_memset(&D_00035204, 0, 0x24);
+    D_00035204 = ehsys_1856E536((s32) &D_00035230, 0x500000);
 }
 /* func_00015854 — 0 words. MATCH 100% (shape: same-shape twin). */
 void func_00015854(void) {
