@@ -598,6 +598,20 @@ s32 func_000165A0(s32 arg0) {
 s32 func_000165CC(u16 *arg0, u16 *arg1) {
     return *arg0 - *arg1;
 }
+/* func_00017440 — 34 words. MATCH 100% (shape: pipeline). */
+void func_00017440(void) {
+
+    extern int ehsys_20E340D9();
+    extern int ehsys_E1139F1A();
+    extern s32 D_0002951C;
+    extern s32 D_0002C104;
+    ehsys_E1139F1A((*(int *)((char *)D_0002C104 + 0x14)));
+    ehsys_E1139F1A((*(int *)((char *)D_0002C104 + 0x10)));
+    ehsys_20E340D9(D_0002951C, (*(int *)((char *)D_0002C104 + 0x14)));
+    ehsys_20E340D9(D_0002951C, (*(int *)((char *)D_0002C104 + 0x10)));
+    ehsys_20E340D9(D_0002951C, D_0002C104);
+    D_0002C104 = NULL;
+}
 
 /* func_00017D20 — 2 words. MATCH 100% (shape: m2c). */
 void func_00017D20(void) {
@@ -720,6 +734,24 @@ void func_00018FDC(void) {
         temp_a0 = (*(int *)((char *)(D_0002C108 + (var_s0 * 4)) + 0x98));
         if (temp_a0 != 0) {
             ehsys_E1139F1A(temp_a0);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 2);
+}
+/* func_00019030 — 26 words. MATCH 100% (shape: pipeline). */
+void func_00019030(void) {
+
+    extern int ehsys_20E340D9();
+    extern s32 D_0002951C;
+    extern s32 D_0002C108;
+    s32 temp_a1;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_a1 = (*(int *)((char *)(D_0002C108 + (var_s0 * 4)) + 0x98));
+        if (temp_a1 != 0) {
+            ehsys_20E340D9(D_0002951C, temp_a1);
         }
         var_s0 += 1;
     } while (var_s0 < 2);
