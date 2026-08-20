@@ -683,6 +683,28 @@ census of every mnemonic in unmatched functions against m2c's instruction table
 found `ext` (1,701 functions) and `ins` (3). Nothing else it does not know is
 more than a rounding error, so this blind spot is now closed.
 
+### A small dead class: PRX relocations splat leaves as literal zero
+
+Seventeen unmatched functions contain
+
+    lui        $v0, (0x0 >> 16)
+    lw         $a1, 0x0($v0)
+
+The address really is zero in the shipped instruction word. These are PSP PRX
+relocations carrying a section index, which the loader patches at load time by
+adding that section's base — so the disassembly has nothing to name, and m2c
+renders the access as `*NULL` and the draft does not compile.
+
+They cluster: fifteen of the seventeen are two LCG families
+(`seed = seed * 0x41C64E6D + 0x3039; return (seed >> 16) & 0x7FFF`, indexed by
+a global), spread across rel_cutin_viewer, rel_duel_draw, rel_password and
+rel_shop. The C is completely understood; only the symbol is missing.
+
+Not worth tooling at seventeen functions, and recorded here so the next person
+does not re-derive it. If it is ever worth doing, the addresses are recoverable
+from the PRX's `.rel.text` section index plus that section's base — not from the
+disassembly, which is why every text-level approach fails.
+
 ### Bitfields: `sll N; srl M` is a field read, and MWCC packs LSB-first
 
 A pair of shifts with no mask between them is not arithmetic, it is a bitfield
