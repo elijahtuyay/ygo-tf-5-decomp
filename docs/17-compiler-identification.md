@@ -1,4 +1,4 @@
-# Compiler identification: a fingerprint mismatch, and why it is probably NOT our blocker
+# Compiler identification: the fingerprint is NOT diagnostic, and NOT our blocker
 
 > **READ THIS FIRST — conclusion revised 2026-08-19.** This document originally
 > argued that our size ceiling (nothing above 160 instructions has ever matched)
@@ -9,8 +9,16 @@
 > and contains a single **822-line** matched function. So 219 is demonstrably
 > capable of large PSP functions, and our ceiling is far more likely a
 > methodology problem than a compiler problem. See "What actually changed" at
-> the end. The `.comment` fingerprint mismatch below is still a real, unexplained
-> fact — but it no longer carries the weight originally placed on it.
+> the end.
+>
+> **SETTLED 2026-08-20.** The remaining pillar of the compiler argument — the
+> `.comment` fingerprint mismatch — is now **falsified by experiment**. The
+> Metrowerks linker writes `.comment` ITSELF; it does not merge or forward the
+> strings its input objects carry. Two objects compiled by 2.3.1.01 link into a
+> binary reporting 2.4.1.01. So the shipped modules' `MW MIPS C Compiler
+> (2.4.1.01)` describes **mwldpsp, not mwccpsp**, and says nothing whatsoever
+> about which compiler built the code. Everything below that reasons from the
+> fingerprint is dead. See "THE FINGERPRINT IS A LINKER STAMP" at the end.
 
 
 **Finding, 2026-08-18: every compiler build this project has ever used is the
@@ -365,3 +373,104 @@ a single compiler.** The "inherited from crt0/SDK object" explanation is dead.
 Combined with sotn-decomp matching large PSP functions using 219 (which reports
 3.0.0), the remaining consistent reading is that **Tag Force 5 and Castlevania
 were built with different compilers** — ours predating the 3.0.0 front-end.
+
+
+---
+
+## THE FINGERPRINT IS A LINKER STAMP — experiment, 2026-08-20
+
+The decisive experiment named above ("re-run the mixed-compiler link test with
+`mwldpsp`, not GNU ld") has been run. It kills the compiler thesis outright.
+
+**There is no `mwldpsp` in this repo** — `tools/` carries only the PS2 line's
+`mwldps2.exe`. That is a limitation, and it is stated plainly in the caveats
+below; it does not weaken the result, because the effect turns out not to be
+version-specific or even object-dependent at all.
+
+### Setup
+
+Two trivial objects, compiled by two PS2 compilers that fingerprint differently:
+
+    tools/mwcps2-2.3.3-000906/mwccps2.exe  ->  MW MIPS C Compiler (2.3.1.01)
+    tools/mwcps2-2.4-001213/mwccps2.exe    ->  MW MIPS C Compiler (2.4.1.01)
+
+### Results
+
+| # | linker | input objects | resulting `.comment` |
+|---|---|---|---|
+| A | mwldps2 2.4 | 2.3.1.01 + 2.4.1.01 | `(2.4.1.01)\0PlayStation2` |
+| B | mwldps2 2.3.3 | 2.3.1.01 + 2.4.1.01 | `(2.4.1.01)\0PlayStation2` |
+| C | mwldps2 2.4 | reversed order | `(2.4.1.01)\0PlayStation2` |
+| D | **mwldps2 2.4** | **2.3.1.01 + 2.3.1.01** | **`(2.4.1.01)\0PlayStation2`** |
+| E | **mwldps2 2.3.3** | **2.3.1.01 + 2.3.1.01** | **`(2.4.1.01)\0PlayStation2`** |
+| — | GNU ld | 2.3.1.01 + 2.4.1.01 | `(2.3.1.01)` **and** `(2.4.1.01)`, both |
+
+**Rows D and E are the whole argument.** Every input object was compiled by
+2.3.1.01, and the linked output claims 2.4.1.01 regardless. The string is not
+merged from the objects, not taken from the first object, not order-sensitive,
+and not even the linker's own nominal version (row E's linker is 2.3.3). The
+Metrowerks linker simply emits a fixed string of its own.
+
+The byte layout confirms it is the same mechanism that produced the game's:
+
+    mwldps2 output    4d57...(2.4.1.01)\0PlayStation2\0     0x2b bytes
+    shipped TF5 .prx  4d57...(2.4.1.01)\0PSP\0              0x22 bytes
+
+Identical construction — the same version string, then a platform tag. This is
+a **linker** signature with the platform name swapped, which is exactly what one
+expects from `mwldps2` versus `mwldpsp`.
+
+### What this falsifies
+
+The original argument ran: the shipped binary contains exactly ONE compiler
+string, therefore every object linked into it came from ONE compiler, therefore
+that compiler reported 2.4.1.01, therefore our 3.0.0 compilers are all wrong.
+The first inference is now known to be false — a Metrowerks-linked binary
+contains one string no matter how many compilers contributed to it, and that
+string need not be any of theirs.
+
+The earlier "both strings appear, therefore `.comment` is trustworthy" result
+was **an artifact of testing with GNU ld**, which does merge them (last row).
+That was flagged as a possible flaw at the time; it was.
+
+Consequences:
+
+- **`readelf -p .comment` is not a compiler test for a linked binary.** The
+  "ten-second, binary accept/reject per candidate" screen recommended earlier in
+  this document is invalid. Do not reject a compiler on it. (It remains valid on
+  an unlinked `.o`, which is what the compiler itself stamps.)
+- **"The compiler is not publicly catalogued" is unsupported.** It rested
+  entirely on the fingerprint. `mwccpsp_3.0.1_219` is not excluded by anything.
+- **Hunting other PSP games' `.comment` strings is pointless** — it would
+  fingerprint their linkers.
+- The size ceiling is a **methodology** problem. This now agrees with the
+  sotn-decomp counter-evidence rather than sitting in tension with it.
+
+### Caveats, stated honestly
+
+1. The linker tested is `mwldps2`, not `mwldpsp` — no PSP linker exists in this
+   repo. The claim generalises only if the PSP linker shares the behaviour.
+   Rows D/E make that very likely (neither PS2 linker forwards object strings,
+   and the shipped PSP layout is structurally identical), but it is inference.
+2. The test objects are trivial. A real link pulls in crt0 and SDK libraries;
+   none of them changed the outcome here, but none were present either.
+
+Neither caveat can rescue the original argument: showing that *some* Metrowerks
+linker manufactures the string is enough to break the inference that the string
+identifies the compiler.
+
+### What to do with the freed effort
+
+The 36 PS2 compilers in `tools/` were fetched to chase this and can be dropped.
+The remaining prescriptions from the "How to settle it" section are still worth
+running, but for a different reason — they are about flags and technique, not
+identity:
+
+1. Sweep the flag space scored by **word count on a corpus of verified
+   functions**, not by match count against over-fitted `src/`.
+   `-char unsigned` alone decides `lb` vs `lbu` for every plain `char`.
+2. Re-derive one medium function from scratch, without the 219-tuned levers.
+3. Keep the real acceptance criterion: **match rate must stop collapsing with
+   function size.**
+
+Reproduce with: `scripts/comment_fingerprint_test.sh`.
