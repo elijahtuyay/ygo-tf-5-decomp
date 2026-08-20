@@ -171,13 +171,111 @@ def referenced(asm_lines, symtab, self_name=None, data_type="char", types=None):
 ASM_HEADER = '.include "macro.inc"\n\n.set noat\n.set noreorder\n\n.section .text, "ax"\n\n'
 
 
+EXT_RE = re.compile(
+    r"^(?P<pre>.*?)\b(?P<op>ext)\s+\$(?P<rd>\w+),\s*\$(?P<rs>\w+),\s*"
+    r"(?P<pos>\d+),\s*(?P<size>\d+)\s*$")
+
+
+def rewrite_ext(lines):
+    """Rewrite Allegrex `ext` into the shift pair that means the same thing.
+
+    m2c's MIPS backend has no `ext`/`ins`: they are MIPS32r2, and m2c targets
+    the N64 and PS2. Handed one, it does not error — it silently drops the
+    value, which is far worse. func_000404DC is a textbook LCG and m2c rendered
+    the whole return as `return 0;`.
+
+    `ext rd, rs, pos, size` takes `size` bits starting at `pos`, which is
+    exactly:
+
+        sll rd, rs, 32 - pos - size
+        srl rd, rd, 32 - size
+
+    Shifts rather than `srl` + `andi`, because an `andi` immediate is 16 bits
+    and a field can be wider than that. This is ONLY for the copy handed to
+    m2c — the draft it produces is compiled and byte-compared against the real
+    target as usual, and MWCC re-emits a single `ext` from the C. Nothing in
+    the build sees the rewrite.
+
+    1,703 unmatched functions contain `ext` or `ins`, 1,463 of them in
+    rel_duel_eng, so this is not a niche case.
+    """
+    out = []
+    for line in lines:
+        m = EXT_RE.match(line.rstrip("\n"))
+        if not m:
+            out.append(line)
+            continue
+        pos, size = int(m.group("pos")), int(m.group("size"))
+        if pos + size > 32 or size < 1:
+            out.append(line)
+            continue
+        rd, rs = m.group("rd"), m.group("rs")
+        first = f"    sll        ${rd}, ${rs}, {32 - pos - size}\n"
+        second = f"    srl        ${rd}, ${rd}, {32 - size}\n"
+        # An `ext` in a BRANCH DELAY SLOT cannot simply become two lines: the
+        # second would land after the branch has been taken, and m2c would drop
+        # it — which is how func_000404DC came back as `temp_v1 * 2` instead of
+        # its LCG return. Hoist the pair above the jump instead and leave a nop
+        # in the slot. Same effect, since a delay-slot instruction executes
+        # before the transfer completes.
+        if out and _is_branch(out[-1]):
+            jump = out.pop()
+            out += [first, second, jump, "     nop\n"]
+        else:
+            out += [first, second]
+    return out
+
+
+BRANCH_RE = re.compile(
+    r"\*/\s+(j|jr|jal|jalr|b|beq|bne|beql|bnel|blez|bgtz|bltz|bgez|beqz|bnez"
+    r"|blezl|bgtzl|bltzl|bgezl|bc1t|bc1f|bc1tl|bc1fl)\b")
+
+
+def _is_branch(line):
+    return bool(BRANCH_RE.search(line))
+
+
 def slice_path(module, fn, lines, workdir):
     """m2c re-parses whatever .s you hand it, so give it ONE function. On
     rel_duel_eng (3 MB of text.s, 7487 functions) parsing the whole file per
     function would dominate the runtime."""
     p = os.path.join(workdir, f"{fn}.s")
-    open(p, "w").write(ASM_HEADER + "".join(lines))
+    open(p, "w").write(ASM_HEADER + "".join(rewrite_ext(lines)))
     return p
+
+
+def canonicalise_bitfield(src):
+    """Put a shift-pair back into the form MWCC compiles to a single `ext`.
+
+    rewrite_ext() hands m2c `sll` + `srl` because m2c cannot read `ext`, and m2c
+    faithfully renders that pair as `(u32) (x * 2) >> 0x11`. That is correct C
+    and it is the wrong SHAPE: MWCC emits the two shifts back, so the candidate
+    comes out two words long. Written the way a person would write it —
+    `(x >> 16) & 0x7FFF` — MWCC emits one `ext` and the function matches.
+
+    For `(x << a) >> b` taking the top `32 - b` bits starting at `b - a`:
+
+        (x >> (b - a)) & ((1 << (32 - b)) - 1)
+    """
+    def repl(m):
+        expr, mul, shift = m.group("expr"), m.group("mul"), m.group("shift")
+        a = int(mul, 0)
+        if m.group("op") == "*":
+            if a < 2 or (a & (a - 1)):
+                return m.group(0)         # not a power of two; leave it alone
+            a = a.bit_length() - 1
+        b = int(shift, 0)
+        if not 0 < b < 32 or a > b:
+            return m.group(0)
+        pos, size = b - a, 32 - b
+        mask = (1 << size) - 1
+        inner = expr if pos == 0 else f"({expr} >> {pos})"
+        return f"({inner} & 0x{mask:X})"
+
+    return re.sub(
+        r"\(u32\)\s*\((?P<expr>[^()]+?)\s*(?P<op>\*|<<)\s*(?P<mul>0x[0-9a-fA-F]+|\d+)\)"
+        r"\s*>>\s*(?P<shift>0x[0-9a-fA-F]+|\d+)",
+        repl, src)
 
 
 # ------------------------------------------------------------------ m2c draft
@@ -212,6 +310,7 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # unset register), but it costs nothing to let the compiler judge.
     src = re.sub(r"M2C_ERROR\([^)]*\)", "0", src)
     src = src.replace("M2C_UNK", "int")
+    src = canonicalise_bitfield(src)
     # m2c renders a load from an address it knows nothing about as *(void *)addr,
     # which is not a legal dereference; a word load is what the asm actually does
     src = src.replace("*(void *)", "*(int *)").replace("*(void*)", "*(int *)")
@@ -644,7 +743,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("module")
     ap.add_argument("--max-words", type=int, default=10**9)
-    ap.add_argument("--only")
+    ap.add_argument("--only",
+                    help="one function, a comma-separated list, or @FILE with "
+                         "one name per line")
     ap.add_argument("--dump", metavar="DIR",
                     help="on a NEAR MISS, write the closest candidate's source to "
                          "DIR/<func>.c. The pipeline otherwise throws it away, "
@@ -670,8 +771,18 @@ def main():
 
     results, matched = [], []
     funcs = load_functions(mod)
+    # --only takes a LIST now, not just one name. Targeting a known family
+    # across a 7,487-function module is otherwise impossible: rel_duel_eng holds
+    # 1,463 of the project's 1,703 unmatched `ext` functions, and re-trying the
+    # whole module to reach them costs hours.
+    only = None
+    if args.only:
+        if args.only.startswith("@"):
+            only = {l.strip() for l in open(args.only[1:]) if l.strip()}
+        else:
+            only = {x.strip() for x in args.only.split(",") if x.strip()}
     todo = [f for f in funcs if f[2] <= args.max_words and
-            (not args.only or f[0] == args.only)][:args.limit]
+            (not only or f[0] in only)][:args.limit]
     si, sn = (int(x) for x in args.shard.split("/"))
     tag = "" if sn == 1 else f".{si}of{sn}"
     if sn > 1:
@@ -752,11 +863,11 @@ def main():
                       open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
 
     n = sum(1 for r in results if r["status"] == "MATCH")
-    if args.only:      # a single-function probe must never clobber the module's results
+    if only and len(only) == 1:   # a single-function probe must never clobber the module's results
         # print the closest verdict too: a probe is almost always run to see WHY
         # a function fails, and "no match" alone forces a second, slower run.
         detail = next((r.get("closest") for r in results if r.get("closest")), None)
-        print(f"{mod} {args.only}: {'MATCH' if n else 'no match'}"
+        print(f"{mod} {next(iter(only))}: {'MATCH' if n else 'no match'}"
               + (f" [{detail}]" if detail and not n else ""))
         return
     out = {"module": mod, "tried": len(todo), "matched": n, "results": results}
