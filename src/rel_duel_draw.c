@@ -1057,6 +1057,16 @@ int func_00004F88(arg0) s32 arg0;
     func_00050304(0x10, 1);
     ehsys_4BF558F1(0xD);
 }
+/* func_00005460 — 21 words. MATCH 100% (shape: m2c asm-fields). */
+int func_00005460(s32 arg0, s32 arg1) {
+    extern int func_00005D10();
+    extern int func_00005D58();
+    int temp_v0;
+    temp_v0 = func_00005D10();
+    if ((arg0 != (*(int *)((char *)temp_v0 + 0x33C))) || ((*(unsigned short *)((char *)temp_v0 + 0x338)) != 0)) {
+        func_00005D58((s32) temp_v0, arg0, arg1);
+    }
+}
 
 /* func_00005F9C — 15 words. MATCH 100% (shape: m2c). */
 void func_00005F9C(void) {
@@ -2101,6 +2111,17 @@ void func_00031BD0(void) {
     func_00031A10(5);
     func_00031A10(7);
     func_00031A10(8);
+}
+/* func_00031EC8 — 19 words. MATCH 100% (shape: m2c). */
+int func_00031EC8(s32 arg0, s32 arg1, s32 arg2) {
+    extern int ehsys_4175E3DB();
+    extern int ehsys_C0AB60EF();
+    extern int ehsys_F462EE6E();
+    if (arg1 == 1) {
+        ehsys_C0AB60EF(ehsys_F462EE6E(arg0, 1), arg2);
+        return;
+    }
+    ehsys_4175E3DB(arg0, 1, arg2);
 }
 
 /* func_000320B0 — 13 words. MATCH 100% (shape: m2c). */
@@ -4055,6 +4076,17 @@ s32 func_000573B4(void *arg0, void *arg1) {
 s32 func_000573E0(void) {
     return 1;
 }
+/* func_000573E8 — 13 words. MATCH 100% (shape: m2c). */
+int func_000573E8(void) {
+    extern int func_0005369C();
+    s32 temp_a0;
+
+    temp_a0 = *(s32 *)0x395774;
+    if (temp_a0 != 0) {
+        func_0005369C(temp_a0);
+        *(int *)0x395774 = 0;
+    }
+}
 /* func_0005741C — 37 words. MATCH 100% (shape: m2c). */
 void func_0005741C(s32 arg0) {
     extern int ehsys_2AE3C0AD();
@@ -4557,6 +4589,17 @@ s32 func_0005ECC0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 /* func_0005F310 — 8 words. MATCH 100% (shape: thunk). */
 s32 func_0005F310(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return ehsys_B89D38DC((arg0 << 6), (arg1 << 6), ((0x1E0 - arg0) << 6), arg2);
+}
+/* func_0005F330 — 25 words. MATCH 100% (shape: m2c). */
+void func_0005F330(s32 *arg0, s32 arg1, s32 *arg2) {
+    extern int ehsys_87A64CC6();
+    extern int func_000536B8();
+    extern int func_0005F330();
+    s32 temp_v0;
+
+    temp_v0 = ehsys_87A64CC6(0x7800, 0x4400, func_000536B8(*arg2, arg1));
+    *arg0 = (s32) ((((temp_v0 >> 16) & 0xFFFF)) + 0x3F) >> 6;
+    *(int *)arg1 = (s32) ((s32) ((temp_v0 & 0xFFFF) + 0x3F) >> 6);
 }
 
 /* func_0005F700 — 7 words. MATCH 100% (shape: thunk). */

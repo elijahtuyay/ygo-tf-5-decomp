@@ -86,7 +86,7 @@ def defined_in(module):
     p = os.path.join(ROOT, "src", module + ".c")
     if not os.path.exists(p):
         return set()
-    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;]*$",
+    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;\n]*$",
                           open(p).read(), re.M))
 
 

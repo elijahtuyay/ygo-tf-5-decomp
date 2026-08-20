@@ -36,7 +36,17 @@ def symbols(module):
 
 
 def defined_in(text):
-    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;]*$", text, re.M))
+    """Which functions this file already defines.
+
+    `[^;\n]*$`, not `[^;]*$`. Under re.M the `$` matches at any line end, but
+    `[^;]` also matches a NEWLINE, so the old pattern could run from one
+    definition across hundreds of lines to the next line that happened to end
+    without a semicolon — and every definition inside that span was invisible.
+    It hid 23 of rel_duel_draw's 628 definitions, which is why the merge kept
+    offering functions the file already had and burning a whole-file compile
+    discovering that each one was a redeclaration.
+    """
+    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;\n]*$", text, re.M))
 
 
 # The declared type of a global decides the load width MWCC emits — `char` gives
@@ -46,10 +56,25 @@ def defined_in(text):
 DATA_FLAVOURS = ["int", "char", "unsigned short", "void *"]
 
 
-def block_decls(src, symtab, flavour="int"):
-    """Externs for one function, at block scope (widths differ between users)."""
+def block_decls(src, symtab, flavour="int", self_name=None):
+    """Externs for one function, at block scope (widths differ between users).
+
+    `self_name` is excluded. The scan reads every identifier in the source,
+    which includes the function's own name from its definition line, and it
+    emitted `extern int func_X();` ahead of the definition. For a function
+    returning anything other than int that is a straight contradiction —
+
+        identifier 'func_0000246C(...)' redeclared
+        was declared as: 'int (...)'   now declared as: 'void (int)'
+
+    — and the candidate was rejected as "does not compile" with no hint that
+    the merge itself had written the conflicting line. A definition is its own
+    declaration, so there was never anything to emit.
+    """
     out = []
     for n in sorted(set(re.findall(r"\b\w+\b", src))):
+        if n == self_name:
+            continue
         if n in symtab:
             out.append(f"    extern int {n}();" if symtab[n] == "func"
                        else f"    extern {flavour} {n};")
@@ -58,6 +83,35 @@ def block_decls(src, symtab, flavour="int"):
         elif re.match(r"^func_[0-9A-F]{8}$", n):
             out.append(f"    extern int {n}();")
     return out
+
+
+
+def reconcile_return_type(text, src, func):
+    """Match the candidate's return type to what the file already declares.
+
+    Callers in the same file carry block-scope declarations like
+    `extern int func_0000246C();`. Those have external linkage, so a later
+    definition returning something else is a redeclaration and the whole file
+    stops compiling:
+
+        identifier 'func_0000246C(...)' redeclared
+        was declared as: 'int (...)'   now declared as: 'void (int)'
+
+    A function that never returns a value compiles to the same instructions
+    whether it is declared `void` or `int` — nothing is placed in $v0 either
+    way — so adopting the declared type is usually free. "Usually" is doing
+    real work in that sentence, which is why this is only ever a CANDIDATE:
+    the caller re-verifies the whole file byte-for-byte afterwards and rolls
+    back if a single instruction moved.
+    """
+    m = re.search(r"\bextern\s+(\w[\w \*]*?)\s+" + re.escape(func) + r"\s*\(", text)
+    if not m:
+        return None
+    declared = m.group(1).strip()
+    m2 = re.match(r"^\s*(\w[\w \*]*?)\s+" + re.escape(func) + r"\s*\(", src)
+    if not m2 or m2.group(1).strip() == declared:
+        return None
+    return src[:m2.start(1)] + declared + src[m2.end(1):]
 
 
 def verify(module, names):
@@ -192,14 +246,25 @@ def main():
         before = open(path).read()
         names = defined_in(before) | {e["func"]}
         flavours = DATA_FLAVOURS if needs_decls(e["src"]) else [None]
-        for flavour in flavours:
-            decls = block_decls(e["src"], symtab, flavour) if flavour else []
-            open(path, "w").write(insert(before, e, decls))
-            bad = verify(module, names)
-            if bad is not None and not bad:
-                added += 1
+        # Try the candidate as written, then with its return type reconciled to
+        # whatever the file already declares for it.
+        variants = [e]
+        alt = reconcile_return_type(before, e["src"], e["func"])
+        if alt:
+            variants.append({**e, "src": alt})
+        done = False
+        for cand in variants:
+            for flavour in flavours:
+                decls = block_decls(cand["src"], symtab, flavour, cand["func"]) if flavour else []
+                open(path, "w").write(insert(before, cand, decls))
+                bad = verify(module, names)
+                if bad is not None and not bad:
+                    added += 1
+                    done = True
+                    break
+                open(path, "w").write(before)  # roll back, try the next flavour
+            if done:
                 break
-            open(path, "w").write(before)      # roll back, try the next flavour
     print(f"{module}: added {added} of {len(todo)} candidates "
           f"({len(defined_in(open(path).read()))} now in file)")
 

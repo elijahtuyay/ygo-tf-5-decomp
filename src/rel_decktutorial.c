@@ -812,6 +812,14 @@ s32 func_00019674(s32 arg0, s32 arg1, s32 arg2) {
     extern int ehsys_B89D38DC();
     return ehsys_B89D38DC(arg0 << 6, arg1 << 6, (0x1E0 - arg0) << 6, arg2);
 }
+/* func_00019974 — 11 words. MATCH 100% (shape: m2c). */
+int func_00019974(s32 arg0) {
+    extern int D_0002C108;
+    extern int ehsys_025FE238();
+    if (D_0002C108 != 0) {
+        ehsys_025FE238(D_0002C108 + 6, arg0);
+    }
+}
 /* func_000199A0 — 0 words. MATCH 100% (shape: twin of func_00014C6C). */
 int func_000199A0(int a0, void *a1) {
 

@@ -667,6 +667,17 @@ void func_0000647C(void) {
     func_000062BC(7);
     func_000062BC(8);
 }
+/* func_00006590 — 19 words. MATCH 100% (shape: m2c). */
+int func_00006590(s32 arg0, s32 arg1, s32 arg2) {
+    extern int ehsys_4175E3DB();
+    extern int ehsys_C0AB60EF();
+    extern int ehsys_F462EE6E();
+    if (arg1 == 1) {
+        ehsys_C0AB60EF(ehsys_F462EE6E(arg0, 1), arg2);
+        return;
+    }
+    ehsys_4175E3DB(arg0, 1, arg2);
+}
 
 /* func_00006778 — 13 words. MATCH 100% (mwccpsp_3.0.1_219, -O4,s -sdatathreshold 0). */
 void func_00006778(s32 arg0, int arg1) {

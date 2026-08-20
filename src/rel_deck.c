@@ -448,6 +448,21 @@ s32 func_00015B04(u16 *arg0, u16 *arg1) {
 void func_00015D20(void) {
     func_00015D28();
 }
+/* func_00015D28 — 23 words. MATCH 100% (shape: m2c). */
+int func_00015D28(void) {
+    extern int D_0002E0FC;
+    extern int D_0002E104;
+    extern int D_0002E110;
+    extern int ehsys_20E340D9();
+    if (D_0002E104 != 0) {
+        ehsys_20E340D9(D_0002E0FC, D_0002E104);
+        D_0002E104 = 0;
+    }
+    if (D_0002E110 != 0) {
+        ehsys_20E340D9(D_0002E0FC, D_0002E110);
+        D_0002E110 = 0;
+    }
+}
 /* func_000169B0 — 34 words. MATCH 100% (shape: pipeline). */
 void func_000169B0(void) {
 

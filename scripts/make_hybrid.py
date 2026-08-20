@@ -163,7 +163,7 @@ def split_asm(module):
 
 
 def defined_in_c(text):
-    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;]*$",
+    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;\n]*$",
                           text, re.M))
 
 
