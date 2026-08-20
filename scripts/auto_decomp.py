@@ -354,6 +354,12 @@ def m2c_draft(module, fn, ctx_path=None, asm_path=None):
     # register, and the later uses are explicit casts, so `int` is safe.
     src = re.sub(r"^(\s*)(?:void|[su]?\d*int|s8|u8|s16|u16|s32|u32|f32|char|short|long)\s*\*(\w+);\s*$",
                  r"\1int \2;", src, flags=re.M)
+    # AFTER that retyping, not before. A local m2c declared `int *temp_s0` and
+    # dereferenced is legal C until the line above rewrites it to `int`, and
+    # only then does `*temp_s0` need a cast. Running this first sees the
+    # original pointer declaration, skips the name, and the retyping downstream
+    # leaves the dereference broken — which is exactly what happened.
+    src = fix_int_var_derefs(src)
     # A call through a struct field arrives as `(*(int *)(...))(args)`, which is
     # a call of a non-function. Cast it to a function pointer first.
     # NOT ATTEMPTED: casting `(*(int *)(...))(args)` to a function pointer.
@@ -477,6 +483,58 @@ def fix_int_derefs(src):
         else:
             i = j + 2
     return out
+
+
+INT_DECL_RE = re.compile(
+    r"^\s*(?:register\s+)?(?:unsigned\s+|signed\s+)?"
+    r"(int|s32|u32|s8|u8|s16|u16|long)\s+([A-Za-z_]\w*)\s*(?:=[^;]*)?;\s*$")
+
+
+def fix_int_var_derefs(src):
+    """Cast the dereference of a local m2c declared as a plain integer.
+
+    m2c routinely assigns an address into an `int` and then dereferences it:
+
+        int temp_s0;
+        temp_s0 = var_s2 + 0x10;
+        ... while ((u32) var_s3 < (u32) *temp_s0);
+
+    MWCC rejects `*temp_s0` with "pointer/array required", and this is the
+    largest remaining gate-1 class — 14 of 150 sampled drafts, versus 11 for
+    everything else combined.
+
+    Retyping the local to `int *` would be the wrong repair: it is assigned
+    from integer arithmetic all over the function, and every one of those
+    assignments would then need its own cast. Casting at the point of
+    dereference is local, and it is what the code means — both are 32 bits in
+    the same register, which is why m2c conflated them in the first place.
+
+    Only names the function DECLARES as an integer are touched, so a genuine
+    pointer local is left alone.
+    """
+    ints = {m.group(2) for m in (INT_DECL_RE.match(l) for l in src.splitlines()) if m}
+    # parameters too: `s32 func_x(s32 arg0, s32 arg1)`
+    sig = re.search(r"^[A-Za-z_][\w \*]*\b\w+\s*\(([^)]*)\)\s*\{", src, re.M)
+    if sig:
+        for part in sig.group(1).split(","):
+            m = re.match(r"\s*(?:unsigned\s+|signed\s+)?"
+                         r"(?:int|s32|u32|s8|u8|s16|u16|long)\s+([A-Za-z_]\w*)\s*$", part)
+            if m:
+                ints.add(m.group(1))
+    if not ints:
+        return src
+
+    def repl(m):
+        prev = m.group("prev")
+        # `a * b` is multiplication; a dereference follows an operator, an
+        # opening bracket, a comma, or the start of the expression.
+        if prev and (prev.isalnum() or prev in "_)]"):
+            return m.group(0)
+        return f"{prev}*(int *){m.group('name')}"
+
+    return re.sub(r"(?P<prev>.?)\*\s*(?P<name>" + "|".join(sorted(map(re.escape, ints), key=len, reverse=True)) + r")\b",
+                  repl, src)
+
 
 def rewrite_arrow_fields(src):
     """Rewrite `EXPR->unkNN` for ANY left-hand side, not just a bare identifier.
