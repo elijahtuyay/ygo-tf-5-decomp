@@ -646,6 +646,43 @@ target has `bnez` plus `nop`), or the `byte = (byte & ~1) | (arg & 1)` operand
 order, are the documented dead ends — no loop shape, optimisation level or
 pragma moved either. Recognise and skip.
 
+### m2c cannot read `ext`, and does not say so (2026-08-20)
+
+`ext` and `ins` are MIPS32r2. m2c targets the N64 and the PS2, so its MIPS
+backend has no case for either — and handed one it does **not** error. It
+silently drops the value. `func_000404DC` is a textbook LCG:
+
+    seed = seed * 0x343FD + 0x269EC3;
+    return (seed >> 16) & 0x7FFF;      /* the ext */
+
+and m2c rendered the whole return as `return 0;`. **1,703 unmatched functions
+contain `ext` or `ins`** (1,463 of them in rel_duel_eng), so every one of those
+drafts was wrong before the compiler ever saw it. A silent wrong answer is far
+more expensive than a failure: the function looks like an ordinary near-miss and
+gets triaged as a codegen problem.
+
+`scripts/auto_decomp.py` now rewrites `ext` into the equivalent shift pair in
+the copy handed to m2c. Three things had to be right, and each was only visible
+after the previous one was fixed:
+
+1. **Shifts, not `srl` + `andi`.** An `andi` immediate is 16 bits and a field
+   can be wider. `ext rd, rs, pos, size` is exactly
+   `sll rd, rs, 32-pos-size` then `srl rd, rd, 32-size`.
+2. **Delay slots.** An `ext` in a branch delay slot cannot become two lines —
+   the second lands after the branch is taken, and m2c drops it. That turned
+   the LCG return into `temp_v1 * 2`. Hoist the pair above the jump and leave a
+   nop in the slot.
+3. **Shape, not just semantics.** m2c then writes the pair faithfully as
+   `(u32) (x * 2) >> 0x11`. That is correct C and the wrong shape: MWCC emits
+   the two shifts straight back and the candidate is two words too long.
+   Written the way a person would, `(x >> 16) & 0x7FFF`, MWCC emits one `ext`.
+
+The general point is worth more than the lever: **check what the disassembler
+in your pipeline cannot read before treating its output as a near-miss.** A
+census of every mnemonic in unmatched functions against m2c's instruction table
+found `ext` (1,701 functions) and `ins` (3). Nothing else it does not know is
+more than a rounding error, so this blind spot is now closed.
+
 ### Bitfields: `sll N; srl M` is a field read, and MWCC packs LSB-first
 
 A pair of shifts with no mask between them is not arithmetic, it is a bitfield
