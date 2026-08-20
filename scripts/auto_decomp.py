@@ -857,12 +857,31 @@ def main():
             n = sum(1 for r in results if r["status"] == "MATCH")
             print(f"  {i+1}/{len(todo)} tried, {n} matched", flush=True)
             # checkpoint: a long run must never lose its results to a kill
-            json.dump({"module": mod, "tried": i + 1, "matched": n, "results": results},
-                      open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
-            json.dump(matched,
-                      open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
+            if not only:      # see the --only note below: a subset is not a census
+                json.dump({"module": mod, "tried": i + 1, "matched": n, "results": results},
+                          open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
+                json.dump(matched,
+                          open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
 
     n = sum(1 for r in results if r["status"] == "MATCH")
+    if only and len(only) > 1:
+        # A --only run covers a chosen subset, so its results are NOT a census
+        # of the module and must not replace one. Fold any matches into the
+        # existing matched.json additively and leave the per-function verdict
+        # file alone — overwriting it would throw away every verdict for the
+        # functions this run did not look at, which is what near_misses.py and
+        # the gate-1 census both read.
+        path = os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json")
+        existing = {}
+        if os.path.exists(path):
+            prev = json.load(open(path))
+            existing = {e["func"]: e for e in prev} if isinstance(prev, list) else prev
+        for e in matched:
+            existing[e["func"]] = e
+        json.dump(list(existing.values()), open(path, "w"), indent=1)
+        print(f"{mod}: {n} of {len(todo)} probed functions matched "
+              f"({len(existing)} in {os.path.basename(path)})")
+        return
     if only and len(only) == 1:   # a single-function probe must never clobber the module's results
         # print the closest verdict too: a probe is almost always run to see WHY
         # a function fails, and "no match" alone forces a second, slower run.
