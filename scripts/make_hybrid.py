@@ -553,6 +553,25 @@ def main():
     # that already build byte-exactly cannot be disturbed.
     contested = _contested_externs(lines)
 
+    # `#pragma optimization_level N` is FILE-ORDER STATE: it applies to every
+    # function after it until the next one. Emitting functions in ADDRESS order
+    # detaches each pragma from the function it governs, and the function then
+    # compiles at the wrong level. rel_title is the only module that uses them
+    # (50 of them, alternating 2 and 4) and it is the only module where this
+    # mattered — four thunks lost their tail call and grew from 8 words to 15,
+    # putting every later function 0x1C further out and the module 112 bytes
+    # over. So resolve the level in effect at each function's ORIGINAL position
+    # and restate it in the output.
+    #
+    # 4 is the base: the command line compiles at -O4,s.
+    pragma_at, level = {}, 4
+    for i, line in enumerate(lines):
+        m = re.match(r"\s*#pragma\s+optimization_level\s+(\d+)", line)
+        if m:
+            level = int(m.group(1))
+        pragma_at[i] = level
+    uses_pragmas = any(re.match(r"\s*#pragma\s+optimization_level", l) for l in lines)
+
     # A prelude declaration is not necessarily for its own function: rel_story
     # declares D_0002F128 once and uses it from several. Attaching it to one
     # function loses it the moment that function is carried as assembly. So
@@ -649,6 +668,13 @@ def main():
                     if line.rstrip().endswith("{"):
                         body = body[:i + 1] + inject + body[i + 1:]
                         break
+            # Drop any pragma that travelled here in the prelude; the
+            # authoritative one is restated below from the original position.
+            others = [l for l in others
+                      if not re.match(r"\s*#pragma\s+optimization_level", l)]
+            if uses_pragmas:
+                others = others + [
+                    f"#pragma optimization_level {pragma_at[starts_in_file[f]]}"]
             out += others + body
         else:
             out.append(f'INCLUDE_ASM("build/hybrid/asm/{module}", {f});')
