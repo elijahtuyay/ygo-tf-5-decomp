@@ -22,7 +22,19 @@
 # schedules differently. Every other byte of the module, all 15 other functions
 # and the jump table included, is identical.
 #
-# Definition of done for a module: `make MODULE=<name> SRC=1` prints OK.
+# HYBRID=1 is what a module is actually finished against. It compiles every
+# function we have matched and assembles the rest, splicing them into one object
+# with tools/mwccgap. SRC=1 cannot be the bar: 248 functions across 19 modules
+# are hand-written assembly and can never come from C, so for those modules
+# SRC=1 is unreachable by construction.
+#
+# Definition of done for a module: `make MODULE=<name> HYBRID=1` prints OK.
+# All 28 do, as of 2026-08-20 — see scripts/hybrid_sweep.sh and docs/21. That
+# proves the layout, symbols and relocations are right and that the .text is
+# reconstructed byte-for-byte. It does NOT mean a module is decompiled: only a
+# few percent of .text currently comes from C, and the rest is carried assembly.
+#
+# Use SRC=1 to test how much of a module genuinely compiles from C.
 
 MODULE  ?= rel_html_view
 SRC     ?=
