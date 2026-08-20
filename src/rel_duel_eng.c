@@ -1215,6 +1215,22 @@ int func_0002E6C0(int a0, int a1, int a2, int a3) {
     extern int func_0002E6C0();
     return func_0002E52C(a0, a1, 0xE, 0x10002);
 }
+/* func_00030588 — 31 words. MATCH 100% (shape: m2c). */
+s32 func_00030588(s32 arg0, s32 arg1) {
+    extern int func_00030588();
+    extern int func_0006170C();
+    extern int func_0006F96C();
+    extern int func_00078AAC();
+    extern int func_000820D8();
+    s32 temp_s0;
+
+    if (func_00078AAC(arg0, 0xB, arg1) != 0) {
+        temp_s0 = 1 - func_000820D8(arg0, 0xB, 0xE);
+        func_0006F96C(arg0, arg1);
+        func_0006170C(arg0, 0xB, 0xE, temp_s0);
+    }
+    return 1;
+}
 
 
 
@@ -1255,6 +1271,41 @@ void *func_00035F78(s32 arg0) {
     extern int func_00035F78();
     return &D_0034C6C8 + ((arg0 == (s32) &D_0034C6F8) * 0x4C) + 0x30;
 }
+/* func_0003CC8C — 18 words. MATCH 100% (shape: m2c). */
+void func_0003CC8C(s32 arg0, s32 arg1) {
+    extern int D_003268E8;
+    extern int D_00351784;
+    extern int func_0003CC8C();
+    extern int func_00040550();
+    D_00351784 = arg0;
+    if ((&D_003268E8)[arg0] == 0) {
+        func_00040550(0x36, 0, arg1, 0);
+    }
+}
+/* func_0003D530 — 20 words. MATCH 100% (shape: m2c). */
+void func_0003D530(s32 arg0, s32 arg1, s32 arg2) {
+    extern int D_003268E8;
+    extern int D_00351784;
+    extern int D_003517C8;
+    extern int func_0003D530();
+    extern int func_00040550();
+    D_00351784 = arg0;
+    D_003517C8 = arg0;
+    if ((&D_003268E8)[arg0] == 0) {
+        func_00040550(0x36, 3, arg1, arg2);
+    }
+}
+/* func_0003D950 — 18 words. MATCH 100% (shape: m2c). */
+void func_0003D950(s32 arg0, s32 arg1) {
+    extern int D_003268E8;
+    extern int D_00351784;
+    extern int func_0003D950();
+    extern int func_00040550();
+    D_00351784 = arg0;
+    if ((&D_003268E8)[arg0] == 0) {
+        func_00040550(0x36, 5, 0xE7, arg1);
+    }
+}
 /* func_0003DC20 — 7 words. MATCH 100% (shape: hand). */
 int func_0003DC20(int a0) {
     extern int D_00351784;
@@ -1274,6 +1325,28 @@ int func_00038FAC(int a0, int a1, int a2, int a3, int t0, int t1, int t2, int t3
 int func_0003CB10(int a0, int a1, int a2, int a3, int t0) {
     extern int func_0003B4A0();
     extern int func_0003CB10(); return func_0003B4A0(a0, 0, a2, a3, t0); }
+/* func_0003DC3C — 18 words. MATCH 100% (shape: m2c). */
+void func_0003DC3C(s32 arg0, s32 arg1) {
+    extern int D_003268E8;
+    extern int D_00351784;
+    extern int func_0003DC3C();
+    extern int func_00040550();
+    D_00351784 = arg0;
+    if ((&D_003268E8)[arg0] == 0) {
+        func_00040550(0x36, 0xD, arg1, 0);
+    }
+}
+/* func_0003DC84 — 18 words. MATCH 100% (shape: m2c). */
+void func_0003DC84(s32 arg0, s32 arg1, s32 arg2) {
+    extern int D_003268E8;
+    extern int D_00351784;
+    extern int func_0003DC84();
+    extern int func_00040550();
+    D_00351784 = arg0;
+    if ((&D_003268E8)[arg0] == 0) {
+        func_00040550(0x36, 0xE, arg1, arg2);
+    }
+}
 
 
 /* func_0003E0A0 — 10 words. MATCH 100% (shape: m2c). */
@@ -1342,11 +1415,54 @@ int func_00040358(int a0) {
     extern int func_00040358();
     return ((unsigned int)(*(unsigned short *)((char *)&D_0034DF44 + a0 * 2 + 0x4C4)) << 17) >> 23;
 }
+/* func_000404DC — 13 words. MATCH 100% (shape: m2c). */
+u32 func_000404DC(void) {
+    extern int D_00351708;
+    extern int func_000404DC();
+    s32 temp_v1;
+
+    temp_v1 = (D_00351708 * 0x343FD) + 0x269EC3;
+    D_00351708 = temp_v1;
+    return ((temp_v1 >> 16) & 0x7FFF);
+}
+/* func_00040510 — 16 words. MATCH 100% (shape: m2c). */
+u32 func_00040510(s32 arg0) {
+    extern int D_00351708;
+    extern int func_00040510();
+    s32 temp_v1;
+
+    temp_v1 = (D_00351708 * 0x343FD) + 0x269EC3;
+    D_00351708 = temp_v1;
+    return (u32) (arg0 * (((temp_v1 >> 16) & 0x7FFF))) >> 0xF;
+}
+/* func_00041EE0 — 11 words. MATCH 100% (shape: m2c). */
+void func_00041EE0(void) {
+    extern int D_00326E80;
+    extern int func_00041EE0();
+    if (D_00326E80 != 0) {
+        ((int (*)()) D_00326E80)();
+    }
+}
 /* func_0004458C — 3 words. MATCH 100% (shape: hand). */
 int func_0004458C(void) {
     extern int D_00351740;
     extern int func_0004458C();
     return D_00351740;
+}
+/* func_00044598 — 19 words. MATCH 100% (shape: m2c). */
+s32 func_00044598(void) {
+    extern int D_003268E8;
+    extern int D_0034CA48;
+    extern int D_00351718;
+    extern int D_0035173C;
+    extern int func_00044598();
+    s32 var_v1;
+
+    var_v1 = D_0035173C != 0;
+    if (var_v1 != 0) {
+        var_v1 = (&D_003268E8)[D_00351718] == 2;
+    }
+    return (D_0034CA48 + var_v1) > 0;
 }
 
 /* func_0004461C — 17 words. MATCH 100% (shape: m2c). */
@@ -1375,6 +1491,17 @@ int func_0004EADC(void) {
 }
 /* func_0005AA80 — 3 words. MATCH 100% (shape: hand). */
 extern int func_0005A860();
+/* func_0004FA5C — 13 words. MATCH 100% (shape: m2c). */
+void func_0004FA5C(void) {
+    extern unsigned short D_0034D6D6;
+    extern unsigned short D_0034D6F4;
+    extern int func_0004DEA8();
+    extern int func_0004FA5C();
+    if ((D_0034D6D6 != 0) && (D_0034D6F4 == 0)) {
+        D_0034D6F4 = 0xA;
+    }
+    func_0004DEA8();
+}
 /* func_00050600 — 14 words. MATCH 100% (shape: bool-fold). */
 s32 func_00050600(s32 arg0, int arg1, int arg2) {
     extern int func_00050600();
@@ -1383,6 +1510,22 @@ s32 func_00050600(s32 arg0, int arg1, int arg2) {
         return 0;
     }
     return 0x800;
+}
+/* func_0005A330 — 14 words. MATCH 100% (shape: m2c). */
+void func_0005A330(void) {
+    extern unsigned short D_0034D6EE;
+    extern unsigned short D_0034D6F0;
+    extern unsigned short D_0034D6F4;
+    extern unsigned short D_0034D6F6;
+    extern unsigned short D_0034D6F8;
+    extern unsigned short D_0034D6FA;
+    extern int func_0005A330();
+    D_0034D6F4 = 0;
+    D_0034D6F6 = 0;
+    D_0034D6F8 = 0;
+    D_0034D6FA = 0;
+    D_0034D6EE = 1;
+    D_0034D6F0 = 1;
 }
 int func_0005AA80(int a0, int a1, int a2, int a3, int t0) {
     extern int func_0005A860();
@@ -1425,6 +1568,22 @@ void func_0005BDDC(s32 arg0, s32 arg1) {
             var_v1 = 0x8000;
         }
         func_000135F0((var_v1 | 0x37) & 0xFFFF, ((arg1 & 0xFF) | ((temp_v0 & 0xFF) << 8)) & 0xFFFF, 0, 0);
+    }
+}
+/* func_0005BE7C — 30 words. MATCH 100% (shape: m2c). */
+void func_0005BE7C(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_000135F0();
+    extern int func_0005BE7C();
+    extern int func_000790D0();
+    s32 var_v0;
+
+    if (func_000790D0(arg0, arg1) != 0) {
+        if (!(arg0 & 1)) {
+            var_v0 = 0;
+        } else {
+            var_v0 = 0x8000;
+        }
+        func_000135F0((var_v0 | 0x36) & 0xFFFF, ((((arg0 >> 1) & 0xFF)) | 0x100) & 0xFFFF, (arg1 | 0x8000) & 0xFFFF, arg2 & 0xFFFF);
     }
 }
 
@@ -1701,6 +1860,25 @@ s32 func_00080504(s32 *arg0, s32 *arg1) {
     extern int func_00080504();
     return *arg0 == *arg1;
 }
+/* func_000813A4 — 34 words. MATCH 100% (shape: m2c). */
+s32 func_000813A4(s32 arg0, s32 arg1) {
+    extern int func_00078EC0();
+    extern int func_000813A4();
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 var_s0;
+
+    var_s0 = 0x10000;
+    temp_v0 = func_00078EC0(arg0, arg1, 0x112F);
+    if ((temp_v0 >= 0) && (temp_v0 < 0x10000)) {
+        var_s0 = temp_v0;
+    }
+    temp_v0_2 = func_00078EC0(arg0, arg1, 0x1130);
+    if ((temp_v0_2 >= 0) && (temp_v0_2 < var_s0)) {
+        var_s0 = temp_v0_2;
+    }
+    return var_s0 & 0xFFFF;
+}
 /* func_00081ED8 — 6 words. MATCH 100% (shape: hand). */
 int func_00081ED8(int a0) {
 
@@ -1729,6 +1907,14 @@ void func_000832E4(s32 unused0, s32 unused1, int arg2) {
     extern int func_000832E4();
     extern int func_0009412C();
     ehsys_6F2C8118(func_0009412C(), arg2);
+}
+/* func_00083C80 — 12 words. MATCH 100% (shape: m2c). */
+void func_00083C80(void) {
+    extern int D_0034E780;
+    extern int D_0034F2BC;
+    extern int func_00083C80();
+    D_0034E780 &= ~8;
+    D_0034F2BC &= ~8;
 }
 /* func_00088198 — 4 words. MATCH 100% (shape: hand). */
 int func_00088198(int a0) {
@@ -1836,6 +2022,16 @@ int func_0008CFCC(int a0, int a1, int a2) {
     extern int func_0008CFCC(); return func_0008CCB0(a0, 0x20000, a2); }
 /* func_0008DEEC — 2 words. MATCH 100% (shape: hand). */
 extern int func_0008D184();
+/* func_0008D080 — 14 words. MATCH 100% (shape: bool-fold). */
+s32 func_0008D080(s32 arg0) {
+    extern int func_0008CCB0();
+    extern int func_0008D080();
+    extern int func_0008D0B8();
+    if (!func_0008CCB0(arg0, 0)) {
+        return -1;
+    }
+    return func_0008D0B8(arg0);
+}
 int func_0008DEEC(int a0, int a1, int a2, int a3) {
     extern int func_0008D184();
     extern int func_0008DEEC(); return func_0008D184(a0, a1, a2, 0x1); }
@@ -2121,6 +2317,15 @@ s32 func_000A294C(s32 arg0, s32 arg1) {
 extern int func_000A3CBC();
 /* func_000A2F70 — 3 words. MATCH 100% (shape: hand). */
 extern int func_000A2F7C();
+/* func_000A2AEC — 17 words. MATCH 100% (shape: m2c). */
+s32 func_000A2AEC(s32 arg0, s32 arg1) {
+    extern int func_00078C8C();
+    extern int func_000A2AEC();
+    if (((u32) (arg1 - 3) < 2U) && (func_00078C8C(arg0, 0xB, 0x2146, 1) != 0)) {
+        return 0;
+    }
+    return 1;
+}
 int func_000A2F70(int a0, int a1, int a2, int a3) {
     extern int func_000A2F70();
     extern int func_000A2F7C(); return func_000A2F7C(a0, a1, 0, 0); }
@@ -2230,6 +2435,17 @@ int func_000AEED8(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000AEED8(); return func_000ACAC8(a0, a1, a2, 0x4059, t0); }
 /* func_000AF00C — 2 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000AEEE0 — 14 words. MATCH 100% (shape: m2c asm-fields). */
+void func_000AEEE0(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000AEEE0();
+    extern int func_000AF2A4();
+    extern int func_000B88B0();
+    if ((*(unsigned short *)((char *)arg0 + 0x2)) == arg1) {
+        func_000B88B0((s32) arg0, arg1, arg2);
+        return;
+    }
+    func_000AF2A4((s32) arg0, arg1, arg2);
+}
 /* func_000AEF18 — 8 words. MATCH 100% (shape: hand). */
 int func_000AEF18(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
@@ -2250,6 +2466,16 @@ int func_000AF234(int a0, int a1, int a2, int a3, int t0) {
 extern int func_000ACAC8();
 /* func_000AF298 — 3 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000AF23C — 23 words. MATCH 100% (shape: bool-fold). */
+s32 func_000AF23C(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_000A4934();
+    extern int func_000ACAC8();
+    extern int func_000AF23C();
+    if (!func_000A4934(arg0)) {
+        return func_000ACAC8(arg0, arg1, arg2, 0x13);
+    }
+    return 1;
+}
 int func_000AF298(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000AF298(); return func_000ACAC8(a0, a1, a2, 0x80412, t0); }
@@ -2364,6 +2590,17 @@ int func_000B1750(int a0, int a1, int a2, int a3, int t0) {
 int func_000B2C24(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000B2C24(); return func_000ACAC8(a0, a1, a2, 0x16, t0); }
+/* func_000B2C2C — 14 words. MATCH 100% (shape: m2c asm-fields). */
+void func_000B2C2C(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000B2C2C();
+    extern int func_000B7964();
+    extern int func_000BAA60();
+    if ((*(unsigned short *)((char *)arg0 + 0x2)) != arg1) {
+        func_000BAA60((s32) arg0, arg1, arg2);
+        return;
+    }
+    func_000B7964((s32) arg0, arg1, arg2);
+}
 
 int func_000B2C64(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
@@ -2532,6 +2769,28 @@ int func_000B7630(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000B7630(); return func_000ACAC8(a0, a1, a2, 0x21410, t0); }
 /* func_000B76B0 — 3 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000B763C — 15 words. MATCH 100% (shape: m2c asm-fields). */
+void func_000B763C(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000ACAC8();
+    extern int func_000B3CEC();
+    extern int func_000B763C();
+    if ((*(unsigned short *)((char *)arg0 + 0x24)) != 0) {
+        func_000ACAC8((s32) arg0, arg1, arg2, 0x21040);
+        return;
+    }
+    func_000B3CEC((s32) arg0, arg1, arg2);
+}
+/* func_000B7678 — 14 words. MATCH 100% (shape: m2c asm-fields). */
+void func_000B7678(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000AFA60();
+    extern int func_000AFF94();
+    extern int func_000B7678();
+    if ((*(unsigned short *)((char *)arg0 + 0x20)) != 0) {
+        func_000AFA60((s32) arg0, arg1, arg2);
+        return;
+    }
+    func_000AFF94((s32) arg0, arg1, arg2);
+}
 int func_000B76B0(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000B76B0(); return func_000ACAC8(a0, a1, a2, 0x24041, t0); }
@@ -2630,6 +2889,16 @@ int func_000B7EA0(int a0, int a1, int a2, int a3, int t0) {
 extern int func_000ACAC8();
 /* func_000B820C — 3 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000B810C — 21 words. MATCH 100% (shape: bool-fold). */
+s32 func_000B810C(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_00078098();
+    extern int func_000ACAC8();
+    extern int func_000B810C();
+    if (!func_000ACAC8(arg0, arg1, arg2, 0x1040)) {
+        return 0;
+    }
+    return (func_00078098(arg1, arg2) & 0xFFFF) != 0xFFFF;
+}
 int func_000B820C(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000B820C(); return func_000ACAC8(a0, a1, a2, 0x80470, t0); }
@@ -2900,6 +3169,17 @@ int func_000BCDEC(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000BCDEC(); return func_000ACAC8(a0, a1, a2, 0x2040, t0); }
 /* func_000BD1FC — 2 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000BCF3C — 15 words. MATCH 100% (shape: m2c asm-fields). */
+void func_000BCF3C(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000BBD58();
+    extern int func_000BCF3C();
+    extern int func_000BD574();
+    if ((*(unsigned short *)((char *)arg0 + 0x26)) == 2) {
+        func_000BD574((s32) arg0, arg1, arg2);
+        return;
+    }
+    func_000BBD58((s32) arg0, arg1, arg2);
+}
 int func_000BD1FC(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000BD1FC(); return func_000ACAC8(a0, a1, a2, 0x1070, t0); }
@@ -3090,6 +3370,17 @@ int func_000BFB18(int a0, int a1, int a2, int a3, int t0) {
 extern int func_000ACAC8();
 /* func_000BFBB4 — 3 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000BFB20 — 14 words. MATCH 100% (shape: m2c unsigned short-fields). */
+void func_000BFB20(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000AFF94();
+    extern int func_000B95D4();
+    extern int func_000BFB20();
+    if ((*(unsigned short *)((char *)arg0 + 0xC)) != 0) {
+        func_000B95D4((s32) arg0, arg1, arg2);
+        return;
+    }
+    func_000AFF94((s32) arg0, arg1, arg2);
+}
 int func_000BFBB4(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000BFBB4(); return func_000ACAC8(a0, a1, a2, 0xa0401, t0); }
@@ -3216,6 +3507,17 @@ int func_000C15F8(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000C15F8(); return func_000ACAC8(a0, a1, a2, 0x40092, t0); }
 /* func_000C1754 — 3 words. MATCH 100% (shape: hand). */
 extern int func_000ACAC8();
+/* func_000C1604 — 14 words. MATCH 100% (shape: m2c unsigned short-fields). */
+void func_000C1604(void *arg0, s32 arg1, s32 arg2) {
+    extern int func_000B51C8();
+    extern int func_000C1480();
+    extern int func_000C1604();
+    if ((*(unsigned short *)((char *)arg0 + 0xC)) != 0) {
+        func_000B51C8((s32) arg0, arg1, arg2);
+        return;
+    }
+    func_000C1480((s32) arg0, arg1, arg2);
+}
 int func_000C1754(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000C1754(); return func_000ACAC8(a0, a1, a2, 0x80052, t0); }
@@ -3229,6 +3531,36 @@ extern int func_000ACAC8();
 int func_000C1B24(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000ACAC8();
     extern int func_000C1B24(); return func_000ACAC8(a0, a1, a2, 0x100476, t0); }
+/* func_000C2988 — 18 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C2988(s32 arg0) {
+    extern int func_0005BA60();
+    extern int func_000A49E8();
+    extern int func_000C2988();
+    if (func_000A49E8(arg0) != 0) {
+        func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), 0xFB6, 2, 0);
+    }
+    return 1;
+}
+/* func_000C29D0 — 18 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C29D0(s32 arg0) {
+    extern int func_0005BA60();
+    extern int func_000A49E8();
+    extern int func_000C29D0();
+    if (func_000A49E8(arg0) != 0) {
+        func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), 0x1EC4, 2, 0);
+    }
+    return 1;
+}
+/* func_000C2A18 — 18 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C2A18(s32 arg0) {
+    extern int func_0005BA60();
+    extern int func_000A49E8();
+    extern int func_000C2A18();
+    if (func_000A49E8(arg0) != 0) {
+        func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), 0x239E, 2, 0);
+    }
+    return 1;
+}
 /* func_000C2A60 — 10 words. MATCH 100% (shape: hand). */
 int func_000C2A60(void *a0) {
     extern int func_0006ECD0();
@@ -3357,6 +3689,78 @@ s32 func_000C2C68(void) {
     }
     return func_000C2A88();
 }
+/* func_000C69F0 — 13 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C69F0(s32 arg0) {
+    extern int func_0006ECD0();
+    extern int func_000C69F0();
+    extern int func_000C7998();
+    func_000C7998(arg0);
+    func_0006ECD0((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)));
+    return 1;
+}
+/* func_000C7998 — 17 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C7998(s32 arg0) {
+    extern int func_00074230();
+    extern int func_000A48AC();
+    extern int func_000C7998();
+    if (func_000A48AC(arg0) == 0) {
+        func_00074230((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x0)), 1, (s32) (*(unsigned short *)((char *)arg0 + 0x16)));
+    }
+    return 1;
+}
+/* func_000C7AA4 — 17 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C7AA4(s32 arg0) {
+    extern int func_000154B4();
+    extern int func_000A4934();
+    extern int func_000C7AA4();
+    if (func_000A4934(arg0) == 0) {
+        func_000154B4((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 1, 1, 0);
+    }
+    return 1;
+}
+/* func_000C9474 — 17 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C9474(s32 arg0) {
+    extern int func_00074230();
+    extern int func_000A48AC();
+    extern int func_000C9474();
+    if (func_000A48AC(arg0) == 0) {
+        func_00074230((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x0)), 1, 0);
+    }
+    return 1;
+}
+/* func_000C9794 — 23 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000C9794(s32 arg0) {
+    extern int func_000154B4();
+    extern int func_0005BA60();
+    extern int func_000A49E8();
+    extern int func_000C9794();
+    if (func_000A49E8(arg0) != 0) {
+        func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), 0xFB6, 2, 0);
+    }
+    func_000154B4((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 1, 0, 1);
+    return 1;
+}
+/* func_000CA0FC — 17 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000CA0FC(s32 arg0) {
+    extern int func_000154B4();
+    extern int func_000A4934();
+    extern int func_000CA0FC();
+    if (func_000A4934(arg0) == 0) {
+        func_000154B4((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 1, 0, 1);
+    }
+    return 1;
+}
+/* func_000CCF04 — 12 words. MATCH 100% (shape: m2c). */
+void func_000CCF04(s32 arg0, s32 arg1) {
+    extern int func_000C4C84();
+    extern int func_000C5DD0();
+    extern int func_000CCF04();
+    if (arg1 != 0) {
+        func_000C5DD0(arg0);
+        return;
+    }
+    func_000C4C84(arg0, 0);
+}
 
 /* func_000CD188 — 17 words. MATCH 100% (shape: m2c). */
 s32 func_000CD188(s32 arg0) {
@@ -3377,6 +3781,57 @@ int func_000CED20(unsigned short *a0, int a1, int a2, int a3) {
     extern int func_000CED20();
     extern int func_00074A28();
     func_00074A28(a0[1], a0[2], 0x1B, 0x1);
+    return 1;
+}
+/* func_000CFB1C — 35 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000CFB1C(void *arg0) {
+    extern int func_0005BA60();
+    extern int func_0005BCC4();
+    extern int func_000A49E8();
+    extern int func_000CFB1C();
+    if ((*(unsigned short *)((char *)arg0 + 0x6)) == 0x13) {
+        func_0005BCC4((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), (s32) (*(unsigned short *)((char *)arg0 + 0x0)), 1);
+    } else {
+        if (func_000A49E8((s32) arg0) != 0) {
+            func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), 0xFB6, 2, 0);
+        }
+        func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), (s32) (*(unsigned short *)((char *)arg0 + 0x0)), 2, 0);
+    }
+    return 1;
+}
+/* func_000D0720 — 25 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D0720(s32 arg0, s32 arg1) {
+    extern int func_0005BA60();
+    extern int func_000A49E8();
+    extern int func_000D0720();
+    extern int func_0017B444();
+    if (func_0017B444(arg0, arg1) == 2) {
+        if (func_000A49E8(arg0) != 0) {
+            func_0005BA60((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4)), 0xFB6, 2, 0);
+        }
+        (*(unsigned short *)((char *)arg0 + 0x26)) = 1;
+    }
+    return 1;
+}
+/* func_000D0DA4 — 26 words. MATCH 100% (shape: single-switch asm-fields). */
+s32 func_000D0DA4(void *arg0) {
+    extern int D_0034D560;
+    extern int func_0005F33C();
+    extern int func_000743F8();
+    extern int func_000D0DA4();
+    if (D_0034D560 != 1) {
+
+        switch (D_0034D560) {
+        case 0:
+            func_0005F33C((s32) arg0, (s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x16)), 1);
+            D_0034D560 += 1;
+            return 0;
+            break;
+        }
+        goto block_7;
+    }
+    func_000743F8();
+block_7:
     return 1;
 }
 
@@ -3412,6 +3867,56 @@ int func_000D2C5C(int a0, int a1, int a2, int a3) {
 int func_000D4D0C(int a0, int a1, int a2, int a3, int t0) {
     extern int func_000D4D0C();
     extern int func_000D4D14(); return func_000D4D14(0, a1, a2, a3, t0); }
+/* func_000D6A00 — 23 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D6A00(s32 arg0) {
+    extern int func_000A4934();
+    extern int func_000C21D4();
+    extern int func_000D6464();
+    extern int func_000D6A00();
+    if ((func_000A4934(arg0) == 0) && (func_000D6464((s32) (*(unsigned short *)((char *)arg0 + 0x2)), func_000C21D4(arg0), (s32) (*(unsigned short *)((char *)arg0 + 0x16)), 0) == 0)) {
+        return 0;
+    }
+    return 1;
+}
+/* func_000D6AE8 — 29 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D6AE8(s32 arg0) {
+    extern int func_000A4934();
+    extern int func_000C2284();
+    extern int func_000D6684();
+    extern int func_000D6AE8();
+    s32 temp_s0;
+
+    if (func_000A4934(arg0) == 0) {
+        temp_s0 = func_000C2284(arg0);
+        if (func_000D6684((*(unsigned short *)((char *)arg0 + 0x2)) ^ (*(unsigned short *)((char *)arg0 + 0xA)), (s32) (*(unsigned short *)((char *)arg0 + 0x16)), 0, 0) < temp_s0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+/* func_000D74FC — 19 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D74FC(void *arg0) {
+    extern int func_000D74FC();
+    extern int func_00152710();
+    extern int func_00171004();
+    s32 temp_s0;
+
+    temp_s0 = (*(unsigned short *)((char *)arg0 + 0x2)) ^ (*(unsigned short *)((char *)arg0 + 0xA));
+    return func_00171004(temp_s0, (s32) (*(unsigned short *)((char *)arg0 + 0x0)), func_00152710((s32) arg0)) != 0;
+}
+/* func_000D75E8 — 16 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000D75E8(s32 arg0) {
+    extern int func_000A41B4();
+    extern int func_000D75E8();
+    extern int func_000FF2B4();
+    s32 temp_v0;
+
+    temp_v0 = func_000FF2B4(arg0);
+    if (!temp_v0) {
+        return 0;
+    }
+    return func_000A41B4((*(unsigned short *)((char *)arg0 + 0x2)) ^ (*(unsigned short *)((char *)arg0 + 0xA)), temp_v0);
+}
 /* func_000D7AFC — 10 words. MATCH 100% (shape: bool-fold). */
 s32 func_000D7AFC(void) {
     extern int func_000C3644();
@@ -3426,6 +3931,39 @@ int func_000D816C(void *a0) {
     extern int func_000A455C();
     extern int func_000D816C();
     return func_000A455C(*(unsigned short *)((char *)a0 + 2)) != 0;
+}
+/* func_000D8528 — 13 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D8528(void *arg0) {
+    extern int func_000820D8();
+    extern int func_000D8528();
+    return func_000820D8(1 - (*(unsigned short *)((char *)arg0 + 0x2)), 0xB, 0xE) >= 6;
+}
+/* func_000D86B4 — 18 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D86B4(s32 arg0) {
+    extern int func_0008BDA0();
+    extern int func_000A4808();
+    extern int func_000D86B4();
+    if ((func_000A4808(arg0) == 0) && (func_0008BDA0((s32) (*(unsigned short *)((char *)arg0 + 0x2))) != 0)) {
+        return 0;
+    }
+    return 1;
+}
+/* func_000D98EC — 13 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000D98EC(void *arg0) {
+    extern int func_0008E6C4();
+    extern int func_000D98EC();
+    return func_0008E6C4(1 - (*(unsigned short *)((char *)arg0 + 0x2)), 0, 1, 0) >= 2;
+}
+/* func_000DAD78 — 16 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000DAD78(void *arg0) {
+    extern int func_000DAD78();
+    u8 temp_a1;
+
+    temp_a1 = (*(unsigned char *)((char *)arg0 + 0x31));
+    if (((*(unsigned short *)((char *)arg0 + 0x2)) == ((u32) (temp_a1 << 0x1E) >> 0x1F)) && ((*(unsigned short *)((char *)arg0 + 0x4)) == ((u32) (temp_a1 << 0x1A) >> 0x1C))) {
+        return 0;
+    }
+    return 1;
 }
 /* func_000DB028 — 8 words. MATCH 100% (shape: hand). */
 int func_000DB028(void) {
@@ -3484,6 +4022,16 @@ int func_000DD5DC(void *a0) {
     extern int func_000DD5DC();
     return func_0008CFCC(*(unsigned short *)((char *)a0 + 2)) != 0;
 }
+/* func_000DD9EC — 22 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000DD9EC(s32 arg0) {
+    extern int func_000A4934();
+    extern int func_000D6628();
+    extern int func_000DD9EC();
+    if ((func_000A4934(arg0) == 0) && (func_000D6628((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 5, (s32) (*(unsigned short *)((char *)arg0 + 0x16)), 0, 0) == 0)) {
+        return 0;
+    }
+    return 1;
+}
 /* func_000DDD60 — 9 words. MATCH 100% (shape: hand). */
 int func_000DDD60(void) {
     extern int func_000D6970();
@@ -3536,15 +4084,45 @@ s32 func_000DEE40(void *arg0) {
     }
     return 1;
 }
+/* func_000DEE7C — 22 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000DEE7C(s32 arg0) {
+    extern int func_000A4934();
+    extern int func_000D664C();
+    extern int func_000DEE7C();
+    if ((func_000A4934(arg0) == 0) && (func_000D664C((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 1, (s32) (*(unsigned short *)((char *)arg0 + 0x16)), 1, 0) == 0)) {
+        return 0;
+    }
+    return 1;
+}
 
 int func_000DEED4(int a0) {
     extern int func_0008F280();
     extern int func_000DEED4(); return func_0008F280(0x10F4); }
+/* func_000DF648 — 19 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000DF648(s32 arg0) {
+    extern int func_0008ACC8();
+    extern int func_000A4808();
+    extern int func_000DF648();
+    if ((func_000A4808(arg0) == 0) && (func_0008ACC8((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 0xFC9) == 0)) {
+        return 0;
+    }
+    return 1;
+}
 /* func_000E0024 — 8 words. MATCH 100% (shape: hand). */
 int func_000E0024(void *a0) {
     extern int func_00094970();
     extern int func_000E0024();
     return func_00094970(*(unsigned short *)((char *)a0 + 2)) > 0;
+}
+/* func_000E0940 — 16 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000E0940(s32 arg0) {
+    extern int func_0008B544();
+    extern int func_000A4808();
+    extern int func_000E0940();
+    if (!func_000A4808(arg0)) {
+        return func_0008B544((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 1) > 0;
+    }
+    return 1;
 }
 /* func_000E13C4 — 8 words. MATCH 100% (shape: hand). */
 int func_000E13C4(void *a0) {
@@ -3628,6 +4206,20 @@ int func_000E2EF8(unsigned short *a0, int a1, int a2, int a3) {
     extern int func_0009321C();
     return func_0009321C(a0[1], a0[2], a2, a3) != 0;
 }
+/* func_000E350C — 22 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000E350C(s32 arg0) {
+    extern int func_0008218C();
+    extern int func_000A4934();
+    extern int func_000C2364();
+    extern int func_000E350C();
+    s32 temp_s0;
+
+    temp_s0 = func_000C2364(arg0);
+    if (!func_000A4934(arg0)) {
+        return func_0008218C((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 0) >= temp_s0;
+    }
+    return 1;
+}
 
 /* func_000E4530 — 8 words. MATCH 100% (shape: hand). */
 int func_000E4530(void *a0) {
@@ -3702,6 +4294,15 @@ int func_000E6130(unsigned short *a0, int a1, int a2, int a3) {
     extern int func_00078AAC();
     return func_00078AAC(a0[1], a0[2], a0[0], a3) != 0;
 }
+/* func_000E6F4C — 22 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000E6F4C(void *arg0) {
+    extern int func_000E6F4C();
+    extern int func_00171004();
+    if ((*(unsigned short *)((char *)arg0 + 0x6)) == 7) {
+        return func_00171004((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x0)), 0) >= (s32) ((u32) ((*(unsigned char *)((char *)arg0 + 0x32)) << 0x1C) >> 0x1E);
+    }
+    return 0;
+}
 
 /* func_000E77A0 — 17 words. MATCH 100% (shape: bool-fold). */
 s32 func_000E77A0(s32 arg0, int arg1) {
@@ -3718,6 +4319,18 @@ int func_000E7AFC(void *a0) {
     extern int func_00096754();
     extern int func_000E7AFC();
     return func_00096754(*(unsigned short *)((char *)a0 + 2)) > 0;
+}
+/* func_000E7ED0 — 29 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000E7ED0(s32 arg0, s32 arg1) {
+    extern int func_000A4934();
+    extern int func_000C2284();
+    extern int func_000D664C();
+    extern int func_000E4A14();
+    extern int func_000E7ED0();
+    if ((func_000A4934(arg0) == 0) && (func_000D664C((s32) (*(unsigned short *)((char *)arg0 + 0x2)), func_000C2284(arg0), (s32) (*(unsigned short *)((char *)arg0 + 0x16)), 0, 0) == 0)) {
+        return 0;
+    }
+    return func_000E4A14(arg0, arg1);
 }
 /* func_000E7FE4 — 11 words. MATCH 100% (shape: hand). */
 int func_000E7FE4(unsigned short *a0) {
@@ -3779,6 +4392,20 @@ s32 func_000E95E0(void *arg0) {
     }
     return func_00171104(arg0) > 0;
 }
+/* func_000EA184 — 25 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000EA184(void *arg0) {
+    extern int ehsys_93517477();
+    extern int func_0008C29C();
+    extern int func_000EA184();
+    extern int func_0017B9C4();
+    s32 temp_v0;
+
+    temp_v0 = func_0008C29C((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) ehsys_93517477);
+    if ((temp_v0 != 0) && (func_0017B9C4((s32) arg0) >= temp_v0)) {
+        return 2;
+    }
+    return 0;
+}
 /* func_000EAA24 — 15 words. MATCH 100% (shape: single-switch). */
 s32 func_000EAA24(void *arg0, s32 arg1) {
     extern int func_000EAA24();
@@ -3793,6 +4420,32 @@ s32 func_000EAA24(void *arg0, s32 arg1) {
         }
         return 1;
         break;
+    }
+    return 0;
+}
+/* func_000EB1A4 — 12 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000EB1A4(void *arg0) {
+    extern int func_00077E80();
+    extern int func_000EB1A4();
+    return (func_00077E80((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4))) & 0xFFFF) == 0xFFFF;
+}
+/* func_000EC114 — 18 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000EC114(s32 arg0) {
+    extern int func_0008BDA0();
+    extern int func_000A4808();
+    extern int func_000EC114();
+    if (!func_000A4808(arg0)) {
+        return func_0008BDA0(1 - (*(unsigned short *)((char *)arg0 + 0x2))) == 5;
+    }
+    return 1;
+}
+/* func_000EC5A8 — 18 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000EC5A8(s32 arg0) {
+    extern int func_0008E7EC();
+    extern int func_000A4808();
+    extern int func_000EC5A8();
+    if (!func_000A4808(arg0)) {
+        return func_0008E7EC(1 - (*(unsigned short *)((char *)arg0 + 0x2))) == 5;
     }
     return 0;
 }
@@ -3831,6 +4484,16 @@ s32 func_000ED2FC(void) {
     extern int func_000ED2FC();
     return func_0008A0D0(0x175E) != 0;
 }
+/* func_000EDB20 — 18 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000EDB20(s32 arg0) {
+    extern int func_0008E7EC();
+    extern int func_000A4808();
+    extern int func_000EDB20();
+    if (!func_000A4808(arg0)) {
+        return func_0008E7EC(1 - (*(unsigned short *)((char *)arg0 + 0x2))) >= 3;
+    }
+    return 1;
+}
 /* func_000EDB68 — 12 words. MATCH 100% (shape: hand). */
 int func_000EDB68(void *a0) {
     extern int func_0008AB14();
@@ -3861,6 +4524,38 @@ extern int func_000D7714();
 int func_000EF2C0(u16 *p, int arg1) {
 
     return func_000D6800(p, p[1]) ? func_000D7714(p, arg1) : 0;
+}
+/* func_000EF844 — 14 words. MATCH 100% (shape: m2c). */
+s32 func_000EF844(s32 arg0) {
+    extern int D_0034D56C;
+    extern int func_000EA4D4();
+    extern int func_000EF844();
+    if (D_0034D56C == 0xB) {
+        return 0;
+    }
+    return func_000EA4D4(arg0);
+}
+/* func_000F0500 — 29 words. MATCH 100% (shape: m2c unsigned short-fields). */
+s32 func_000F0500(s32 arg0, s32 arg1) {
+    extern int func_000892D4();
+    extern int func_000A41B4();
+    extern int func_000ED214();
+    extern int func_000F0500();
+    if ((func_000ED214(arg0, arg1) != 0) && (func_000892D4(arg1, 1) == 0) && (func_000A41B4((s32) (*(unsigned short *)((char *)arg1 + 0x2)), 1) != 0)) {
+        return 2;
+    }
+    return (*(unsigned short *)((char *)arg0 + 0x8)) == 0;
+}
+/* func_000F18FC — 20 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000F18FC(s32 arg0) {
+    extern int ehsys_1738DF69();
+    extern int func_0008AE40();
+    extern int func_000A4808();
+    extern int func_000F18FC();
+    if ((func_000A4808(arg0) == 0) && (func_0008AE40((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) ehsys_1738DF69) == 0)) {
+        return 0;
+    }
+    return 1;
 }
 /* func_000F1BD8 — 8 words. MATCH 100% (shape: hand). */
 int func_000F1BD8(void *a0) {
@@ -3917,6 +4612,17 @@ int func_000F4394(int a0) {
     extern int func_000F4394();
     return func_0017BB0C(a0, (int)&func_000AF2E0) != 0;
 }
+/* func_000F44FC — 23 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000F44FC(s32 arg0) {
+    extern int func_000A4934();
+    extern int func_000F44FC();
+    extern int func_00152710();
+    extern int func_00171004();
+    if ((func_000A4934(arg0) == 0) && (func_00171004((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x0)), func_00152710(arg0)) < 2)) {
+        return 0;
+    }
+    return 1;
+}
 
 /* func_000F45A8 — 10 words. MATCH 100% (shape: bool-fold). */
 s32 func_000F45A8(void) {
@@ -3968,6 +4674,16 @@ s32 func_000F5398(void) {
     extern int func_000F5398();
     return func_000A49E8() != 0;
 }
+/* func_000F5814 — 15 words. MATCH 100% (shape: bool-fold asm-fields). */
+s32 func_000F5814(void *arg0) {
+    extern int D_0034C6D0;
+    extern int func_00035D28();
+    extern int func_000F5814();
+    if (!D_0034C6D0) {
+        return func_00035D28((s32) (*(unsigned short *)((char *)arg0 + 0x2)), (s32) (*(unsigned short *)((char *)arg0 + 0x4))) != 0;
+    }
+    return 0;
+}
 /* func_000F5AC4 — 9 words. MATCH 100% (shape: hand). */
 int func_000F5AC4(int a0) {
     extern int func_0017BB0C();
@@ -3975,11 +4691,47 @@ int func_000F5AC4(int a0) {
     extern int func_000F5AC4();
     return func_0017BB0C(a0, (int)&func_000BE0A8) != 0;
 }
+/* func_000F6150 — 13 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000F6150(void *arg0) {
+    extern int func_000E2908();
+    extern int func_000F6150();
+    if ((s32) (*(unsigned short *)((char *)arg0 + 0x4)) < 5) {
+        return 0;
+    }
+    return func_000E2908((s32) arg0);
+}
+/* func_000F6C54 — 16 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000F6C54(void *arg0) {
+    extern int D_0034D57C;
+    extern int func_000F6C54();
+    extern int func_0017BF20();
+    if ((D_0034D57C == 0) && (func_0017BF20((s32) arg0, (s32) (*(unsigned short *)((char *)arg0 + 0x2))) != 0)) {
+        return 0;
+    }
+    return 2;
+}
 /* func_000F6D7C — 9 words. MATCH 100% (shape: hand). */
 int func_000F6D7C(void *a0) {
     extern int func_00094AA4();
     extern int func_000F6D7C();
     return func_00094AA4(*(unsigned short *)((char *)a0 + 2), 0xD) > 0;
+}
+/* func_000F6FAC — 25 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000F6FAC(void *arg0) {
+    extern int func_00078C8C();
+    extern int func_000D7144();
+    extern int func_000F6FAC();
+    if ((*(unsigned short *)((char *)arg0 + 0x8)) == 0) {
+        if (func_00078C8C((s32) (*(unsigned short *)((char *)arg0 + 0x2)), 0xB, (s32) (*(unsigned short *)((char *)arg0 + 0x0)), 2) == 0) {
+            return 0;
+        }
+        goto block_5;
+    }
+    if (func_000D7144((s32) arg0) == 0) {
+        return 0;
+    }
+block_5:
+    return 1;
 }
 /* func_000F80D0 — 8 words. MATCH 100% (shape: hand). */
 int func_000F80D0(void *a0) {
@@ -3999,6 +4751,15 @@ int func_000FA4EC(void *a0) {
     extern int func_000779C8();
     extern int func_000FA4EC();
     return func_000779C8(*(unsigned short *)((char *)a0 + 2), *(unsigned short *)((char *)a0 + 4)) != 0;
+}
+/* func_000FADEC — 15 words. MATCH 100% (shape: bool-fold unsigned short-fields). */
+s32 func_000FADEC(s32 arg0, s32 arg1) {
+    extern int func_000DAAD0();
+    extern int func_000FADEC();
+    if (!func_000DAAD0(arg0, arg1)) {
+        return (*(unsigned short *)((char *)arg0 + 0x8)) == 0;
+    }
+    return 2;
 }
 /* func_000FC068 — 10 words. MATCH 100% (shape: hand). */
 int func_000FC068(void *a0) {
