@@ -88,6 +88,24 @@ s32 func_000018E8(s32 arg0, s32 arg1, s32 arg2) {
     }
     return (arg1 + arg0 - 1) / arg0;
 }
+/* func_000026A0 — 18 words. MATCH 100% (shape: m2c). */
+void func_000026A0(void) {
+    extern int D_0000E680;
+    extern int D_0000E688;
+    extern int func_000025C0();
+    extern int func_000026A0();
+    s32 temp_v0;
+    u16 temp_a0;
+
+    temp_v0 = func_000025C0();
+    if (temp_v0 != 0) {
+        temp_a0 = *(int *)temp_v0;
+        if (temp_a0 != D_0000E680) {
+            D_0000E680 = (s32) temp_a0;
+            D_0000E688 = 0;
+        }
+    }
+}
 
 /* func_00002958 — 5 words. MATCH 100% (shape: m2c). */
 u32 func_00002958(void) {

@@ -1730,6 +1730,19 @@ void func_0001CA60(int arg0) {
 void func_0001CAB8(s32 *arg0) {
     ((s32 *)arg0[6])[3] = 1;
 }
+/* func_0001CB98 — 16 words. MATCH 100% (shape: m2c asm-fields). */
+void func_0001CB98(int arg0) {
+    extern int ehsys_4BF558F1();
+    extern int func_000194EC();
+    extern int func_0001CB98();
+    extern int func_00030644();
+    int temp_s0;
+    temp_s0 = (*(int *)((char *)arg0 + 0x18));
+    ehsys_4BF558F1(0);
+    if (func_00030644(*(int *)temp_s0) == 0) {
+        func_000194EC();
+    }
+}
 
 /* func_0001CC70 — 10 words. MATCH 100% (shape: m2c). */
 int func_0001CC70() {
@@ -1803,6 +1816,23 @@ int func_0001D428(arg0) s32 arg0;
 {
     (*(s32 *)&D_00091654) = arg0;
 }
+/* func_00021A50 — 31 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00021A50(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int func_00021A50();
+    extern int func_00021ACC();
+    extern int func_00021AEC();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_00021AEC, arg2, arg3, 0x18, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x4)) = arg0;
+        func_00021ACC((s32) (temp_v0_2 + 8), arg1);
+    }
+    return temp_v0;
+}
 /* func_00021ACC — 8 words. MATCH 100% (shape: m2c). */
 void *func_00021ACC(void *arg0, void *arg1) {
     extern int func_00021ACC();
@@ -1814,6 +1844,23 @@ void *func_00021ACC(void *arg0, void *arg1) {
 
 /* func_000222D0 — 14 words. MATCH 100% (verified). */
 typedef struct { f32 a, b; s32 c; f32 d, e, f; } S6_222D0;
+/* func_00021D6C — 31 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00021D6C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int func_00021ACC();
+    extern int func_00021D6C();
+    extern int func_00021DE8();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_00021DE8, arg2, arg3, 0x19C, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x4)) = arg0;
+        func_00021ACC((s32) (temp_v0_2 + 8), arg1);
+    }
+    return temp_v0;
+}
 void *func_000222D0(S6_222D0 *arg0, S6_222D0 *arg1) {
     arg0->a = arg1->a;
     arg0->b = arg1->b;
@@ -1822,6 +1869,39 @@ void *func_000222D0(S6_222D0 *arg0, S6_222D0 *arg1) {
     arg0->e = arg1->e;
     arg0->f = arg1->f;
     return arg0;
+}
+/* func_00022308 — 25 words. MATCH 100% (shape: m2c). */
+s32 func_00022308(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_00021ACC();
+    extern int func_00022308();
+    extern int func_0002236C();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+
+    temp_v0 = func_0003176C((s32) func_0002236C, arg1, arg2, 0x14, 0);
+    if (temp_v0 != -1) {
+        func_00021ACC(func_00031974(temp_v0) + 4, arg0);
+    }
+    return temp_v0;
+}
+/* func_000225F0 — 36 words. MATCH 100% (shape: m2c). */
+s32 func_000225F0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int ehsys_CFC58802();
+    extern int func_000225F0();
+    extern int func_00022680();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    temp_v0 = func_0003176C((s32) func_00022680, arg2, arg3, 0x490, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        ehsys_CFC58802(temp_v0_2 + 4, arg0);
+        ehsys_CFC58802(temp_v0_2 + 0x10, arg1);
+    }
+    return temp_v0;
 }
 
 /* func_00022DBC — 14 words. MATCH 100% (verified). */
@@ -1835,6 +1915,24 @@ u8 func_00022DBC(void) {
     }
     val = v0[1];
     return val >= 0x10;
+}
+/* func_00022DF4 — 32 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00022DF4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int func_00021ACC();
+    extern int func_00022DF4();
+    extern int func_00022E74();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_00022E74, arg2, arg3, 0x6C, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x0)) = temp_v0;
+        (*(int *)((char *)temp_v0_2 + 0xC)) = arg0;
+        func_00021ACC((s32) (temp_v0_2 + 0x10), arg1);
+    }
+    return temp_v0;
 }
 
 /* func_000232A4 — 14 words. MATCH 100% (verified). */
@@ -1854,6 +1952,57 @@ int func_000232A4(s32 arg0) {
 
 /* func_0002EEC4 — 6 words. MATCH 100% (verified). */
 typedef struct { f32 a, b; } V2_EEC4;
+/* func_000232DC — 26 words. MATCH 100% (shape: m2c). */
+s32 func_000232DC(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_00021ACC();
+    extern int func_000232DC();
+    extern int func_00023344();
+    extern int func_0003176C();
+    extern int func_00031974();
+    int temp_v0_2;
+    s32 temp_v0;
+
+    temp_v0 = func_0003176C((s32) func_00023344, arg1, arg2, 0x20, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        *(int *)temp_v0_2 = temp_v0;
+        func_00021ACC((s32) (temp_v0_2 + 0xC), arg0);
+    }
+    return temp_v0;
+}
+/* func_00026CD4 — 30 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00026CD4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int func_00026CD4();
+    extern int func_00026D4C();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_00026D4C, arg2, arg3, 0x90, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x4)) = 0;
+        (*(int *)((char *)temp_v0_2 + 0xC)) = arg0;
+        (*(int *)((char *)temp_v0_2 + 0x10)) = arg1;
+    }
+    return temp_v0;
+}
+/* func_0002E07C — 29 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_0002E07C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    extern int func_0002E07C();
+    extern int func_0002E4CC();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_0002E4CC, arg2, arg3, 0x219C, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0xC)) = arg0;
+        (*(int *)((char *)temp_v0_2 + 0x10)) = arg1;
+    }
+    return temp_v0;
+}
 void *func_0002EEC4(V2_EEC4 *arg0, V2_EEC4 *arg1) {
     arg0->a = arg1->a;
     arg0->b = arg1->b;
@@ -1862,6 +2011,22 @@ void *func_0002EEC4(V2_EEC4 *arg0, V2_EEC4 *arg1) {
 
 /* func_00030644 — 10 words. MATCH 100% (verified). */
 extern s32 *func_00031974();
+/* func_0002FAAC — 24 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_0002FAAC(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_0002FAAC();
+    extern int func_0002FB0C();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_0002FB0C, arg1, arg2, 0x130, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x0)) = 0;
+        (*(int *)((char *)temp_v0_2 + 0xC)) = arg0;
+    }
+    return temp_v0;
+}
 u8 func_00030644(void) {
     s32 *v0;
     s32 val;
@@ -1882,6 +2047,23 @@ extern s32 *func_00031974();
 int func_00030694(s32 arg0, s32 arg1) {
     s32 *v0 = func_00031974(arg0);
     *(s32 *)((char *)v0 + 0x5E0) = arg1;
+}
+/* func_000306BC — 25 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_000306BC(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_000306BC();
+    extern int func_00030720();
+    extern int func_0003176C();
+    extern int func_00031974();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_00030720, arg1, arg2, 0x5F0, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x0)) = temp_v0;
+        (*(int *)((char *)temp_v0_2 + 0x4)) = 0;
+        (*(int *)((char *)temp_v0_2 + 0x14)) = arg0;
+    }
+    return temp_v0;
 }
 
 /* func_0003159C — 14 words. MATCH 100% (shape: m2c). */
@@ -2295,6 +2477,38 @@ void func_00039284(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 extern int func_0003176C();
 extern int *func_00031974();
 extern void func_0003D09C();
+/* func_00039318 — 24 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00039318(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_0003176C();
+    extern int func_00031974();
+    extern int func_00039318();
+    extern int func_00039378();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_00039378, arg1, arg2, 0x7F70, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x14)) = arg0;
+        (*(int *)((char *)temp_v0_2 + 0x18)) = 0;
+    }
+    return temp_v0;
+}
+/* func_0003A6CC — 25 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_0003A6CC(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_0003176C();
+    extern int func_00031974();
+    extern int func_0003A6CC();
+    extern int func_0003A730();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_0003176C((s32) func_0003A730, arg1, arg2, 0x1D200, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00031974(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x18)) = arg0;
+        (*(int *)((char *)temp_v0_2 + 0x1C)) = 0;
+    }
+    return temp_v0;
+}
 int func_0003D040(int arg0, int arg1, int arg2) {
 
     int h = func_0003176C(&func_0003D09C, arg1, arg2, 0x67CC, 0);
@@ -2339,6 +2553,20 @@ extern void func_00040254();
 extern int func_0003176C();
 extern int *func_00031974();
 extern void func_0003F7B8();
+/* func_0003E6F0 — 24 words. MATCH 100% (shape: m2c). */
+s32 func_0003E6F0(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_0003176C();
+    extern int func_00031974();
+    extern int func_0003E6F0();
+    extern int func_0003E750();
+    s32 temp_v0;
+
+    temp_v0 = func_0003176C((s32) func_0003E750, arg1, arg2, 0x21A24, 0);
+    if (temp_v0 != -1) {
+        (*(int *)((char *)(func_00031974(temp_v0)) + 0x14)) = arg0;
+    }
+    return temp_v0;
+}
 int func_0003F75C(int arg0, int arg1, int arg2) {
 
     int h = func_0003176C(&func_0003F7B8, arg1, arg2, 0xC8C8, 0);

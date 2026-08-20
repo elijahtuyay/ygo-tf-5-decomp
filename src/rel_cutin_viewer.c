@@ -836,6 +836,38 @@ void func_00007D10(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 extern int func_000060BC();
 extern int *func_00006294();
 extern void func_0000BB28();
+/* func_00007DA4 — 24 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00007DA4(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_000060BC();
+    extern int func_00006294();
+    extern int func_00007DA4();
+    extern int func_00007E04();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_000060BC((s32) func_00007E04, arg1, arg2, 0x7F70, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00006294(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x14)) = arg0;
+        (*(int *)((char *)temp_v0_2 + 0x18)) = 0;
+    }
+    return temp_v0;
+}
+/* func_00009158 — 25 words. MATCH 100% (shape: m2c asm-fields). */
+s32 func_00009158(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_000060BC();
+    extern int func_00006294();
+    extern int func_00009158();
+    extern int func_000091BC();
+    s32 temp_v0;
+    int temp_v0_2;
+    temp_v0 = func_000060BC((s32) func_000091BC, arg1, arg2, 0x1D200, 0);
+    if (temp_v0 != -1) {
+        temp_v0_2 = func_00006294(temp_v0);
+        (*(int *)((char *)temp_v0_2 + 0x18)) = arg0;
+        (*(int *)((char *)temp_v0_2 + 0x1C)) = 0;
+    }
+    return temp_v0;
+}
 int func_0000BACC(int arg0, int arg1, int arg2) {
 
     int h = func_000060BC(&func_0000BB28, arg1, arg2, 0x67CC, 0);
@@ -875,6 +907,20 @@ extern void func_0000ECD4();
 extern int func_000060BC();
 extern int *func_00006294();
 extern void func_0000E238();
+/* func_0000D170 — 24 words. MATCH 100% (shape: m2c). */
+s32 func_0000D170(s32 arg0, s32 arg1, s32 arg2) {
+    extern int func_000060BC();
+    extern int func_00006294();
+    extern int func_0000D170();
+    extern int func_0000D1D0();
+    s32 temp_v0;
+
+    temp_v0 = func_000060BC((s32) func_0000D1D0, arg1, arg2, 0x21A24, 0);
+    if (temp_v0 != -1) {
+        (*(int *)((char *)(func_00006294(temp_v0)) + 0x14)) = arg0;
+    }
+    return temp_v0;
+}
 int func_0000E1DC(int arg0, int arg1, int arg2) {
 
     int h = func_000060BC(&func_0000E238, arg1, arg2, 0xC8C8, 0);
