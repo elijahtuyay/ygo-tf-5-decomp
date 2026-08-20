@@ -14,6 +14,7 @@ it is rolled back and the next one is tried.
 That makes it safe to run against files that agents or humans are curating: the
 worst case is that nothing is added.
 """
+import glob
 import json
 import os
 import re
@@ -149,11 +150,31 @@ def harvest_objects(module):
 def main():
     module = sys.argv[1]
     path = os.path.join(ROOT, "src", module + ".c")
-    mj = os.path.join(ROOT, f"build/auto/{module}.matched.json")
-    if not os.path.exists(path) or not os.path.exists(mj):
+    if not os.path.exists(path):
         print(f"{module}: nothing to do")
         return
-    entries = json.load(open(mj))
+
+    # Read the SHARDED outputs too. `auto_decomp.py --shard i/n` writes
+    # build/auto/<module>.<i>of<n>.matched.json, and this script used to read
+    # only the unsharded name — so every sharded run's matches were simply lost
+    # unless somebody consolidated them by hand. They were not: one such sweep
+    # of rel_duel_eng had 65 verified functions sitting unmerged. Every entry is
+    # re-verified against the whole file below, so reading a stale shard file
+    # costs a rejected candidate at worst.
+    entries, seen = [], set()
+    sources = (sorted(glob.glob(os.path.join(ROOT, f"build/auto/{module}.matched.json")))
+               + sorted(glob.glob(os.path.join(ROOT, f"build/auto/{module}.*of*.matched.json"))))
+    for mj in sources:
+        try:
+            for e in json.load(open(mj)):
+                if e["func"] not in seen:
+                    seen.add(e["func"])
+                    entries.append(e)
+        except (json.JSONDecodeError, KeyError, TypeError):
+            print(f"  skipping unreadable {os.path.basename(mj)}")
+    if not entries:
+        print(f"{module}: nothing to do")
+        return
     if "--scan-objects" in sys.argv:
         known = {e["func"] for e in entries}
         extra = [e for e in harvest_objects(module) if e["func"] not in known]
