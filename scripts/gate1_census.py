@@ -55,6 +55,14 @@ def main():
     ap.add_argument("--max-words", type=int, default=120)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--show", help="print drafts whose error matches this text")
+    ap.add_argument("--pool", metavar="FILE",
+                    help="read the sample from FILE (written on first use). "
+                         "THE SAMPLE IS NOT STABLE WITHOUT THIS: it is drawn "
+                         "from the functions not in the baseline, so matching "
+                         "anything changes which functions are eligible and an "
+                         "A/B taken across a baseline refresh compares two "
+                         "different samples. That mistake cost a correct result "
+                         "here once — a change measured as -10 was really +1.")
     args = ap.parse_args()
 
     base = json.load(open(os.path.join(ROOT, "config/progress-baseline.json")))["modules"]
@@ -67,6 +75,16 @@ def main():
             if fn not in done and words <= args.max_words:
                 pool.append((mod, fn, lines, words))
     random.Random(args.seed).shuffle(pool)
+
+    if args.pool:
+        if os.path.exists(args.pool):
+            want = [tuple(l.split()) for l in open(args.pool).read().split("\n") if l.strip()]
+            index = {(m, f): (m, f, l, w) for m, f, l, w in pool}
+            pool = [index[k] for k in want if k in index]
+        else:
+            with open(args.pool, "w") as fh:
+                for m, f, _, _ in pool[:args.sample]:
+                    fh.write(f"{m} {f}\n")
 
     counts = collections.Counter()
     shown = 0
