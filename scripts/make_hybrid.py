@@ -87,10 +87,78 @@ def split_asm(module):
     # would neither be committed nor reproduce. Merging the two functions into
     # one .s is wrong for a different reason: it assumes splat split one real
     # function, and here the referenced functions are not even adjacent.
+    # `alabel` marks an alternate entry point inside a function, and macro.inc
+    # expands it to `.global NAME`. A GLOBAL symbol cannot be resolved by the
+    # assembler — it might be interposed at link time — so every branch to one
+    # becomes a relocation instead of a computed offset, and mwccgap's transplant
+    # does not carry those through correctly. rel_field failed with ten of them:
+    #
+    #     func_00036160: (.text+0x40): relocation truncated to fit:
+    #                    R_MIPS_PC16 against `func_000361B0'
+    #
+    # The distance is 0x10. Nothing is out of range; the relocation is simply
+    # wrong. Where an alternate entry is only ever reached from inside its own
+    # function and is never named by the C, it does not need to be global at
+    # all. Emitting it as a plain label lets gas resolve the branch at assembly
+    # time and no relocation is produced.
+    c_path = os.path.join(ROOT, "src", module + ".c")
+    c_text = open(c_path).read() if os.path.exists(c_path) else ""
+    demoted = 0
     for name, body in chunks.items():
+        local = set()
+        for line in body:
+            m = re.match(r"\s*alabel\s+(\S+)", line)
+            if not m:
+                continue
+            sym = m.group(1)
+            elsewhere = any(sym in l for n2, b2 in chunks.items()
+                            if n2 != name for l in b2)
+            if not elsewhere and not re.search(r"\b" + re.escape(sym) + r"\b", c_text):
+                local.add(sym)
+        if local:
+            # Neither keeping nor renaming these symbols works, so remove them.
+            #
+            # Kept as `alabel`, macro.inc makes them .global, and mwccgap
+            # defines them at an offset relative to the FUNCTION rather than the
+            # section: rel_tutorial's func_00006818 came out at 0x60, which is
+            # exactly 0x6818 - 0x67B8. Every jump through it then lands
+            # somewhere arbitrary, which is why the module built to the right
+            # size and still failed its sha1.
+            #
+            # Renamed to `.L`, they become local symbols, and mwccgap's
+            # relocation fix-up indexes rodata_section_indices[0] whenever any
+            # local symbol was inserted — IndexError on a module with no
+            # .rodata at all.
+            #
+            # mwccgap cannot be patched: tools/ is gitignored, so the fix would
+            # not be committed. But nothing actually needs the symbol. The
+            # disassembly records each instruction's exact encoding, so every
+            # reference can be emitted as that literal word — no symbol, no
+            # relocation, byte-exact by construction. asm_prepare.py already
+            # does this for the Allegrex opcodes gas cannot assemble.
+            out_body, rewritten = [], 0
+            for line in body:
+                m = re.match(r"^\s*alabel\s+(\S+)\s*$", line)
+                if m and m.group(1) in local:
+                    continue                       # label no longer needed
+                m = re.match(r"^(\s*/\* [0-9A-F]+ [0-9A-F]+ ([0-9A-F]{8}) \*/)(\s+)(.*)$",
+                             line)
+                if m and any(re.search(r"\b" + re.escape(sym) + r"\b", m.group(4))
+                             for sym in local):
+                    raw = m.group(2)
+                    word = int.from_bytes(bytes.fromhex(raw), "little")
+                    line = f"{m.group(1)}{m.group(3)}.word 0x{word:08X}"
+                    rewritten += 1
+                out_body.append(line)
+            body = out_body
+            chunks[name] = body
+            demoted += rewritten
         with open(os.path.join(out_dir, name + ".s"), "w") as fh:
             fh.write("\n".join(header) + "\n")
             fh.write("\n".join(body) + "\n")
+    if demoted:
+        print(f"  {demoted} reference(s) to intra-function alternate entry "
+              f"points emitted as literal words")
     return len(chunks)
 
 
@@ -151,6 +219,205 @@ def _contested_externs(lines):
         if name:
             seen.setdefault(name, set()).add(_canon_type(typ, typedefs))
     return {n for n, types in seen.items() if len(types) > 1}
+
+
+def _param_count(code, start):
+    """Number of parameters in the definition beginning at line `start`."""
+    text, depth = "", 0
+    for i in range(start, min(start + 12, len(code))):
+        for ch in code[i]:
+            if ch == "(":
+                depth += 1
+                if depth == 1:
+                    continue
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    inner = text.strip()
+                    if not inner or inner == "void":
+                        return 0
+                    return inner.count(",") + 1
+            if depth >= 1:
+                text += ch
+    return None
+
+
+def _call_arg_counts(code, a, b, name, skip_lines):
+    """Argument counts of every call to `name` in code[a:b]."""
+    counts = []
+    pat = re.compile(r"\b" + name + r"\s*\(")
+    for i in range(a, b):
+        # `extern int func_X();` is a declaration, not a call. Counting those as
+        # zero-argument calls flagged 1,131 of rel_duel_eng's 1,318 C functions
+        # when the compiler finds exactly two real conflicts.
+        if "extern" in code[i] or i in skip_lines:
+            continue                      # a declaration or a definition head
+        for m in pat.finditer(code[i]):
+            depth, args, seen, text = 0, 0, False, ""
+            j, k = i, m.end() - 1
+            while j < min(b, i + 8):
+                line = code[j]
+                while k < len(line):
+                    ch = line[k]
+                    if ch == "(":
+                        depth += 1
+                    elif ch == ")":
+                        depth -= 1
+                        if depth == 0:
+                            inner = text.strip()
+                            # Only argument-bearing calls are evidence. A bare
+                            # `func_X()` is overwhelmingly a declaration in this
+                            # source, and a genuine zero-argument call against a
+                            # visible prototype would be caught by the compiler
+                            # anyway.
+                            if inner:
+                                counts.append(args + 1)
+                            seen = True
+                            break
+                    elif ch == "," and depth == 1:
+                        args += 1
+                    if depth >= 1 and not (depth == 1 and ch == "("):
+                        text += ch
+                    k += 1
+                if seen:
+                    break
+                j += 1
+                k = 0
+    return counts
+
+
+def _arity_conflicts(code, order, starts_in_file, bounds, have):
+    """C definitions whose parameter list disagrees with a call to them.
+
+    src/rel_duel_eng.c defines func_000FF294 with four parameters and calls it
+    with two. In FILE order the call precedes the definition, so C89 lets it
+    through on an implicit declaration; in ADDRESS order the definition comes
+    first and mwcc rejects the call outright. Neither side can be rewritten
+    without risking the codegen of a function that currently matches, so the
+    definition is carried as assembly instead — the shipped bytes are identical
+    either way, and the disagreement is a real defect in the source worth
+    reporting.
+    """
+    params = {}
+    for f in have:
+        n = _param_count(code, starts_in_file[f])
+        if n is not None:
+            params[f] = n
+    def_lines = set(starts_in_file.values())
+    bad = set()
+    for f in order:
+        if f not in have:
+            continue
+        a, b = bounds[f]
+        for callee, n in params.items():
+            if callee in bad:
+                continue
+            for got in _call_arg_counts(code, a, b, callee, def_lines):
+                if got != n:
+                    bad.add(callee)
+                    break
+    return bad
+
+
+def _code_only(lines):
+    """Per-line copy with comments blanked and string/char bodies emptied.
+
+    Brace counting and "does this line end in a semicolon" are both wrong if a
+    brace or semicolon inside a comment or a literal is allowed to count.
+    """
+    out, in_block = [], False
+    for line in lines:
+        res, i, n = [], 0, len(line)
+        while i < n:
+            two = line[i:i + 2]
+            if in_block:
+                if two == "*/":
+                    in_block = False
+                    i += 2
+                else:
+                    i += 1
+                continue
+            if two == "/*":
+                in_block = True
+                i += 2
+                continue
+            if two == "//":
+                break
+            ch = line[i]
+            if ch in "\"'":
+                quote, i = ch, i + 1
+                while i < n:
+                    if line[i] == "\\":
+                        i += 2
+                        continue
+                    if line[i] == quote:
+                        i += 1
+                        break
+                    i += 1
+                res.append(quote * 2)
+                continue
+            res.append(ch)
+            i += 1
+        out.append("".join(res))
+    return out
+
+
+def _body_end(code, start):
+    """Index of the line closing the body that opens at or after `start`.
+
+    Counting braces rather than looking for a line that is exactly `}`, because
+    src/rel_duel_eng.c writes whole bodies on one line:
+
+        int func_0000EC04(int a0, ...) {
+            extern int func_0000EC04(); return func_0000EB18(...); }
+
+    Matching on a bare `}` runs straight past that and swallows every function
+    after it, which then get emitted twice and fail to compile as "redefined".
+    """
+    depth, seen = 0, False
+    for i in range(start, len(code)):
+        for ch in code[i]:
+            if ch == "{":
+                depth += 1
+                seen = True
+            elif ch == "}":
+                depth -= 1
+                if seen and depth <= 0:
+                    return i
+        if seen and depth <= 0:
+            return i
+    return start
+
+
+def _is_knr_definition(lines, i):
+    """Does line `i` open a K&R definition rather than close a declaration?
+
+    The merge tooling emits old-style definitions, which end in a semicolon and
+    so look exactly like a forward declaration:
+
+        int func_0006DE84(arg0) s32 arg0;
+        {
+            ...
+
+    Missing one is not benign — the function ends up carried as INCLUDE_ASM
+    while its body is still emitted inside a neighbouring block, and the module
+    fails to link with "multiple definition". Distinguish them by looking ahead:
+    a definition reaches a bare `{` past nothing but more parameter
+    declarations.
+    """
+    if re.match(r"^\s*extern\b", lines[i]):
+        return False
+    for j in range(i + 1, min(i + 10, len(lines))):
+        st = lines[j].strip()
+        if not st:
+            continue
+        if st == "{":
+            return True
+        # more K&R parameter declarations may intervene
+        if re.match(r"^[A-Za-z_][\w \*]*\s+\*?\w+(\[[^\]]*\])?\s*;$", st):
+            continue
+        return False
+    return False
 
 
 def _classify_prelude(prelude):
@@ -218,16 +485,15 @@ def main():
     # as INCLUDE_ASM, while its C body still gets emitted as part of a
     # neighbouring block. The object then defines it twice and the module fails
     # to link with "multiple definition of func_00001EC8".
+    code_lines = _code_only(lines)
     starts_in_file = {}
     for i, line in enumerate(lines):
         if not line or line[0].isspace() or line[0] in "/*#}":
             continue
-        # Strip comments before deciding: a forward declaration often carries a
-        # trailing note, and `void func_0000F928(void); /* defined below */`
-        # does not end in a semicolon as written.
-        code = re.sub(r"/\*.*?\*/", "", line)
-        code = re.sub(r"/\*.*$", "", code).split("//")[0].rstrip()
-        if not code or code.endswith(";"):
+        code = code_lines[i].rstrip()
+        if not code:
+            continue
+        if code.endswith(";") and not _is_knr_definition(lines, i):
             continue                      # a declaration, not a definition
         m = re.search(r"\b(func_[0-9A-F]+)\s*\(", code)
         if m:
@@ -260,11 +526,7 @@ def main():
     prev_end = starts_in_file[order[0]] if order else 0
     for f in order:
         a = starts_in_file[f]
-        body_end = a
-        for i in range(a, len(lines)):
-            if lines[i].rstrip() == "}":
-                body_end = i
-                break
+        body_end = _body_end(code_lines, a)
         bounds[f] = (prev_end, body_end + 1)
         prev_end = body_end + 1
     preamble = lines[:starts_in_file[order[0]]] if order else lines
@@ -341,6 +603,14 @@ def main():
     have = set(starts_in_file)
     if verified:
         have &= verified          # anything unverified falls through to INCLUDE_ASM
+
+    conflicts = _arity_conflicts(code_lines, order, starts_in_file, bounds, have)
+    if conflicts:
+        have -= conflicts
+        print(f"  {len(conflicts)} function(s) carried as asm: their parameter "
+              f"list disagrees with a call site "
+              f"({', '.join(sorted(conflicts)[:4])}"
+              f"{', ...' if len(conflicts) > 4 else ''})")
 
     missing = sorted(set(funcs) - have, key=lambda f: starts.get(f, 0))
 
