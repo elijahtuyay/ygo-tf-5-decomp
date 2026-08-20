@@ -77,9 +77,19 @@ ASSET_OBJS := $(patsubst assets/$(MODULE)/%.bin,build/assets/$(MODULE)/%.bin.o,$
 # globals the ORIGINAL bakes as absolute constants with no relocation, so splat
 # never emitted a name for them (see KNOWN_ADDR in scripts/mwcc_diff.py). Their
 # address is encoded in the name, which is what makes this safe to automate.
+#
+# .LXXXXXXXX joins them under HYBRID=1. Splitting .text into one .s per function
+# leaves any reference that crosses a function boundary dangling, since gas keeps
+# `.L` names out of the symbol table — in rel_cutin_viewer, absolute references
+# like `lui %hi(.L00010B48)` / `sw %lo(.L00010B48)($v0)` reaching into another
+# function. Same reasoning applies: the name encodes the address.
 build/$(MODULE).srcsyms.ld: $(MWOBJ)
 	@$(CROSS)nm -u $< | grep -oE '\b(jtbl|D)_[0-9A-F]{4,8}\b' | sort -u | awk -F_ \
 		'{ printf "PROVIDE(%s = 0x%s);\n", $$0, $$2 }' > $@
+	@# .L names never appear in `nm -u` — they are local, so nm filters them out
+	@# even though the relocations reference them. Read the relocation table.
+	@$(CROSS)readelf -r $< | grep -oE '\.L[0-9A-F]{8}' | sort -u \
+		| sed -E 's/^\.L(.*)$$/PROVIDE(.L\1 = 0x\1);/' >> $@
 
 ifeq ($(SRC),1)
   # our compiled C replaces the disassembled .text. The linker script names that
@@ -93,6 +103,7 @@ else
 endif
 
 .PRECIOUS: build/asm/$(MODULE)/%.s
+.DELETE_ON_ERROR:
 .PHONY: all verify clean
 all: verify
 
@@ -161,7 +172,8 @@ verify: $(BIN)
 	@expected=$$(grep -F "$(MODULE).prx" checksums.sha1 | cut -d' ' -f1); \
 	actual=$$(sha1sum $(BIN) | cut -d' ' -f1); \
 	total=$$(wc -c < $(PRX)); \
-	code=$$(readelf -SW $(PRX) | awk '$$2==".text"{print strtonum("0x" $$6)}'); \
+	code=$$(readelf -SW $(PRX) | sed 's/\[ *[0-9]*\]//' \
+		| awk '$$1==".text"{print strtonum("0x" $$5)}'); \
 	if [ "$$expected" != "$$actual" ]; then \
 		echo "FAIL $(MODULE).prx"; \
 		echo "  expected $$expected"; \
@@ -187,14 +199,47 @@ clean:
 		build/$(MODULE).symbols.ld build/$(MODULE).src.ld build/$(MODULE).srcsyms.ld
 
 
+# THE mwccgap HANG, SOLVED. Module builds were observed sitting at 0.0% CPU for
+# one to four hours (docs/19), blamed first on concurrency and then on wibo.
+# It is neither. tools/mwccgap/mwccgap.py opens with:
+#
+#     read_from_file = sys.stdin.isatty()
+#     if not read_from_file:
+#         in_lines = sys.stdin.readlines()
+#
+# So whenever stdin is not a terminal it reads stdin to EOF. Under a terminal
+# that is fine; run it from a script, a CI job, or any harness that hands it an
+# open socket, and it blocks forever on a read that will never return. A hung
+# process shows exactly that: no children, no compiler running, blocked in
+# unix_stream_read_gen on fd 0. It looked concurrency-related only because the
+# runs without a controlling terminal were the background ones.
+#
+# `< /dev/null` is the fix: readlines() returns immediately.
+#
+#   timeout  still bounds every invocation — cheap insurance, and it turns any
+#            future stall into a clear failure instead of a silent CPU squat;
+#   flock    still serialises them, so two builds cannot race the same output.
+#
+# This discipline used to live in a throwaway /tmp script, which meant the
+# "19 of 28 modules build byte-exactly" result could not be reproduced at all.
+MWCCGAP_TIMEOUT ?= 900
+
 build/hybrid/$(MODULE).o: src/$(MODULE).c scripts/make_hybrid.py
 	scripts/make_hybrid.py $(MODULE)
-	python3 tools/mwccgap/mwccgap.py build/hybrid/$(MODULE).c $@ \
+	@mkdir -p build/hybrid
+	@flock build/hybrid/.mwccgap.lock \
+	 timeout $(MWCCGAP_TIMEOUT) python3 tools/mwccgap/mwccgap.py build/hybrid/$(MODULE).c $@ \
 		--mwcc-path tools/mwccpsp_3.0.1_219/mwccpsp.exe \
 		--use-wibo --wibo-path tools/wibo-bin/wibo \
 		--as-path $(CROSS)as --as-march mips32r2 --as-mabi 32 \
 		--macro-inc-path include/macro.inc \
-		-Iinclude -O4,s -sdatathreshold 0
+		-Iinclude -O4,s -sdatathreshold 0 < /dev/null \
+	 || { rc=$$?; \
+	      if [ $$rc -eq 124 ]; then \
+	        echo "FAIL $(MODULE): mwccgap timed out after $(MWCCGAP_TIMEOUT)s."; \
+	        echo "     stdin is redirected from /dev/null, so this is NOT the old"; \
+	        echo "     readlines() hang. Retry it; raise MWCCGAP_TIMEOUT if large."; \
+	      fi; exit $$rc; }
 # NOTE: --macro-inc-path is required (the per-function .s files open with
 # .include "macro.inc"), and --as-flags must NOT be used: mwccgap sets its
 # option prefix to "~", so --as-flags' nargs="*" swallows every following
