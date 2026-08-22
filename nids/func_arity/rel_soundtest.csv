@@ -1,0 +1,4 @@
+name,call_sites,max_args,distribution
+func_00001410,9,8,8 args x9
+func_000013FC,4,4,4 args x4
+func_0000148C,2,2,2 args x2

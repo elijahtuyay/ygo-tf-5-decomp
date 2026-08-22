@@ -1,0 +1,58 @@
+name,call_sites,max_args,distribution
+func_00006F3C,62,8,1 args x36; 3 args x21; 2 args x2
+func_00002958,10,6,2 args x1; 6 args x1
+func_000029D4,8,2,1 args x5; 2 args x2
+func_00004580,7,4,4 args x7
+func_00007778,7,7,7 args x7
+func_00007C94,7,3,3 args x7
+func_0000296C,6,1,1 args x1
+func_00001C4C,5,3,2 args x3; 3 args x2
+func_0000192C,5,2,1 args x2; 2 args x1
+func_00007918,5,7,7 args x5
+func_000088D4,4,3,3 args x4
+func_0000605C,4,4,3 args x2; 4 args x2
+func_00005218,4,4,4 args x4
+func_00001854,3,2,2 args x2
+func_000024FC,3,1,1 args x3
+func_00001E54,3,3,3 args x3
+func_000075C8,3,2,2 args x3
+func_00007700,3,1,1 args x3
+func_00008380,3,5,5 args x3
+func_00008770,2,1,1 args x2
+func_000026A0,2,1,1 args x1
+func_00007688,2,1,1 args x2
+func_000018E8,2,3,3 args x2
+func_000087EC,2,2,2 args x2
+func_00003528,2,2,2 args x2
+func_00006644,2,8,8 args x1; 7 args x1
+func_0000848C,2,8,8 args x2
+func_00008724,2,2,2 args x2
+func_00008874,1,2,2 args x1
+func_00000958,1,2,2 args x1
+func_00007104,1,4,4 args x1
+func_00003D98,1,1,1 args x1
+func_000043D8,1,1,1 args x1
+func_00004494,1,1,1 args x1
+func_00004594,1,1,1 args x1
+func_00005AE0,1,1,1 args x1
+func_00005C20,1,1,1 args x1
+func_00004620,1,1,1 args x1
+func_00004B70,1,1,1 args x1
+func_000068C0,1,1,1 args x1
+func_00007A18,1,6,6 args x1
+func_00003BD4,1,2,2 args x1
+func_00007338,1,1,1 args x1
+func_00006664,1,1,1 args x1
+func_000061E4,1,3,3 args x1
+func_0000636C,1,7,7 args x1
+func_00005210,1,2,2 args x1
+func_000051F0,1,3,3 args x1
+func_00005EB4,1,4,4 args x1
+func_00005DAC,1,5,5 args x1
+func_00007E4C,1,8,8 args x1
+func_00008054,1,8,8 args x1
+func_0000696C,1,3,3 args x1
+func_000079F8,1,3,3 args x1
+func_0000763C,1,3,3 args x1
+func_00007D2C,1,5,5 args x1
+func_00008478,1,4,4 args x1
