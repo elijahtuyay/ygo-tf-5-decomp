@@ -1,6 +1,23 @@
 {
  "generated": "2026-08-22",
  "modules": {
+  "rel_movie_viewer": [
+   "func_00000000",
+   "func_00000034",
+   "func_00000138",
+   "func_00000184",
+   "func_000001C0",
+   "func_000001C8",
+   "func_0000024C",
+   "func_00000464",
+   "func_00000470",
+   "func_00000540",
+   "func_000005C8",
+   "func_000006B4",
+   "func_000006BC",
+   "func_000007C8",
+   "func_00000894"
+  ],
   "rel_password": [
    "func_00000A10",
    "func_00000A24",
