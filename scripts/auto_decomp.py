@@ -775,8 +775,47 @@ SHAPES = [
 
 
 # -------------------------------------------------------------------- compile
+# `referenced()` builds declarations from the ASM, before m2c has drafted
+# anything, so it cannot know how a call's RESULT gets used and declares every
+# callee `extern int f();`. When the draft then writes `*func_0003FBD4(arg0)`
+# the compiler rejects it with "pointer/array required" — the single most common
+# reason a draft fails to compile, 16 of 40 failures in a 200-draft census.
+#
+# The draft itself is the evidence: if it dereferences the result, the callee
+# returns a pointer. m2c spaces its binary operators, so `*f(` is a dereference
+# while a multiplication reads `a * f(`; requiring the star to touch the name
+# keeps the two apart.
+DEREFED_CALL = re.compile(r"\*(\w+)\s*\(")
+DECLARED_FUNC = re.compile(r"^extern int (\w+)\((.*)\);$")
+
+
+def pointer_returns(decls, body):
+    """Re-declare as pointer-returning any function whose result the draft derefs."""
+    deref = set(DEREFED_CALL.findall(body))
+    if not deref:
+        return decls
+    out = []
+    for d in decls:
+        m = DECLARED_FUNC.match(d.strip())
+        # `int *`, not `void *`: the draft DEREFERENCES the result, and
+        # dereferencing a void pointer is illegal too — declaring it that way
+        # just moves the failure from "pointer/array required" to "illegal
+        # operands", which is what the first attempt at this did.
+        out.append(f"extern int *{m.group(1)}({m.group(2)});"
+                   if m and m.group(1) in deref else d)
+    return out
+
+
+def candidate_source(decls, body):
+    """The exact text the pipeline compiles. Anything measuring gate 1 must use
+    this rather than reassembling the pieces: gate1_census.py had its own copy
+    and so kept reporting the compile rate of a draft the pipeline no longer
+    builds."""
+    return PRELUDE + "\n" + "\n".join(pointer_returns(decls, body)) + "\n\n" + body + "\n"
+
+
 def try_candidate(module, fn, decls, body, workdir, flags=None):
-    src = PRELUDE + "\n" + "\n".join(decls) + "\n\n" + body + "\n"
+    src = candidate_source(decls, body)
     open(os.path.join(workdir, f"{fn}.c"), "w").write(src)
     r = subprocess.run([WIBO, MWCC, "-c", *(flags or FLAGS), "-o", f"{fn}.o", f"{fn}.c"],
                        capture_output=True, text=True, cwd=workdir)

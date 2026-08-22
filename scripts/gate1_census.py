@@ -112,7 +112,7 @@ def main():
             body = A.apply_field_widths(draft, A.field_widths(lines))
             if "M2C_W" in body:
                 body = body.replace("M2C_W", A.FIELD_WIDTHS[0])
-            src = A.PRELUDE + "\n" + "\n".join(decls) + "\n\n" + body + "\n"
+            src = A.candidate_source(decls, body)
             open(os.path.join(work, f"{fn}.c"), "w").write(src)
             r = subprocess.run([A.WIBO, A.MWCC, "-c", *A.FLAGS,
                                 "-o", f"{fn}.o", f"{fn}.c"],
