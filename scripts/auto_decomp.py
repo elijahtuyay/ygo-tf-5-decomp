@@ -869,13 +869,30 @@ def main():
             only = {l.strip() for l in open(args.only[1:]) if l.strip()}
         else:
             only = {x.strip() for x in args.only.split(",") if x.strip()}
-    todo = [f for f in funcs if f[2] <= args.max_words and
-            (not only or f[0] in only)][:args.limit]
+    eligible = [f for f in funcs if f[2] <= args.max_words and
+                (not only or f[0] in only)]
+    todo = eligible[:args.limit]
     si, sn = (int(x) for x in args.shard.split("/"))
     tag = "" if sn == 1 else f".{si}of{sn}"
     if sn > 1:
         todo = todo[si - 1::sn]
-    print(f"{mod}: {len(funcs)} functions, trying {len(todo)}", flush=True)
+
+    # Say what is NOT being probed. A --limit silently truncated rel_duel_eng to
+    # 2,600 of its 7,487 functions; because the run reported only "trying 325"
+    # per shard, the module read as exhausted when 4,887 functions had never
+    # been looked at once. A cap that is not printed is indistinguishable from
+    # coverage.
+    dropped = {}
+    if args.max_words < 10**9:
+        dropped["over --max-words"] = sum(1 for f in funcs if f[2] > args.max_words)
+    if only:
+        dropped["not in --only"] = sum(1 for f in funcs if f[0] not in only)
+    if len(eligible) > args.limit:
+        dropped["cut by --limit"] = len(eligible) - args.limit
+    note = ", ".join(f"{v} {k}" for k, v in dropped.items() if v)
+    print(f"{mod}: {len(funcs)} functions, trying {len(todo)}"
+          + (f" ({note})" if note else "")
+          + (f" [shard {si}/{sn}]" if sn > 1 else ""), flush=True)
 
     for i, (fn, lines, words) in enumerate(todo):
         best, hit, best_src = None, False, None
@@ -952,13 +969,18 @@ def main():
                           open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
 
     n = sum(1 for r in results if r["status"] == "MATCH")
-    if only and len(only) > 1:
-        # A --only run covers a chosen subset, so its results are NOT a census
-        # of the module and must not replace one. Fold any matches into the
-        # existing matched.json additively and leave the per-function verdict
-        # file alone — overwriting it would throw away every verdict for the
-        # functions this run did not look at, which is what near_misses.py and
-        # the gate-1 census both read.
+    # A run that did not look at every function is not a census of the module
+    # and must not replace one. 851d9f3 established this for --only, but --only
+    # is not the only way to cover a subset: --max-words and --limit truncate
+    # just as silently, and `--max-words 8 --limit 5` on rel_password duly
+    # overwrote a 3-match census with an empty one. The test is coverage, not
+    # which flag caused it.
+    partial = bool(dropped) or (only and len(only) > 1)
+    if partial:
+        # Fold matches into the existing matched.json additively and leave the
+        # per-function verdict file alone — overwriting it would throw away
+        # every verdict for the functions this run did not look at, which is
+        # what near_misses.py and the gate-1 census both read.
         path = os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json")
         existing = {}
         if os.path.exists(path):
@@ -977,7 +999,8 @@ def main():
         print(f"{mod} {next(iter(only))}: {'MATCH' if n else 'no match'}"
               + (f" [{detail}]" if detail and not n else ""))
         return
-    out = {"module": mod, "tried": len(todo), "matched": n, "results": results}
+    out = {"module": mod, "tried": len(todo), "matched": n,
+           "of_module": len(funcs), "excluded": dropped, "results": results}
     json.dump(out, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
     json.dump(matched, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
     print(f"{mod}: MATCHED {n}/{len(todo)}  -> build/auto/{mod}.matched.json")
