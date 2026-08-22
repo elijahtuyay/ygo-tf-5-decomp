@@ -97,120 +97,69 @@ BODIES = json.loads(r'''{
  "99-engineering-log": [
   "docs: the working session log",
   "Chronological notes from the sessions that produced the preceding PRs. Not\nrequired reading -- the distilled findings are already in the PRs they belong\nto. This is here so the reasoning, including the dead ends, is recoverable."
- ],
- "mod-rel_duel_eng": [
-  "feat(rel_duel_eng): 1497 of 7487 functions matched",
-  "The rules engine: 3 MB of code, all card logic hardcoded.\n\n  functions   1497 / 7487\n  .text bytes 60,728 / 3,107,612  (2.0%)\n\nVerify:\n\n    make MODULE=rel_duel_eng HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_duel_eng\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_duel_draw": [
-  "feat(rel_duel_draw): 650 of 1546 functions matched",
-  "The duel renderer \u2014 float/VFPU constant pool in `.data`.\n\n  functions   650 / 1546\n  .text bytes 26,216 / 452,356  (5.8%)\n\nVerify:\n\n    make MODULE=rel_duel_draw HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_duel_draw\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_field": [
-  "feat(rel_field): 317 of 730 functions matched",
-  "The overworld: a named scene table (`bg_02 [S_YUSEI_CAMP]`, `bg_09 [C_STADIUM]`, ...).\n\n  functions   317 / 730\n  .text bytes 11,136 / 228,624  (4.9%)\n\nVerify:\n\n    make MODULE=rel_field HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_field\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_story": [
-  "feat(rel_story): 333 of 640 functions matched",
-  "Story mode / event scenes.\n\n  functions   333 / 640\n  .text bytes 10,556 / 88,840  (11.9%)\n\nVerify:\n\n    make MODULE=rel_story HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_story\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_cutin_viewer": [
-  "feat(rel_cutin_viewer): 124 of 314 functions matched",
-  "Character cut-in viewer (`cutin_*.ehp`, `.tmt.gz` models).\n\n  functions   124 / 314\n  .text bytes 6,120 / 117,500  (5.2%)\n\nVerify:\n\n    make MODULE=rel_cutin_viewer HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_cutin_viewer\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_decktutorial": [
-  "feat(rel_decktutorial): 87 of 354 functions matched",
-  "Guided deck-building tutorial.\n\n  functions   87 / 354\n  .text bytes 5,520 / 137,696  (4.0%)\n\nVerify:\n\n    make MODULE=rel_decktutorial HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_decktutorial\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_deck": [
-  "feat(rel_deck): 101 of 404 functions matched",
-  "Deck editor (loads `duelsys/CARD_Link.bin`).\n\n  functions   101 / 404\n  .text bytes 4,860 / 148,136  (3.3%)\n\nVerify:\n\n    make MODULE=rel_deck HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_deck\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_deckswap": [
-  "feat(rel_deckswap): 61 of 245 functions matched",
-  "Deck swap/share.\n\n  functions   61 / 245\n  .text bytes 4,624 / 98,028  (4.7%)\n\nVerify:\n\n    make MODULE=rel_deckswap HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_deckswap\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_select_card": [
-  "feat(rel_select_card): 64 of 248 functions matched",
-  "Shared card picker used by rental, convert machine and the title menu.\n\n  functions   64 / 248\n  .text bytes 4,472 / 99,404  (4.5%)\n\nVerify:\n\n    make MODULE=rel_select_card HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_select_card\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_tutoriallist": [
-  "feat(rel_tutoriallist): 22 of 31 functions matched",
-  "Tutorial index menu (`database/tutoriallist.ehp`).\n\n  functions   22 / 31\n  .text bytes 3,256 / 10,620  (30.7%)\n\nVerify:\n\n    make MODULE=rel_tutoriallist HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_tutoriallist\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_shop": [
-  "feat(rel_shop): 71 of 254 functions matched",
-  "Card shop.\n\n  functions   71 / 254\n  .text bytes 3,016 / 105,164  (2.9%)\n\nVerify:\n\n    make MODULE=rel_shop HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_shop\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_duel_mgr": [
-  "feat(rel_duel_mgr): 54 of 228 functions matched",
-  "Duel setup & flow: jyanken (turn order), win/lose/draw screens.\n\n  functions   54 / 228\n  .text bytes 2,996 / 94,100  (3.2%)\n\nVerify:\n\n    make MODULE=rel_duel_mgr HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_duel_mgr\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_tutorial": [
-  "feat(rel_tutorial): 98 of 190 functions matched",
-  "In-duel tutorial driver (`tuto_field_%02d.ydq`, `tuto_cmd_%02d.bin`).\n\n  functions   98 / 190\n  .text bytes 2,772 / 26,740  (10.4%)\n\nVerify:\n\n    make MODULE=rel_tutorial HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_tutorial\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_movie_viewer": [
-  "feat(rel_movie_viewer): 15 of 16 functions matched",
-  "`movie/` .pmf player.\n\n  functions   15 / 16\n  .text bytes 1,764 / 2,228  (79.2%)\n\nVerify:\n\n    make MODULE=rel_movie_viewer HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_movie_viewer\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_umd_replace": [
-  "feat(rel_umd_replace): 33 of 76 functions matched",
-  "Previous-UMD recognition: disc IDs for Tag Force 1-4 across EU/JP/US.\n\n  functions   33 / 76\n  .text bytes 1,716 / 14,860  (11.5%)\n\nVerify:\n\n    make MODULE=rel_umd_replace HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_umd_replace\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_duelrecord": [
-  "feat(rel_duelrecord): 22 of 47 functions matched",
-  "Duel record / stats screen.\n\n  functions   22 / 47\n  .text bytes 1,708 / 18,776  (9.1%)\n\nVerify:\n\n    make MODULE=rel_duelrecord HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_duelrecord\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_labo": [
-  "feat(rel_labo): 12 of 14 functions matched",
-  "The \"Labo\" hub menu \u2014 launches password, rental, trade, convert, deckswap, album, duelist list, ranking, limit list, tutorial, partner select, voice & subtitle.\n\n  functions   12 / 14\n  .text bytes 1,704 / 4,840  (35.2%)\n\nVerify:\n\n    make MODULE=rel_labo HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_labo\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_html_view": [
-  "feat(rel_html_view): 15 of 16 functions matched",
-  "In-game browser: Konami's TF5 download page + `/PSP/SAVEDATA/`.\n\n  functions   15 / 16\n  .text bytes 1,584 / 1,888  (83.9%)\n\nVerify:\n\n    make MODULE=rel_html_view HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_html_view\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_soundtest": [
-  "feat(rel_soundtest): 9 of 12 functions matched",
-  "Sound test (`database/soundtest.ehp`).\n\n  functions   9 / 12\n  .text bytes 1,564 / 5,608  (27.9%)\n\nVerify:\n\n    make MODULE=rel_soundtest HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_soundtest\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_title": [
-  "feat(rel_title): 45 of 618 functions matched",
-  "Title screen + options; 6 language message files.\n\n  functions   45 / 618\n  .text bytes 1,548 / 278,520  (0.6%)\n\nVerify:\n\n    make MODULE=rel_title HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_title\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_debug_menu": [
-  "feat(rel_debug_menu): 20 of 44 functions matched",
-  "Developer menu: region select, \"clear all data\", \"get all card\", \"demonstration\".\n\n  functions   20 / 44\n  .text bytes 1,292 / 16,408  (7.9%)\n\nVerify:\n\n    make MODULE=rel_debug_menu HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_debug_menu\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_limitlist": [
-  "feat(rel_limitlist): 18 of 70 functions matched",
-  "Forbidden & limited card list.\n\n  functions   18 / 70\n  .text bytes 1,048 / 22,648  (4.6%)\n\nVerify:\n\n    make MODULE=rel_limitlist HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_limitlist\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_charalist": [
-  "feat(rel_charalist): 29 of 120 functions matched",
-  "Duelist list: portraits, bustups, voice test.\n\n  functions   29 / 120\n  .text bytes 1,032 / 36,240  (2.8%)\n\nVerify:\n\n    make MODULE=rel_charalist HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_charalist\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_conv_machine": [
-  "feat(rel_conv_machine): 26 of 62 functions matched",
-  "Card Convert Machine (`labo/conv_machine.ehp`).\n\n  functions   26 / 62\n  .text bytes 1,032 / 13,996  (7.4%)\n\nVerify:\n\n    make MODULE=rel_conv_machine HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_conv_machine\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_gallery": [
-  "feat(rel_gallery): 34 of 98 functions matched",
-  "Movie gallery (`TF5_opening`, `TF5_staffroll`, +USA variants).\n\n  functions   34 / 98\n  .text bytes 1,028 / 17,740  (5.8%)\n\nVerify:\n\n    make MODULE=rel_gallery HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_gallery\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_cardalbum": [
-  "feat(rel_cardalbum): 16 of 82 functions matched",
-  "Card album browser.\n\n  functions   16 / 82\n  .text bytes 856 / 28,340  (3.0%)\n\nVerify:\n\n    make MODULE=rel_cardalbum HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_cardalbum\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_recipeviewer": [
-  "feat(rel_recipeviewer): 19 of 96 functions matched",
-  "Deck recipe viewer (`deck/recipe_view.ehp`).\n\n  functions   19 / 96\n  .text bytes 692 / 35,564  (1.9%)\n\nVerify:\n\n    make MODULE=rel_recipeviewer HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_recipeviewer\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
- ],
- "mod-rel_password": [
-  "feat(rel_password): 11 of 41 functions matched",
-  "Password machine \u2014 nixie-tube display (`nixi.ehf`), `labo/password.ehp`.\n\n  functions   11 / 41\n  .text bytes 432 / 14,264  (3.0%)\n\nVerify:\n\n    make MODULE=rel_password HYBRID=1        # rebuilds .text byte-for-byte\n    scripts/check_regressions.py rel_password\n\nEvery function in this file compiled with mwccpsp and diffed byte-identical\nagainst the shipped module. The baseline entry added here is the list of their\nnames, so any later regression names exactly what broke."
  ]
 }''')
+
+
+# Module PR bodies are COMPUTED, not stored. An earlier version froze each
+# module's match count into this file, which meant the stack quietly advertised
+# stale numbers the moment anything new matched — while docs/22 promised it is
+# always regenerated. The counts come from the committed baseline and the
+# shipped assembly, so they cannot disagree with what the branch actually
+# carries. Sizes come from asm/<module>/text.s directly: no compiling needed.
+def module_sizes(module):
+    """{function: size in bytes} for every function in the shipped module."""
+    path = os.path.join(ROOT, "asm", module, "text.s")
+    out, cur, words = {}, None, 0
+    if not os.path.exists(path):
+        return out
+    for line in open(path, errors="replace"):
+        m = re.match(r"glabel (\w+)", line)
+        if m:
+            cur, words = m.group(1), 0
+        elif cur and re.match(r"\s*/\* [0-9A-F]+ ", line):
+            words += 1
+        elif cur and line.startswith("endlabel"):
+            out[cur] = words * 4
+            cur = None
+    return out
+
+
+def module_descriptions():
+    """The one-line 'what it is' column from the survey index."""
+    out = {}
+    path = os.path.join(ROOT, "docs/modules/README.md")
+    if not os.path.exists(path):
+        return out
+    for line in open(path):
+        m = re.match(r"\| `(rel_\w+)` \| 0x[0-9A-F]+ \|.*?\|\s*([^|]+?)\s*\|\s*$", line)
+        if m:
+            out[m.group(1)] = re.sub(r"\*\*|\(\d+/\d+ matched\)", "", m.group(2)).strip()
+    return out
+
+
+def module_body(module, matched):
+    sizes = module_sizes(module)
+    got = [f for f in matched if f in sizes]
+    fn, fnt = len(got), len(sizes)
+    by, byt = sum(sizes[f] for f in got), sum(sizes.values())
+    desc = module_descriptions().get(module, "")
+    desc = (desc[0].upper() + desc[1:]) if desc else module
+    pct = (100.0 * by / byt) if byt else 0.0
+    return (f"feat({module}): {fn} of {fnt} functions matched",
+            f"""{desc}.
+
+  functions   {fn} / {fnt}
+  .text bytes {by:,} / {byt:,}  ({pct:.1f}%)
+
+Verify:
+
+    make MODULE={module} HYBRID=1        # rebuilds .text byte-for-byte
+    scripts/check_regressions.py {module}
+
+Every function in this file compiled with mwccpsp and diffed byte-identical
+against the shipped module. The baseline entry added here is the list of their
+names, so any later regression names exactly what broke.""")
 
 
 def classify(files):
@@ -261,7 +210,8 @@ def main():
 
     files = git("diff", "--name-only", f"{UPSTREAM}...HEAD").split()
     assign = classify(files)
-    missing = [b for b in branch_order(assign) if b not in BODIES]
+    missing = [b for b in branch_order(assign)
+               if b not in BODIES and not b.startswith("mod-")]
     if missing:
         sys.exit(f"no commit message defined for: {missing}")
 
@@ -282,7 +232,8 @@ def main():
                           fh, indent=1)
                 fh.write("\n")
             git("add", "config/progress-baseline.json")
-        subject, body = BODIES[name]
+        subject, body = (module_body(name[4:], cumulative.get(name[4:], []))
+                         if name.startswith("mod-") else BODIES[name])
         git("commit", "-q", "-m", subject, "-m", body + TRAILER)
         made.append((branch, git("rev-parse", "--short", "HEAD").strip(), len(group)))
         base = branch
