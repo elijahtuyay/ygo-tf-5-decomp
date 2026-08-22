@@ -814,12 +814,61 @@ def candidate_source(decls, body):
     return PRELUDE + "\n" + "\n".join(pointer_returns(decls, body)) + "\n\n" + body + "\n"
 
 
+# mwcc reports an implicit conversion with everything needed to repair it: the
+# line number, the offending source line, and both types.
+#
+#   #      34: var_a3 = &D_0032541C;
+#   #   Error:                     ^
+#   #   illegal implicit conversion from 'int *' to
+#   #   'int'
+#
+# m2c gets these wrong constantly because it infers a local's type from one use
+# and then assigns something else to it. The repair is to cast the right-hand
+# side to the type mwcc asks for. That is codegen-neutral — an int/pointer cast
+# emits no instruction on MIPS, the value already sits in a register either way
+# — so it fixes the type checker without changing what we are trying to match.
+CONVERSION = re.compile(
+    r"#\s+(\d+):\s(.*)\n#\s+Error:.*\n#\s+illegal implicit conversion from '[^']*' to\s*\n#\s+'([^']*)'")
+
+
+def repair_conversions(src, output):
+    """Cast the RHS of each mis-typed assignment to the type mwcc named."""
+    lines = src.split("\n")
+    fixed = 0
+    for m in CONVERSION.finditer(output):
+        n, text, want = int(m.group(1)), m.group(2), m.group(3).strip()
+        if not (1 <= n <= len(lines)) or lines[n - 1].strip() != text.strip():
+            continue                      # line numbers drifted; do not guess
+        # only plain `lhs = rhs;` — compound assignment would change semantics
+        eq = re.match(r"^(\s*[\w\[\]\.\->\*\(\) ]+?)\s=\s(.+);\s*$", lines[n - 1])
+        if not eq or "==" in lines[n - 1] or f"({want})" in eq.group(2):
+            continue
+        lines[n - 1] = f"{eq.group(1)} = ({want})({eq.group(2)});"
+        fixed += 1
+    return "\n".join(lines) if fixed else None
+
+
+def compile_candidate(fn, src, workdir, flags, repairs=6):
+    """Compile, and let the compiler's own diagnostics repair the draft.
+
+    Bounded: each pass must fix at least one line or the loop stops, so a draft
+    the compiler cannot explain costs one extra compile, not six."""
+    for _ in range(repairs + 1):
+        open(os.path.join(workdir, f"{fn}.c"), "w").write(src)
+        r = subprocess.run([WIBO, MWCC, "-c", *flags, "-o", f"{fn}.o", f"{fn}.c"],
+                           capture_output=True, text=True, cwd=workdir)
+        if r.returncode == 0:
+            return True
+        repaired = repair_conversions(src, r.stdout + r.stderr)
+        if not repaired:
+            return False
+        src = repaired
+    return False
+
+
 def try_candidate(module, fn, decls, body, workdir, flags=None):
     src = candidate_source(decls, body)
-    open(os.path.join(workdir, f"{fn}.c"), "w").write(src)
-    r = subprocess.run([WIBO, MWCC, "-c", *(flags or FLAGS), "-o", f"{fn}.o", f"{fn}.c"],
-                       capture_output=True, text=True, cwd=workdir)
-    if r.returncode != 0:
+    if not compile_candidate(fn, src, workdir, list(flags or FLAGS)):
         return None, "compile-error"
     d = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
                         os.path.join(ROOT, "asm", module, "text.s"),

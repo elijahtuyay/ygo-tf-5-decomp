@@ -113,15 +113,19 @@ def main():
             if "M2C_W" in body:
                 body = body.replace("M2C_W", A.FIELD_WIDTHS[0])
             src = A.candidate_source(decls, body)
+            # Measure what the PIPELINE compiles, repair loop included. Running a
+            # bare single compile here made this census report the gate-1 rate of
+            # a draft auto_decomp.py had already stopped building.
+            tried += 1
+            if A.compile_candidate(fn, src, work, list(A.FLAGS)):
+                compiled += 1
+                counts["(compiles)"] += 1
+                continue
+            # residual failure: recompile once, unrepaired, to classify it
             open(os.path.join(work, f"{fn}.c"), "w").write(src)
             r = subprocess.run([A.WIBO, A.MWCC, "-c", *A.FLAGS,
                                 "-o", f"{fn}.o", f"{fn}.c"],
                                capture_output=True, text=True, cwd=work)
-            tried += 1
-            if r.returncode == 0:
-                compiled += 1
-                counts["(compiles)"] += 1
-                continue
             err = first_error(r.stdout + r.stderr)
             counts[err] += 1
             if args.show and args.show.lower() in err.lower() and shown < 3:
