@@ -94,12 +94,81 @@ def load(module):
     return out
 
 
+# Structural features of the TARGET, not of our draft. A ranked list says which
+# functions are close; it does not say what they have in common, and the lever
+# is almost always a property of the shape rather than of any one function.
+# rel_duel_eng's +6w near-misses turned out to be 46% tail calls against a 9%
+# base rate — invisible until the rows were grouped.
+SHAPES = [
+    ("tail-call", re.compile(r"\bj\s+func_[0-9A-F]+")),
+    ("ext/ins", re.compile(r"\b(ext|ins)\s+\$")),
+    ("jump-table", re.compile(r"jtbl_[0-9A-F]+")),
+    ("float", re.compile(r"\b(lwc1|swc1|add\.s|mul\.s|div\.s|cvt\.|mfc1|mtc1)\b")),
+    ("vfpu", re.compile(r"\bv[a-z0-9_]+\.[sqpt]\b")),
+    ("multiple-return", re.compile(r"\bjr\s+\$ra\b[\s\S]*\bjr\s+\$ra\b")),
+]
+_BODIES = {}
+
+
+def target_shapes(module, fn):
+    """Which structural features the shipped function has. Empty if unknown."""
+    if module not in _BODIES:
+        path = os.path.join(ROOT, "asm", module, "text.s")
+        bodies = {}
+        if os.path.exists(path):
+            for m in re.finditer(r"^glabel (func_[0-9A-F]+)\n(.*?)^endlabel",
+                                 open(path, errors="replace").read(), re.M | re.S):
+                bodies[m.group(1)] = m.group(2)
+        _BODIES[module] = bodies
+    body = _BODIES[module].get(fn)
+    if body is None:
+        return ()
+    return tuple(name for name, rx in SHAPES if rx.search(body)) or ("plain",)
+
+
+def families(rows, base_rate):
+    """Group near-misses by (closeness label, target shape), biggest first."""
+    import collections
+    grp = collections.Counter()
+    for score, label, module, fn, words in rows:
+        for shape in target_shapes(module, fn) or ("unknown",):
+            grp[(label, shape)] += 1
+    print(f"{'closeness':<12}{'target shape':<18}{'count':>7}  {'vs base rate':>12}")
+    for (label, shape), n in grp.most_common(25):
+        br = base_rate.get(shape)
+        note = f"{n_pct(n, label, grp):.0f}% vs {br:.0f}%" if br is not None else ""
+        print(f"{label:<12}{shape:<18}{n:>7}  {note:>12}")
+
+
+def n_pct(n, label, grp):
+    tot = sum(v for (l, _), v in grp.items() if l == label)
+    return 100.0 * n / tot if tot else 0.0
+
+
+def module_base_rates(mods):
+    """How common each shape is across ALL functions — the null hypothesis.
+
+    Without it an enrichment is unreadable: 46% tail calls means nothing until
+    you know the module is 9% tail calls to begin with."""
+    import collections
+    c, tot = collections.Counter(), 0
+    for m in mods:
+        target_shapes(m, "")           # prime the cache
+        for fn in _BODIES.get(m, {}):
+            tot += 1
+            for s in target_shapes(m, fn):
+                c[s] += 1
+    return {s: 100.0 * n / tot for s, n in c.items()} if tot else {}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("modules", nargs="*")
     ap.add_argument("--max-delta", type=int, default=None,
                     help="only rows this close (word delta or diff count)")
     ap.add_argument("--top", type=int, default=40)
+    ap.add_argument("--families", action="store_true",
+                    help="group by target shape instead of listing functions")
     a = ap.parse_args()
 
     mods = a.modules
@@ -124,6 +193,10 @@ def main():
     compile_errors = sum(1 for r in rows if r[1] == "compile")
     print(f"{len(rows)} unmatched functions with a recorded verdict "
           f"({compile_errors} do not compile, {len(rows) - compile_errors} do)\n")
+    if a.families:
+        real = sorted({r[2] for r in shown})
+        families(shown, module_base_rates(real))
+        return
     print(f"{'closeness':<12}{'words':>6}  function")
     for _, label, module, fn, words in shown[:a.top]:
         print(f"{label:<12}{words:>6}  {module}/{fn}")
