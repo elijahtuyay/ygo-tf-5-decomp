@@ -50,6 +50,28 @@
    "func_00008D80",
    "func_00008D88"
   ],
+  "rel_debug_menu": [
+   "func_00000000",
+   "func_00000264",
+   "func_0000026C",
+   "func_00000BE4",
+   "func_00000C04",
+   "func_00000C38",
+   "func_00000C78",
+   "func_00000CE4",
+   "func_000015AC",
+   "func_00001B84",
+   "func_00001BBC",
+   "func_00001C18",
+   "func_00001D84",
+   "func_00002044",
+   "func_0000206C",
+   "func_0000289C",
+   "func_000028BC",
+   "func_00002D44",
+   "func_00003B64",
+   "func_00003B84"
+  ],
   "rel_gallery": [
    "func_00000150",
    "func_00000228",
