@@ -19,6 +19,26 @@
    "func_00006800",
    "func_00006A84"
   ],
+  "rel_limitlist": [
+   "func_00000000",
+   "func_000009E0",
+   "func_00000B30",
+   "func_00000B50",
+   "func_00001484",
+   "func_00001CC8",
+   "func_00001D14",
+   "func_00001DB4",
+   "func_00001E9C",
+   "func_00002BC8",
+   "func_000034C8",
+   "func_00003540",
+   "func_000037F0",
+   "func_00003B18",
+   "func_00003BA8",
+   "func_00003C1C",
+   "func_00003DC0",
+   "func_00005790"
+  ],
   "rel_movie_viewer": [
    "func_00000000",
    "func_00000034",
