@@ -241,7 +241,7 @@ def main():
         print(f"{module}: nothing new ({len(have)} already present)")
         return
 
-    added = 0
+    added, rejects = 0, []
     for e in todo:
         before = open(path).read()
         names = defined_in(before) | {e["func"]}
@@ -252,7 +252,7 @@ def main():
         alt = reconcile_return_type(before, e["src"], e["func"])
         if alt:
             variants.append({**e, "src": alt})
-        done = False
+        done, last = False, None
         for cand in variants:
             for flavour in flavours:
                 decls = block_decls(cand["src"], symtab, flavour, cand["func"]) if flavour else []
@@ -263,10 +263,31 @@ def main():
                     done = True
                     break
                 open(path, "w").write(before)  # roll back, try the next flavour
+                last = bad
             if done:
                 break
+        if not done:
+            rejects.append((e["func"], last))
     print(f"{module}: added {added} of {len(todo)} candidates "
           f"({len(defined_in(open(path).read()))} now in file)")
+
+    # Name the rejects and say what happened. A candidate that verified ALONE in
+    # auto_decomp but fails once inserted is not noise: it means the file's
+    # context changed its codegen, which is a lever, not a dead end. Reporting
+    # only a count hides that entirely.
+    if rejects:
+        broke = [(f, b) for f, b in rejects if b]
+        nocomp = [f for f, b in rejects if b is None]
+        if nocomp:
+            print(f"  {len(nocomp)} did not compile in context: "
+                  + ", ".join(nocomp[:8]) + (" ..." if len(nocomp) > 8 else ""))
+        for f, b in broke[:8]:
+            others = [x for x in b if x != f]
+            print(f"  {f}: rolled back — "
+                  + (f"itself no longer matched" if not others
+                     else f"broke {len(others)} neighbour(s): {', '.join(others[:4])}"))
+        if len(broke) > 8:
+            print(f"  ... and {len(broke) - 8} more")
 
 
 if __name__ == "__main__":
