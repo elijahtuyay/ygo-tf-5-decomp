@@ -1,0 +1,1098 @@
+#!/usr/bin/env python3
+"""
+Automated per-function matching loop — the rel_movie_viewer process, mechanised.
+
+    scripts/auto_decomp.py rel_gallery                 # whole module
+    scripts/auto_decomp.py rel_gallery --max-words 24  # only small functions
+    scripts/auto_decomp.py rel_gallery --only func_00000123
+
+For every function in a module it: slices the function out of splat's text.s,
+asks m2c for a draft, rewrites the draft through a series of source shapes that
+are known to change MWCC's codegen, compiles each candidate with the real
+compiler, and keeps a candidate ONLY if scripts/mwcc_diff.py reports a
+byte-identical match. Nothing unverified is ever recorded as matched.
+
+Results go to build/auto/<module>.matched.json (verified source, per function)
+and build/auto/<module>.json (every function's status, so a human knows where to
+start on the rest).
+
+The shape list is the accumulated knowledge from the two modules matched by
+hand — see the file headers of src/rel_movie_viewer.c and src/rel_html_view.c
+for why each one exists. Add to SHAPES as new levers are found; every module run
+afterwards benefits.
+"""
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MWCC = os.path.join(ROOT, "tools/mwccpsp_3.0.1_219/mwccpsp.exe")
+WIBO = os.path.join(ROOT, "tools/wibo-bin/wibo")
+FLAGS = ["-O4,s", "-sdatathreshold", "0"]
+
+# Most of the game is -O4,s, but not all of it. rel_title contains functions that
+# only match at -O2,s: level 3 is where MWCC turns on instruction scheduling, so a
+# target with an UNFILLED branch delay slot cannot have been built at -O4. A module
+# is linked from several translation units and they were not all compiled alike, so
+# each candidate is tried at both levels.
+FLAG_SETS = [["-O4,s", "-sdatathreshold", "0"],
+             ["-O2,s", "-sdatathreshold", "0"]]
+
+# m2c writes its output in terms of these; MWCC has no stdint and no m2c header.
+PRELUDE = """typedef signed char s8;
+typedef unsigned char u8;
+typedef short s16;
+typedef unsigned short u16;
+typedef int s32;
+typedef unsigned int u32;
+typedef long long s64;
+typedef unsigned long long u64;
+typedef float f32;
+typedef double f64;
+#define NULL 0
+#define M2C_UNK int
+"""
+
+
+# ---------------------------------------------------------------- asm slicing
+def load_functions(module):
+    """[(name, [asm lines], word count)] in address order."""
+    path = os.path.join(ROOT, "asm", module, "text.s")
+    funcs, cur, lines = [], None, []
+    for line in open(path, errors="replace"):
+        m = re.match(r"glabel (\w+)", line)
+        if m:
+            cur, lines = m.group(1), [line]
+            continue
+        if cur:
+            lines.append(line)
+            if line.startswith("endlabel"):
+                words = sum(1 for l in lines if re.match(r"\s*/\* [0-9A-F]+ ", l))
+                funcs.append((cur, lines, words))
+                cur = None
+    return funcs
+
+
+def symbols(module):
+    """Every name the linker knows about, so trials can declare what they use."""
+    out = {}
+    p = os.path.join(ROOT, "config/symbols", module + ".txt")
+    if os.path.exists(p):
+        for line in open(p):
+            m = re.match(r"(\w+) = 0x([0-9A-Fa-f]+);(.*)", line)
+            if m:
+                out[m.group(1)] = "func" if "type:func" in m.group(3) else "data"
+    return out
+
+
+# Global types measured across the WHOLE module by scripts/gen_types.py, rather
+# than guessed per function. 95% of named globals are accessed at exactly one
+# width everywhere they appear, so the type is already decided by the binary.
+# This matters most for big functions: the number of independent type decisions
+# grows with size (median 3 at <=20 instructions, 22 above 160), and a function
+# only matches if EVERY one is right, which is why the match rate collapses from
+# 11% to 0% across that range. Using the measured type removes the guess.
+_TYPE_CACHE = {}
+
+
+def measured_types(module):
+    if module in _TYPE_CACHE:
+        return _TYPE_CACHE[module]
+    out = {}
+    path = os.path.join(ROOT, "include/globals", module + ".h")
+    if os.path.exists(path):
+        for line in open(path):
+            m = re.match(r"extern (\w+) (\w+);", line)
+            if m:
+                out[m.group(2)] = m.group(1)
+    _TYPE_CACHE[module] = out
+    return out
+
+
+
+# Width of a named global as used by THIS function. scripts/gen_types.py decides
+# a type from every access across the module and deliberately declines when the
+# module disagrees with itself — a global accessed as both a byte and a halfword
+# is usually two fields sharing a base. Declining is right at module scope but
+# useless here: the function in front of us uses exactly one width, and its own
+# instructions say which. This recovers the ambiguous cases (66 globals, but
+# they appear in far more functions) that would otherwise fall back to `char`
+# and emit `sb` where the target has `sh`.
+LOCAL_GLOBAL_ACCESS = re.compile(
+    r"\*/\s+(l[bhw]u?|s[bhw]|lwc1|swc1)\s+\$\w+,\s*%lo\(([A-Za-z_]\w*)\)")
+LOCAL_WIDTH_TYPE = {"lb": "char", "lbu": "unsigned char", "sb": "unsigned char",
+                    "lh": "short", "lhu": "unsigned short", "sh": "unsigned short",
+                    "lw": "int", "sw": "int", "lwc1": "float", "swc1": "float"}
+
+
+def local_global_types(asm_lines):
+    """{global: C type} from the widths this one function uses."""
+    seen = {}
+    for line in asm_lines:
+        m = LOCAL_GLOBAL_ACCESS.search(line)
+        if not m:
+            continue
+        t = LOCAL_WIDTH_TYPE.get(m.group(1))
+        if t is None:
+            continue
+        prev = seen.get(m.group(2))
+        if prev is None:
+            seen[m.group(2)] = t
+        elif prev != t:
+            seen[m.group(2)] = None          # even locally inconsistent: give up
+    return {k: v for k, v in seen.items() if v}
+
+def referenced(asm_lines, symtab, self_name=None, data_type="char", types=None):
+    """Declarations a candidate needs: imports it calls, globals it touches.
+
+    m2c decides on its own whether a global is used as a scalar or a pointer, so
+    a single declaration flavour cannot satisfy every draft — the caller retries
+    with each of DATA_FLAVOURS until one compiles."""
+    # module-wide measured types first, then this function's own usage for the
+    # globals the module could not decide
+    types = dict(local_global_types(asm_lines), **{k: v for k, v in (types or {}).items()})
+    text = "".join(asm_lines)
+    names = set(re.findall(r"\b\w+\b", text))
+    decls = []
+    for n in sorted(names & set(symtab)):
+        decls.append(f"extern int {n}();" if symtab[n] == "func" else f"extern {data_type} {n};")
+    for n in sorted(set(re.findall(r"\b(?:D|jtbl)_[0-9A-F]{4,8}\b", text))):
+        if n not in symtab:
+            decls.append(f"extern {(types or {}).get(n, data_type)} {n};")
+    for n in sorted(set(re.findall(r"\bfunc_[0-9A-F]{8}\b", text))):
+        if n != self_name:                     # never re-declare the function we define
+            decls.append(f"extern int {n}();")
+    return [d for d in decls if f" {self_name}(" not in d and f" {self_name};" not in d]
+
+
+ASM_HEADER = '.include "macro.inc"\n\n.set noat\n.set noreorder\n\n.section .text, "ax"\n\n'
+
+
+EXT_RE = re.compile(
+    r"^(?P<pre>.*?)\b(?P<op>ext)\s+\$(?P<rd>\w+),\s*\$(?P<rs>\w+),\s*"
+    r"(?P<pos>\d+),\s*(?P<size>\d+)\s*$")
+
+
+def rewrite_ext(lines):
+    """Rewrite Allegrex `ext` into the shift pair that means the same thing.
+
+    m2c's MIPS backend has no `ext`/`ins`: they are MIPS32r2, and m2c targets
+    the N64 and PS2. Handed one, it does not error — it silently drops the
+    value, which is far worse. func_000404DC is a textbook LCG and m2c rendered
+    the whole return as `return 0;`.
+
+    `ext rd, rs, pos, size` takes `size` bits starting at `pos`, which is
+    exactly:
+
+        sll rd, rs, 32 - pos - size
+        srl rd, rd, 32 - size
+
+    Shifts rather than `srl` + `andi`, because an `andi` immediate is 16 bits
+    and a field can be wider than that. This is ONLY for the copy handed to
+    m2c — the draft it produces is compiled and byte-compared against the real
+    target as usual, and MWCC re-emits a single `ext` from the C. Nothing in
+    the build sees the rewrite.
+
+    1,703 unmatched functions contain `ext` or `ins`, 1,463 of them in
+    rel_duel_eng, so this is not a niche case.
+    """
+    out = []
+    for line in lines:
+        m = EXT_RE.match(line.rstrip("\n"))
+        if not m:
+            out.append(line)
+            continue
+        pos, size = int(m.group("pos")), int(m.group("size"))
+        if pos + size > 32 or size < 1:
+            out.append(line)
+            continue
+        rd, rs = m.group("rd"), m.group("rs")
+        first = f"    sll        ${rd}, ${rs}, {32 - pos - size}\n"
+        second = f"    srl        ${rd}, ${rd}, {32 - size}\n"
+        # An `ext` in a BRANCH DELAY SLOT cannot simply become two lines: the
+        # second would land after the branch has been taken, and m2c would drop
+        # it — which is how func_000404DC came back as `temp_v1 * 2` instead of
+        # its LCG return. Hoist the pair above the jump instead and leave a nop
+        # in the slot. Same effect, since a delay-slot instruction executes
+        # before the transfer completes.
+        if out and _is_branch(out[-1]):
+            jump = out.pop()
+            out += [first, second, jump, "     nop\n"]
+        else:
+            out += [first, second]
+    return out
+
+
+BRANCH_RE = re.compile(
+    r"\*/\s+(j|jr|jal|jalr|b|beq|bne|beql|bnel|blez|bgtz|bltz|bgez|beqz|bnez"
+    r"|blezl|bgtzl|bltzl|bgezl|bc1t|bc1f|bc1tl|bc1fl)\b")
+
+
+def _is_branch(line):
+    return bool(BRANCH_RE.search(line))
+
+
+def slice_path(module, fn, lines, workdir):
+    """m2c re-parses whatever .s you hand it, so give it ONE function. On
+    rel_duel_eng (3 MB of text.s, 7487 functions) parsing the whole file per
+    function would dominate the runtime."""
+    p = os.path.join(workdir, f"{fn}.s")
+    open(p, "w").write(ASM_HEADER + "".join(rewrite_ext(lines)))
+    return p
+
+
+def canonicalise_bitfield(src):
+    """Put a shift-pair back into the form MWCC compiles to a single `ext`.
+
+    rewrite_ext() hands m2c `sll` + `srl` because m2c cannot read `ext`, and m2c
+    faithfully renders that pair as `(u32) (x * 2) >> 0x11`. That is correct C
+    and it is the wrong SHAPE: MWCC emits the two shifts back, so the candidate
+    comes out two words long. Written the way a person would write it —
+    `(x >> 16) & 0x7FFF` — MWCC emits one `ext` and the function matches.
+
+    For `(x << a) >> b` taking the top `32 - b` bits starting at `b - a`:
+
+        (x >> (b - a)) & ((1 << (32 - b)) - 1)
+    """
+    def repl(m):
+        expr, mul, shift = m.group("expr"), m.group("mul"), m.group("shift")
+        a = int(mul, 0)
+        if m.group("op") == "*":
+            if a < 2 or (a & (a - 1)):
+                return m.group(0)         # not a power of two; leave it alone
+            a = a.bit_length() - 1
+        b = int(shift, 0)
+        if not 0 < b < 32 or a > b:
+            return m.group(0)
+        pos, size = b - a, 32 - b
+        mask = (1 << size) - 1
+        inner = expr if pos == 0 else f"({expr} >> {pos})"
+        return f"({inner} & 0x{mask:X})"
+
+    return re.sub(
+        r"\(u32\)\s*\((?P<expr>[^()]+?)\s*(?P<op>\*|<<)\s*(?P<mul>0x[0-9a-fA-F]+|\d+)\)"
+        r"\s*>>\s*(?P<shift>0x[0-9a-fA-F]+|\d+)",
+        repl, src)
+
+
+# ------------------------------------------------------------------ m2c draft
+def m2c_draft(module, fn, ctx_path=None, asm_path=None):
+    r = subprocess.run(
+        [sys.executable, os.path.join(ROOT, "tools/m2c/m2c.py"), "-f", fn]
+        + (["--context", ctx_path] if ctx_path else [])
+        + [asm_path or os.path.join(ROOT, "asm", module, "text.s")],
+        capture_output=True, text=True, cwd=ROOT)
+    if r.returncode != 0:
+        return None
+    # keep everything from the function's definition line onward; m2c prints a
+    # block of guessed prototypes above it, and we supply our own declarations
+    lines = r.stdout.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if re.search(rf"\b{fn}\s*\(", line) and "{" in line:
+            start = i
+            break
+    if start is None:
+        return None
+    body = lines[start:]
+    src = "\n".join(body).strip()
+    if not src or f"{fn}(" not in src:
+        return None
+    # m2c writes unknown types as '?'; make them compilable
+    src = re.sub(r"\?\s*\*", "int *", src)   # int* not void*: m2c dereferences these
+    src = re.sub(r"(?<![\w*])\?(?!\w)", "int", src)
+    src = src.replace("static ", "")
+    # --valid-syntax marks what m2c could not infer; make those compile. A
+    # function containing M2C_ERROR is usually unmatchable anyway (m2c read an
+    # unset register), but it costs nothing to let the compiler judge.
+    src = re.sub(r"M2C_ERROR\([^)]*\)", "0", src)
+    src = src.replace("M2C_UNK", "int")
+    src = canonicalise_bitfield(src)
+    # m2c renders a load from an address it knows nothing about as *(void *)addr,
+    # which is not a legal dereference; a word load is what the asm actually does
+    src = src.replace("*(void *)", "*(int *)").replace("*(void*)", "*(int *)")
+    # m2c writes unknown struct fields as `p->unk34`, which MWCC rejects because
+    # nothing declares that struct. Rewrite to an explicit byte offset — the same
+    # access the asm performs. This is the single biggest source of compile
+    # failures in rel_duel_eng (3527 of ~4900 attempts).
+    # The width is left as a placeholder rather than fixed at `int`: the access
+    # width is whatever the target's load instruction does, and guessing `lw`
+    # everywhere silently dooms every halfword and byte field. shape_field_width
+    # below tries the alternatives.
+    # m2c computes an address inside a global as `&D_0034E660 + (i * 0xB3C)`.
+    # That offset is in BYTES, but `&D_x` now has the global's measured type, so
+    # C scales it by the element size and the address is wrong — and assigning
+    # the result to a local is an illegal pointer/int conversion besides.
+    # Casting the base to int makes the arithmetic byte-accurate again and the
+    # result assignable; the arrow rewriter above re-casts to `char *` wherever
+    # the result is used as a base. Only `&D_x` followed by + or - is touched,
+    # so `func(&D_x)` keeps passing a real address.
+    src = re.sub(r"&((?:D|jtbl)_[0-9A-Fa-f]{4,8})(\s*[+-]\s)", r"((int)&\1)\2", src)
+    src = rewrite_arrow_fields(src)
+    src = fix_int_derefs(src)
+    # m2c also declares PARAMETERS `void *` when it thinks a register holds a
+    # pointer. The locals were retyped to int above; the parameters must follow
+    # or `arg0 + 0x30` is "illegal operands 'void *' + 'int'".
+    src = re.sub(r"\bvoid \*(arg\d+)\b", r"int \1", src)
+    # NOT DONE: rewriting a bare `*temp_v0` to `*(int *)temp_v0`. Tried, and it
+    # made compile failures WORSE (23 -> 29 on a fixed 60-function sample):
+    # m2c uses those names for genuine pointers too, and forcing the cast broke
+    # drafts that were already valid. Measured, reverted, recorded.
+
+    # m2c declares a temp `void *` when it thinks a register holds a pointer,
+    # then assigns it a plain int load (`temp = *(int *)0xB7AB0C;`), which MWCC
+    # rejects as an illegal implicit conversion. Both are 32 bits and live in
+    # the same register, so declaring the temp `int` makes every use legal —
+    # the later `(char *)temp + 0x10` is then an explicit cast, which is fine.
+    # This was the largest remaining compile failure for medium functions.
+    # ...and the same for any other pointer-typed local m2c invents (`int *sp4C`,
+    # `s32 *temp_v0`). It assigns int-returning calls and raw loads to these, so
+    # every one is an illegal implicit conversion. All are 32 bits in the same
+    # register, and the later uses are explicit casts, so `int` is safe.
+    src = re.sub(r"^(\s*)(?:void|[su]?\d*int|s8|u8|s16|u16|s32|u32|f32|char|short|long)\s*\*(\w+);\s*$",
+                 r"\1int \2;", src, flags=re.M)
+    # AFTER that retyping, not before. A local m2c declared `int *temp_s0` and
+    # dereferenced is legal C until the line above rewrites it to `int`, and
+    # only then does `*temp_s0` need a cast. Running this first sees the
+    # original pointer declaration, skips the name, and the retyping downstream
+    # leaves the dereference broken — which is exactly what happened.
+    src = fix_int_var_derefs(src)
+    src = cast_function_values(src)
+    # A call through a struct field arrives as `(*(int *)(...))(args)`, which is
+    # a call of a non-function. Cast it to a function pointer first.
+    # NOT ATTEMPTED: casting `(*(int *)(...))(args)` to a function pointer.
+    # The inner expression is parenthesised, and a regex cannot tell where it
+    # ends — a non-greedy match happily runs past the closing paren to a later
+    # `))(` on the same line and emits unbalanced output, breaking drafts that
+    # would otherwise compile. docs/11 already recorded this trap for the arrow
+    # form; it applies here too. Worth ~3 functions, needs a real parser.
+
+    # A field access through a dereferenced literal address, which m2c writes
+    # as `(*(int *)0xB7AB0C)->unk0`. Bounded enough to rewrite safely: the left
+    # side is exactly a dereferenced hex constant, so there is no paren
+    # ambiguity to get wrong.
+    src = re.sub(r"\(\*\(int \*\)(0x[0-9A-Fa-f]+)\)->unk_?([0-9A-Fa-f]+)",
+                 lambda m: f"(*(M2C_W *)((char *)*(int *){m.group(1)} + 0x{m.group(2)}))", src)
+    # And the mirror of the void*-temp fix: m2c loads through `*(void **)ADDR`
+    # for the same registers it declared `void *`. Those declarations are now
+    # `int`, so the loads must be `*(int *)` too or the conversion is illegal.
+    src = src.replace("*(void **)", "*(int *)")
+    # m2c also renders a field of a GLOBAL it believes is a struct with a dot,
+    # `D_00054BD0.unk10`, which MWCC rejects with "not a struct/union/class"
+    # because our declaration is a scalar. Same rewrite, taking the address
+    # instead of using the pointer. This is the single biggest compile failure
+    # for medium functions — 12 of 27 in a sample of 81-160 instruction drafts,
+    # where the arrow form barely appears.
+    src = re.sub(r"\b([A-Za-z_]\w*)\.unk_?([0-9A-Fa-f]+)",
+                 lambda m: f"(*(M2C_W *)((char *)&{m.group(1)} + 0x{m.group(2)}))", src)
+    # Only the simple `identifier->unkNN` case is rewritten. A parenthesised
+    # left-hand side needs balanced-paren handling that a regex cannot do safely —
+    # an earlier attempt produced unbalanced output and broke otherwise-valid
+    # drafts, so those are left for the compiler to reject.
+    return src
+
+
+
+# Field widths read from the target instead of guessed. m2c renders an unknown
+# struct field as `p->unkNN`; the width of that access is not a mystery — the
+# load or store the target performs at that offset states it exactly. Reading it
+# beats trying one global width for every field in the function, which can never
+# be right when a function touches both a byte field and a word field.
+OPCODE_TYPE = {"lb": "char", "lbu": "unsigned char", "lh": "short",
+               "lhu": "unsigned short", "lw": "int",
+               "sb": "unsigned char", "sh": "unsigned short", "sw": "int"}
+LOADSTORE = re.compile(r"\*/\s+(l[bhw]u?|s[bhw])\s+\$\w+,\s*(-?0x[0-9A-Fa-f]+|0)\(\$\w+\)")
+
+
+def field_widths(asm_lines):
+    """{byte offset: C type} for every field the target loads or stores.
+
+    An offset accessed at two different widths is ambiguous (two structs sharing
+    a base register) and is left out, so the caller falls back to the search."""
+    out = {}
+    for line in asm_lines:
+        m = LOADSTORE.search(line)
+        if not m:
+            continue
+        raw = m.group(2)
+        off = int(raw, 16) if raw.startswith(("0x", "-0x")) else int(raw)
+        t = OPCODE_TYPE.get(m.group(1))
+        if t is None:
+            continue
+        if off in out and out[off] != t:
+            out[off] = None
+        else:
+            out.setdefault(off, t)
+    return {k: v for k, v in out.items() if v}
+
+
+def apply_field_widths(src, widths):
+    """Substitute each M2C_W with the width the target proves for that offset."""
+    def repl(m):
+        off = int(m.group(2), 16)
+        t = widths.get(off)
+        return (f"(*({t} *)((char *){m.group(1)} + 0x{m.group(2)}))" if t
+                else m.group(0))
+    return re.sub(r"\(\*\(M2C_W \*\)\(\(char \*\)(\w+) \+ 0x([0-9A-Fa-f]+)\)\)",
+                  repl, src)
+
+
+
+
+def fix_int_derefs(src):
+    """Restore the pointer cast on a dereference of int address arithmetic.
+
+    Casting `&D_x` to int (above) makes byte offsets scale correctly, but m2c
+    also writes plain `*(base + off)` for a word load. Once base is an int that
+    dereference is illegal, and it became the single largest compile failure
+    (68 of 200 sampled drafts) — a class this pipeline introduced itself while
+    fixing the scaling.
+
+    Rewrite `*(EXPR)` to `*(int *)(EXPR)` when EXPR contains the `(int)&` marker
+    and is not already cast. Uses a paren scanner rather than a regex for the
+    same reason as rewrite_arrow_fields: the expression is parenthesised and its
+    end cannot be found by pattern alone.
+    """
+    out, i = src, 0
+    while True:
+        j = out.find("*(", i)
+        if j < 0:
+            break
+        # skip forms that already carry a cast, e.g. `*(int *)(...)`
+        after = out[j + 2:j + 40]
+        if re.match(r"\s*(?:unsigned |signed )?\w+\s*\*\s*\)", after):
+            i = j + 2
+            continue
+        depth, k = 0, j + 1
+        while k < len(out):
+            if out[k] == "(":
+                depth += 1
+            elif out[k] == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            k += 1
+        if k >= len(out):
+            break
+        inner = out[j + 2:k]
+        if "(int)&" in inner:
+            out = out[:j] + "*(int *)(" + inner + ")" + out[k + 1:]
+            i = j + 9 + len(inner)
+        else:
+            i = j + 2
+    return out
+
+
+INT_DECL_RE = re.compile(
+    r"^\s*(?:register\s+)?(?:unsigned\s+|signed\s+)?"
+    r"(int|s32|u32|s8|u8|s16|u16|long)\s+([A-Za-z_]\w*)\s*(?:=[^;]*)?;\s*$")
+
+
+def fix_int_var_derefs(src):
+    """Cast the dereference of a local m2c declared as a plain integer.
+
+    m2c routinely assigns an address into an `int` and then dereferences it:
+
+        int temp_s0;
+        temp_s0 = var_s2 + 0x10;
+        ... while ((u32) var_s3 < (u32) *temp_s0);
+
+    MWCC rejects `*temp_s0` with "pointer/array required", and this is the
+    largest remaining gate-1 class — 14 of 150 sampled drafts, versus 11 for
+    everything else combined.
+
+    Retyping the local to `int *` would be the wrong repair: it is assigned
+    from integer arithmetic all over the function, and every one of those
+    assignments would then need its own cast. Casting at the point of
+    dereference is local, and it is what the code means — both are 32 bits in
+    the same register, which is why m2c conflated them in the first place.
+
+    Only names the function DECLARES as an integer are touched, so a genuine
+    pointer local is left alone.
+    """
+    ints = {m.group(2) for m in (INT_DECL_RE.match(l) for l in src.splitlines()) if m}
+    # parameters too: `s32 func_x(s32 arg0, s32 arg1)`
+    sig = re.search(r"^[A-Za-z_][\w \*]*\b\w+\s*\(([^)]*)\)\s*\{", src, re.M)
+    if sig:
+        for part in sig.group(1).split(","):
+            m = re.match(r"\s*(?:unsigned\s+|signed\s+)?"
+                         r"(?:int|s32|u32|s8|u8|s16|u16|long)\s+([A-Za-z_]\w*)\s*$", part)
+            if m:
+                ints.add(m.group(1))
+    if not ints:
+        return src
+
+    def repl(m):
+        prev = m.group("prev")
+        # `a * b` is multiplication; a dereference follows an operator, an
+        # opening bracket, a comma, or the start of the expression.
+        if prev and (prev.isalnum() or prev in "_)]"):
+            return m.group(0)
+        return f"{prev}*(int *){m.group('name')}"
+
+    return re.sub(r"(?P<prev>.?)\*\s*(?P<name>" + "|".join(sorted(map(re.escape, ints), key=len, reverse=True)) + r")\b",
+                  repl, src)
+
+
+
+def cast_function_values(src):
+    """Cast a function used as a VALUE rather than called.
+
+    The game stores callbacks in globals and struct fields, so m2c writes
+
+        D_0000E7FC = func_000007C0;
+        (*(int *)((char *)temp_s1 + 0x41C)) = func_00000624;
+
+    and MWCC rejects both: "illegal implicit conversion from 'int ()' to 'int'".
+    A function designator decays to a pointer, which is 32 bits and exactly what
+    the target stores, so an explicit `(int)` is legal and free.
+
+    Only a name NOT followed by `(` is touched, so calls are untouched, and a
+    name already preceded by `&` or a cast is skipped.
+
+    Worth +1, +3 and +1 compiling drafts on three fixed 150-draft samples. Small,
+    but never negative.
+    """
+    def repl(m):
+        before = src[max(0, m.start() - 8):m.start()]
+        if before.rstrip().endswith(("&", ")", "int", "*")):
+            return m.group(0)
+        return f"(int){m.group(1)}"
+
+    return re.sub(r"\b((?:func|ehsys|duel_eng|duel_draw)_[0-9A-Za-z_]{4,})\b(?!\s*\()",
+                  repl, src)
+
+
+def rewrite_arrow_fields(src):
+    """Rewrite `EXPR->unkNN` for ANY left-hand side, not just a bare identifier.
+
+    m2c writes a field of a computed address as `(base + i*0x14)->unk34`, which
+    MWCC rejects because nothing declares that struct. The bare-identifier case
+    has always been rewritten; the parenthesised case is the single biggest
+    compile failure left (28 of 300 sampled functions, plus much of the
+    "pointer/array required" class).
+
+    docs/11 records an earlier attempt with a regex that emitted unbalanced
+    parentheses and broke working drafts, because a regex cannot find where a
+    parenthesised expression starts. This scans backwards with a paren counter
+    instead, which can: from the `->` walk left over a balanced group, or over a
+    plain identifier, and take that as the base.
+    """
+    out = src
+    while True:
+        m = re.search(r"->unk_?([0-9A-Fa-f]+)", out)
+        if not m:
+            break
+        off, end = m.group(1), m.end()
+        i = m.start() - 1
+        while i >= 0 and out[i] == " ":
+            i -= 1
+        if i < 0:
+            break
+        if out[i] == ")":
+            depth, j = 0, i
+            while j >= 0:
+                if out[j] == ")":
+                    depth += 1
+                elif out[j] == "(":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j -= 1
+            if j < 0:
+                break
+            start = j
+        else:
+            j = i
+            while j >= 0 and (out[j].isalnum() or out[j] == "_"):
+                j -= 1
+            start = j + 1
+            if start > i:
+                break
+        base = out[start:i + 1]
+        out = out[:start] + f"(*(M2C_W *)((char *){base} + 0x{off}))" + out[end:]
+    return out
+
+
+# ------------------------------------------------------------------- reshapes
+def shape_identity(src):
+    return src
+
+
+def shape_while_to_goto(src):
+    """MWCC rotates `while (c) {b}` to a bottom test with an entry branch; the
+    explicit goto form keeps the target's top test (rel_html_view func_00000034)."""
+    m = re.search(r"(\s*)while \((.+?)\) \{\n(.*?)\n\1\}", src, re.S)
+    if not m:
+        return None
+    ind, cond, body = m.groups()
+    return src[:m.start()] + (
+        f"\n{ind}_loop:\n{ind}if (!({cond})) goto _done;\n{body}\n{ind}goto _loop;\n{ind}_done:;"
+    ) + src[m.end():]
+
+
+def shape_dup_return(src):
+    """A shared `return r;` makes MWCC pick the branch-likely form and schedule
+    the return-value move into the delay slot; duplicating it inside the failure
+    branch gives the plain branch (rel_html_view func_00000178/278)."""
+    m = re.search(r"if \((\w+) < 0\) \{\n(.*?)\n(\s*)\}\n(\s*)return \1;", src, re.S)
+    if not m:
+        return None
+    var, body, ind, ind2 = m.groups()
+    return (src[:m.start()] +
+            f"if ({var} < 0) {{\n{body}\n{ind}    return {var};\n{ind}}}\n{ind2}return {var};" +
+            src[m.end():])
+
+
+def shape_single_switch(src):
+    """MWCC compiles a switch by branching INTO the case body; an equivalent if
+    inlines it and comes out shorter. Even a one-case switch is distinct
+    (rel_movie_viewer func_000001C8)."""
+    m = re.search(r"(\s*)if \((\w+) == (\w+)\) \{\n(.*?)\n\1\}", src, re.S)
+    if not m:
+        return None
+    ind, var, val, body = m.groups()
+    return (src[:m.start()] +
+            f"\n{ind}switch ({var}) {{\n{ind}case {val}:\n{body}\n{ind}    break;\n{ind}}}" +
+            src[m.end():])
+
+
+DATA_FLAVOURS = ["char", "void *", "int"]
+
+# Widths tried for m2c's unknown struct fields (the M2C_W placeholder). The
+# access width is whatever the target's load does; forcing `int` everywhere
+# quietly dooms every halfword and byte field, which is how a family of 35
+# rel_story getters and setters ended up needing to be fixed by hand.
+FIELD_WIDTHS = ["int", "unsigned short", "unsigned char"]
+
+def shape_baked_address(src):
+    """Some globals are baked into the ORIGINAL as raw absolute immediates with
+    no relocation at all. Declaring them as extern symbols forces a HI16/LO16
+    relocation and can never match; a literal `*(int *)0xADDR` reproduces the
+    baked constant. (Found on rel_umd_replace func_00003898.)"""
+    out = re.sub(r"&(D_([0-9A-F]{4,8}))\b", lambda m: f"(int *)0x{m.group(2)}", src)
+    out = re.sub(r"\bD_([0-9A-F]{4,8})\b(?!\s*\()", lambda m: f"(*(int *)0x{m.group(1)})", out)
+    return out if out != src else None
+
+
+def shape_tail_return(src):
+    """m2c often ends a function with a bare call where the original wrote
+    `return f(...);`. MWCC turns the latter into a real tail call (`j f` with the
+    last argument in the delay slot) and the former into jal+return, so the two
+    differ by a word or more. 280 functions across the project were exactly one
+    word short of their target — this is the shape that closes them."""
+    m = re.search(r"\n([ \t]*)([A-Za-z_]\w*\([^;{}]*\));\n\}\s*$", src)
+    if not m:
+        return None
+    out = src[:m.start()] + f"\n{m.group(1)}return {m.group(2)};\n}}\n"
+    return re.sub(r"^void(\s+\w+\s*\()", r"int\1", out, count=1, flags=re.M)
+
+
+def make_thunk_shape(extra):
+    """m2c only sees arguments the function TOUCHES. A thunk that forwards its
+    trailing parameter untouched (zero instructions for that register) therefore
+    comes out with too few parameters, and no reshuffling of the body can fix it.
+    These variants re-add passthrough parameters and make the call a tail call,
+    which is the shape the originals use throughout the UI modules.
+
+    CONFIRMED: mwccpsp passes integer arguments 5..8 in $t0-$t3, not on the
+    stack (verified by an 8-argument passthrough test and by matched functions
+    in rel_tutorial). So parameters beyond the fourth are worth trying — this is
+    why the range goes past 4."""
+    def shape(src):
+        m = re.match(r"\s*([\w \*]+?)\s+(func_[0-9A-F]+)\s*\(([^)]*)\)\s*\{\s*"
+                     r"(?:return\s+)?([A-Za-z_]\w*)\s*\(([^;]*)\)\s*;\s*\}\s*$", src, re.S)
+        if not m:
+            return None
+        _ret, fn, params, callee, args = m.groups()
+        params = [] if params.strip() in ("", "void") else [p.strip() for p in params.split(",")]
+        args = [a.strip() for a in args.split(",")] if args.strip() else []
+        for i in range(extra):
+            params.append(f"s32 pass{i}")
+            args.append(f"pass{i}")
+        return (f"int {fn}({', '.join(params) or 'void'}) {{\n"
+                f"    return {callee}({', '.join(args)});\n}}\n")
+    return shape
+
+
+def make_leading_dummy_shape(n):
+    """When the target only ever touches $a1 (or $a2) and passes $a0 straight
+    through, m2c declares one parameter, which the compiler places in $a0. Adding
+    unused LEADING parameters pushes the real one into the register the target
+    actually uses. (Found on rel_duel_draw — about 10 of 23 fixes in one batch.)"""
+    def shape(src):
+        m = re.match(r"(\s*[\w \*]+?\s+func_[0-9A-F]+\s*\()([^)]*)(\))", src, re.S)
+        if not m:
+            return None
+        params = m.group(2).strip()
+        if params in ("", "void"):
+            return None
+        dummies = ", ".join(f"s32 unused{i}" for i in range(n))
+        return src[:m.end(1)] + dummies + ", " + params + src[m.start(3):]
+    return shape
+
+
+def shape_bool_fold(src):
+    """At -O4,s only `!f()` folds into beqz/bnez; `f() == 0` materialises the
+    comparison. m2c writes the explicit comparison, so try the negation form."""
+    out = re.sub(r"\(([\w\.\->\[\]]+(?:\([^()]*\))?) == 0\)", r"(!\1)", src)
+    out = re.sub(r"\(([\w\.\->\[\]]+(?:\([^()]*\))?) != 0\)", r"(\1)", out)
+    return out if out != src else None
+
+
+def shape_void_return(src):
+    """If the target never sets $v0 before `jr $ra` the function is void; a
+    phantom `return 0;` makes MWCC emit an extra `move $v0, $zero`. m2c adds one
+    whenever it cannot tell, so try dropping it."""
+    m = re.search(r"\n\s*return 0;\s*\n\}\s*$", src)
+    if not m:
+        return None
+    out = src[:m.start()] + "\n}\n"
+    return re.sub(r"^(?:int|s32|u32)(\s+func_[0-9A-F]+\s*\()", r"void\1", out, count=1, flags=re.M)
+
+
+SHAPES = [
+    ("m2c", shape_identity),
+    ("void-return", shape_void_return),
+    ("bool-fold", shape_bool_fold),
+    ("lead-dummy1", make_leading_dummy_shape(1)),
+    ("lead-dummy2", make_leading_dummy_shape(2)),
+    ("thunk+1", make_thunk_shape(1)),
+    ("thunk+2", make_thunk_shape(2)),
+    ("thunk+3", make_thunk_shape(3)),
+    ("thunk+4", make_thunk_shape(4)),
+    ("thunk+5", make_thunk_shape(5)),
+    ("thunk+0", make_thunk_shape(0)),
+    ("tail-return", shape_tail_return),
+    ("baked-address", shape_baked_address),
+    ("goto-loop", shape_while_to_goto),
+    ("dup-return", shape_dup_return),
+    ("single-switch", shape_single_switch),
+]
+
+
+# -------------------------------------------------------------------- compile
+# `referenced()` builds declarations from the ASM, before m2c has drafted
+# anything, so it cannot know how a call's RESULT gets used and declares every
+# callee `extern int f();`. When the draft then writes `*func_0003FBD4(arg0)`
+# the compiler rejects it with "pointer/array required" — the single most common
+# reason a draft fails to compile, 16 of 40 failures in a 200-draft census.
+#
+# The draft itself is the evidence: if it dereferences the result, the callee
+# returns a pointer. m2c spaces its binary operators, so `*f(` is a dereference
+# while a multiplication reads `a * f(`; requiring the star to touch the name
+# keeps the two apart.
+DEREFED_CALL = re.compile(r"\*(\w+)\s*\(")
+DECLARED_FUNC = re.compile(r"^extern int (\w+)\((.*)\);$")
+
+
+def pointer_returns(decls, body):
+    """Re-declare as pointer-returning any function whose result the draft derefs."""
+    deref = set(DEREFED_CALL.findall(body))
+    if not deref:
+        return decls
+    out = []
+    for d in decls:
+        m = DECLARED_FUNC.match(d.strip())
+        # `int *`, not `void *`: the draft DEREFERENCES the result, and
+        # dereferencing a void pointer is illegal too — declaring it that way
+        # just moves the failure from "pointer/array required" to "illegal
+        # operands", which is what the first attempt at this did.
+        out.append(f"extern int *{m.group(1)}({m.group(2)});"
+                   if m and m.group(1) in deref else d)
+    return out
+
+
+def candidate_source(decls, body):
+    """The exact text the pipeline compiles. Anything measuring gate 1 must use
+    this rather than reassembling the pieces: gate1_census.py had its own copy
+    and so kept reporting the compile rate of a draft the pipeline no longer
+    builds."""
+    return PRELUDE + "\n" + "\n".join(pointer_returns(decls, body)) + "\n\n" + body + "\n"
+
+
+# mwcc reports an implicit conversion with everything needed to repair it: the
+# line number, the offending source line, and both types.
+#
+#   #      34: var_a3 = &D_0032541C;
+#   #   Error:                     ^
+#   #   illegal implicit conversion from 'int *' to
+#   #   'int'
+#
+# m2c gets these wrong constantly because it infers a local's type from one use
+# and then assigns something else to it. The repair is to cast the right-hand
+# side to the type mwcc asks for. That is codegen-neutral — an int/pointer cast
+# emits no instruction on MIPS, the value already sits in a register either way
+# — so it fixes the type checker without changing what we are trying to match.
+CONVERSION = re.compile(
+    r"#\s+(\d+):\s(.*)\n#\s+Error:.*\n#\s+illegal implicit conversion from '[^']*' to\s*\n#\s+'([^']*)'")
+
+
+def repair_conversions(src, output):
+    """Cast the RHS of each mis-typed assignment to the type mwcc named."""
+    lines = src.split("\n")
+    fixed = 0
+    for m in CONVERSION.finditer(output):
+        n, text, want = int(m.group(1)), m.group(2), m.group(3).strip()
+        if not (1 <= n <= len(lines)) or lines[n - 1].strip() != text.strip():
+            continue                      # line numbers drifted; do not guess
+        # only plain `lhs = rhs;` — compound assignment would change semantics
+        eq = re.match(r"^(\s*[\w\[\]\.\->\*\(\) ]+?)\s=\s(.+);\s*$", lines[n - 1])
+        if not eq or "==" in lines[n - 1] or f"({want})" in eq.group(2):
+            continue
+        lines[n - 1] = f"{eq.group(1)} = ({want})({eq.group(2)});"
+        fixed += 1
+    return "\n".join(lines) if fixed else None
+
+
+def compile_candidate(fn, src, workdir, flags, repairs=6):
+    """Compile, and let the compiler's own diagnostics repair the draft.
+
+    Bounded: each pass must fix at least one line or the loop stops, so a draft
+    the compiler cannot explain costs one extra compile, not six."""
+    for _ in range(repairs + 1):
+        open(os.path.join(workdir, f"{fn}.c"), "w").write(src)
+        r = subprocess.run([WIBO, MWCC, "-c", *flags, "-o", f"{fn}.o", f"{fn}.c"],
+                           capture_output=True, text=True, cwd=workdir)
+        if r.returncode == 0:
+            return True
+        repaired = repair_conversions(src, r.stdout + r.stderr)
+        if not repaired:
+            return False
+        src = repaired
+    return False
+
+
+def try_candidate(module, fn, decls, body, workdir, flags=None):
+    src = candidate_source(decls, body)
+    if not compile_candidate(fn, src, workdir, list(flags or FLAGS)):
+        return None, "compile-error"
+    d = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
+                        os.path.join(ROOT, "asm", module, "text.s"),
+                        os.path.join(workdir, f"{fn}.o"), fn],
+                       capture_output=True, text=True, cwd=ROOT)
+    verdict = d.stdout.strip().splitlines()[0] if d.stdout.strip() else "no-output"
+    return ("MATCH" in verdict and "MISMATCH" not in verdict), verdict
+
+
+
+# Prototypes with the REAL argument count, from scripts/gen_context.py. m2c
+# decides how many arguments a call passes by looking at the call site, and it
+# only reliably sees $a0-$a3; arguments five to eight travel in $t0-$t3, and a
+# tail-call trampoline sets some and jumps without touching the rest, so nothing
+# at the call site reveals them. m2c then emits a call with too few arguments
+# and the draft compiles to FEWER instructions than the target. Feeding it real
+# prototypes fixes that at the source.
+#
+# These go ONLY into m2c's context, never into the compiled source: the compiled
+# source keeps K&R `extern int f();` declarations, because a strict prototype
+# makes MWCC reject perfectly good drafts that pass a pointer where the
+# prototype says s32.
+def load_prototypes(module):
+    path = os.path.join(ROOT, "build/ctx", module + ".h")
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    for line in open(path):
+        m = re.match(r"(?:s32|void)\s+(\w+)\(", line)
+        if m:
+            out[m.group(1)] = line.strip()
+    return out
+
+
+def contextualise(decls, protos):
+    """Swap K&R externs for measured prototypes, for m2c's eyes only."""
+    out = []
+    for d in decls:
+        m = re.match(r"extern \w+ ((?:func|ehsys)_[0-9A-F]+)\(\)", d)
+        if m and m.group(1) in protos:
+            out.append(protos[m.group(1)])
+        else:
+            out.append(d)
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("module")
+    ap.add_argument("--max-words", type=int, default=10**9)
+    ap.add_argument("--only",
+                    help="one function, a comma-separated list, or @FILE with "
+                         "one name per line")
+    ap.add_argument("--dump", metavar="DIR",
+                    help="on a NEAR MISS, write the closest candidate's source to "
+                         "DIR/<func>.c. The pipeline otherwise throws it away, "
+                         "which makes the near-miss queue impossible to classify "
+                         "in bulk: you can see that a function is one instruction "
+                         "off but not what the instruction is.")
+    ap.add_argument("--limit", type=int, default=10**9)
+    ap.add_argument("--shard", default="1/1",
+                    help="i/N — process every Nth function, so N processes can run "
+                         "in parallel on one module (results merge by filename)")
+    args = ap.parse_args()
+
+    mod = args.module
+    workdir = os.path.join(ROOT, "build/auto", mod)
+    os.makedirs(workdir, exist_ok=True)
+    symtab = symbols(mod)
+    # Real argument counts for every callee (scripts/gen_context.py).
+    # Generated on demand so a fresh clone needs no extra step.
+    if not os.path.exists(os.path.join(ROOT, 'build/ctx', mod + '.h')):
+        subprocess.run([sys.executable, os.path.join(ROOT, 'scripts/gen_context.py'), mod],
+                       capture_output=True, cwd=ROOT)
+    protos = load_prototypes(mod)
+
+    results, matched = [], []
+    funcs = load_functions(mod)
+    # --only takes a LIST now, not just one name. Targeting a known family
+    # across a 7,487-function module is otherwise impossible: rel_duel_eng holds
+    # 1,463 of the project's 1,703 unmatched `ext` functions, and re-trying the
+    # whole module to reach them costs hours.
+    only = None
+    if args.only:
+        if args.only.startswith("@"):
+            only = {l.strip() for l in open(args.only[1:]) if l.strip()}
+        else:
+            only = {x.strip() for x in args.only.split(",") if x.strip()}
+    eligible = [f for f in funcs if f[2] <= args.max_words and
+                (not only or f[0] in only)]
+    todo = eligible[:args.limit]
+    si, sn = (int(x) for x in args.shard.split("/"))
+    tag = "" if sn == 1 else f".{si}of{sn}"
+    if sn > 1:
+        todo = todo[si - 1::sn]
+
+    # Say what is NOT being probed. A --limit silently truncated rel_duel_eng to
+    # 2,600 of its 7,487 functions; because the run reported only "trying 325"
+    # per shard, the module read as exhausted when 4,887 functions had never
+    # been looked at once. A cap that is not printed is indistinguishable from
+    # coverage.
+    dropped = {}
+    if args.max_words < 10**9:
+        dropped["over --max-words"] = sum(1 for f in funcs if f[2] > args.max_words)
+    if only:
+        dropped["not in --only"] = sum(1 for f in funcs if f[0] not in only)
+    if len(eligible) > args.limit:
+        dropped["cut by --limit"] = len(eligible) - args.limit
+    note = ", ".join(f"{v} {k}" for k, v in dropped.items() if v)
+    print(f"{mod}: {len(funcs)} functions, trying {len(todo)}"
+          + (f" ({note})" if note else "")
+          + (f" [shard {si}/{sn}]" if sn > 1 else ""), flush=True)
+
+    for i, (fn, lines, words) in enumerate(todo):
+        best, hit, best_src = None, False, None
+        for flavour in DATA_FLAVOURS:
+            decls = referenced(lines, symtab, fn, flavour, measured_types(mod))
+            ctx = os.path.join(workdir, f"{fn}.ctx.c")
+            open(ctx, "w").write(PRELUDE + "\n"
+                                 + "\n".join(contextualise(decls, protos)) + "\n")
+            draft = m2c_draft(mod, fn, ctx, slice_path(mod, fn, lines, workdir))
+            fw = field_widths(lines)
+            if not draft:
+                continue
+            compiled = False
+            for name, shape in SHAPES:
+                shaped = shape(draft)
+                if not shaped:
+                    continue
+                ok = False
+                # Only iterate widths when the draft actually has unknown fields,
+                # so functions without them cost nothing extra.
+                # Try the widths the TARGET proves first, then fall back to the
+                # blind search for any offset the asm did not disambiguate.
+                if "M2C_W" in shaped:
+                    exact = apply_field_widths(shaped, fw)
+                    widths = ([("asm", exact)] if "M2C_W" not in exact else []) + \
+                             [(w, shaped.replace("M2C_W", w)) for w in FIELD_WIDTHS]
+                else:
+                    widths = [(FIELD_WIDTHS[0], shaped)]
+                for width, body in widths:
+                    for fl in FLAG_SETS:
+                        ok, verdict = try_candidate(mod, fn, decls, body, workdir, fl)
+                        if ok:
+                            if width != FIELD_WIDTHS[0]:
+                                name += f" {width}-fields"
+                            name = name if fl is FLAG_SETS[0] else name + " -O2"
+                            break
+                    if ok:
+                        break
+                if verdict != "compile-error":
+                    compiled = True
+                if ok:
+                    matched.append({"func": fn, "words": words, "shape": name,
+                                    "flavour": flavour, "src": body})
+                    results.append({"func": fn, "words": words, "status": "MATCH",
+                                    "shape": name})
+                    hit = True
+                    break
+                if best is None or (best == "compile-error" and verdict != "compile-error"):
+                    best, best_src = verdict, body
+            # the declaration flavour exists only to make the draft COMPILE; once
+            # it does, the other flavours would just recompile the same code
+            if hit or compiled:
+                break
+        if not draft and not hit and best is None:
+            results.append({"func": fn, "words": words, "status": "m2c-failed"})
+            continue
+        if not hit:
+            results.append({"func": fn, "words": words, "status": "no-match", "closest": best})
+            if args.dump and best_src:
+                os.makedirs(args.dump, exist_ok=True)
+                open(os.path.join(args.dump, fn + ".c"), "w").write(
+                    f"/* {fn}: {best} */\n"
+                    + "\n".join(referenced(lines, symtab, fn, DATA_FLAVOURS[0],
+                                            measured_types(mod)))
+                    + "\n" + best_src + "\n")
+        if (i + 1) % 25 == 0:
+            n = sum(1 for r in results if r["status"] == "MATCH")
+            print(f"  {i+1}/{len(todo)} tried, {n} matched", flush=True)
+            # checkpoint: a long run must never lose its results to a kill
+            if not only:      # see the --only note below: a subset is not a census
+                json.dump({"module": mod, "tried": i + 1, "matched": n, "results": results},
+                          open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
+                json.dump(matched,
+                          open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
+
+    n = sum(1 for r in results if r["status"] == "MATCH")
+    # A run that did not look at every function is not a census of the module
+    # and must not replace one. 851d9f3 established this for --only, but --only
+    # is not the only way to cover a subset: --max-words and --limit truncate
+    # just as silently, and `--max-words 8 --limit 5` on rel_password duly
+    # overwrote a 3-match census with an empty one. The test is coverage, not
+    # which flag caused it.
+    partial = bool(dropped) or (only and len(only) > 1)
+    if partial:
+        # Fold matches into the existing matched.json additively and leave the
+        # per-function verdict file alone — overwriting it would throw away
+        # every verdict for the functions this run did not look at, which is
+        # what near_misses.py and the gate-1 census both read.
+        path = os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json")
+        existing = {}
+        if os.path.exists(path):
+            prev = json.load(open(path))
+            existing = {e["func"]: e for e in prev} if isinstance(prev, list) else prev
+        for e in matched:
+            existing[e["func"]] = e
+        json.dump(list(existing.values()), open(path, "w"), indent=1)
+        print(f"{mod}: {n} of {len(todo)} probed functions matched "
+              f"({len(existing)} in {os.path.basename(path)})")
+        return
+    if only and len(only) == 1:   # a single-function probe must never clobber the module's results
+        # print the closest verdict too: a probe is almost always run to see WHY
+        # a function fails, and "no match" alone forces a second, slower run.
+        detail = next((r.get("closest") for r in results if r.get("closest")), None)
+        print(f"{mod} {next(iter(only))}: {'MATCH' if n else 'no match'}"
+              + (f" [{detail}]" if detail and not n else ""))
+        return
+    out = {"module": mod, "tried": len(todo), "matched": n,
+           "of_module": len(funcs), "excluded": dropped, "results": results}
+    json.dump(out, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.json"), "w"), indent=1)
+    json.dump(matched, open(os.path.join(ROOT, f"build/auto/{mod}{tag}.matched.json"), "w"), indent=1)
+    print(f"{mod}: MATCHED {n}/{len(todo)}  -> build/auto/{mod}.matched.json")
+
+
+if __name__ == "__main__":
+    main()

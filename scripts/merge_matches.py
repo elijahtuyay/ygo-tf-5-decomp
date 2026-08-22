@@ -1,0 +1,303 @@
+#!/usr/bin/env python3
+"""
+Add newly-matched functions to an existing module source file, one at a time.
+
+    scripts/merge_matches.py rel_gallery
+
+`assemble_module.py` rebuilds a file from scratch and throws away hand-written
+headers, comments and hand-fixed functions. This only ever ADDS: it takes the
+functions in build/auto/<module>.matched.json that are not yet in
+src/<module>.c, inserts each in address order, and re-verifies the whole file
+after every insertion. If an insertion breaks anything — itself or a neighbour —
+it is rolled back and the next one is tried.
+
+That makes it safe to run against files that agents or humans are curating: the
+worst case is that nothing is added.
+"""
+import concurrent.futures
+import glob
+import json
+import os
+import re
+import subprocess
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def symbols(module):
+    out = {}
+    p = os.path.join(ROOT, "config/symbols", module + ".txt")
+    if os.path.exists(p):
+        for line in open(p):
+            m = re.match(r"(\w+) = 0x([0-9A-Fa-f]+);(.*)", line)
+            if m:
+                out[m.group(1)] = "func" if "type:func" in m.group(3) else "data"
+    return out
+
+
+def defined_in(text):
+    """Which functions this file already defines.
+
+    `[^;\n]*$`, not `[^;]*$`. Under re.M the `$` matches at any line end, but
+    `[^;]` also matches a NEWLINE, so the old pattern could run from one
+    definition across hundreds of lines to the next line that happened to end
+    without a semicolon — and every definition inside that span was invisible.
+    It hid 23 of rel_duel_draw's 628 definitions, which is why the merge kept
+    offering functions the file already had and burning a whole-file compile
+    discovering that each one was a redeclaration.
+    """
+    return set(re.findall(r"^[A-Za-z_][\w \*]*?\b(func_[0-9A-F]+)\s*\([^;\n]*$", text, re.M))
+
+
+# The declared type of a global decides the load width MWCC emits — `char` gives
+# `lb`, `int` gives `lw`, `unsigned short` gives `lhu`. auto_decomp.py picks the
+# flavour that matches while trying a function on its own, but does not record
+# which one it used, so the merge has to rediscover it.
+DATA_FLAVOURS = ["int", "char", "unsigned short", "void *"]
+
+
+def block_decls(src, symtab, flavour="int", self_name=None):
+    """Externs for one function, at block scope (widths differ between users).
+
+    `self_name` is excluded. The scan reads every identifier in the source,
+    which includes the function's own name from its definition line, and it
+    emitted `extern int func_X();` ahead of the definition. For a function
+    returning anything other than int that is a straight contradiction —
+
+        identifier 'func_0000246C(...)' redeclared
+        was declared as: 'int (...)'   now declared as: 'void (int)'
+
+    — and the candidate was rejected as "does not compile" with no hint that
+    the merge itself had written the conflicting line. A definition is its own
+    declaration, so there was never anything to emit.
+    """
+    out = []
+    for n in sorted(set(re.findall(r"\b\w+\b", src))):
+        if n == self_name:
+            continue
+        if n in symtab:
+            out.append(f"    extern int {n}();" if symtab[n] == "func"
+                       else f"    extern {flavour} {n};")
+        elif re.match(r"^(D|jtbl)_[0-9A-F]{4,8}$", n):
+            out.append(f"    extern {flavour} {n};")
+        elif re.match(r"^func_[0-9A-F]{8}$", n):
+            out.append(f"    extern int {n}();")
+    return out
+
+
+
+def reconcile_return_type(text, src, func):
+    """Match the candidate's return type to what the file already declares.
+
+    Callers in the same file carry block-scope declarations like
+    `extern int func_0000246C();`. Those have external linkage, so a later
+    definition returning something else is a redeclaration and the whole file
+    stops compiling:
+
+        identifier 'func_0000246C(...)' redeclared
+        was declared as: 'int (...)'   now declared as: 'void (int)'
+
+    A function that never returns a value compiles to the same instructions
+    whether it is declared `void` or `int` — nothing is placed in $v0 either
+    way — so adopting the declared type is usually free. "Usually" is doing
+    real work in that sentence, which is why this is only ever a CANDIDATE:
+    the caller re-verifies the whole file byte-for-byte afterwards and rolls
+    back if a single instruction moved.
+    """
+    m = re.search(r"\bextern\s+(\w[\w \*]*?)\s+" + re.escape(func) + r"\s*\(", text)
+    if not m:
+        return None
+    declared = m.group(1).strip()
+    m2 = re.match(r"^\s*(\w[\w \*]*?)\s+" + re.escape(func) + r"\s*\(", src)
+    if not m2 or m2.group(1).strip() == declared:
+        return None
+    return src[:m2.start(1)] + declared + src[m2.end(1):]
+
+
+def verify(module, names):
+    r = subprocess.run([os.path.join(ROOT, "scripts/mwcc_build.sh"),
+                        os.path.join(ROOT, "src", module + ".c")],
+                       capture_output=True, text=True, cwd=ROOT)
+    if r.returncode != 0:
+        return None
+    d = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
+                        os.path.join(ROOT, "asm", module, "text.s"),
+                        os.path.join(ROOT, "build/mwcc", module + ".o")],
+                       capture_output=True, text=True, cwd=ROOT)
+    bad = set()
+    for line in d.stdout.splitlines():
+        m = re.match(r"^(func_[0-9A-F]+): (.*)$", line)
+        if m and m.group(1) in names and not m.group(2).startswith("MATCH"):
+            bad.add(m.group(1))
+    return bad
+
+
+def needs_decls(src):
+    """Agent-written functions already declare their externs inside the body.
+    Injecting a second set with different types changes the load widths and
+    breaks a function that verified fine on its own."""
+    body = src[src.index("{"):] if "{" in src else src
+    return "extern " not in body
+
+
+def insert(text, entry, decls):
+    """Place a function in address order among the existing definitions."""
+    addr = int(entry["func"][5:], 16)
+    body = entry["src"]
+    m = re.search(r"\{", body)
+    if m:
+        body = body[:m.end()] + "\n" + "\n".join(decls) + body[m.end():]
+    # Some functions only match at optimisation level 2 — level 3 is where MWCC
+    # turns on instruction scheduling and tail-call optimisation, and these
+    # targets have unfilled delay slots or real jal+frame calls. A per-function
+    # `#pragma optimization_level` reproduces that inside the project's normal
+    # -O4,s build, so the module still compiles as one translation unit.
+    if "-O2" in entry.get("shape", ""):
+        body = ("#pragma optimization_level 2\n" + body +
+                "\n#pragma optimization_level 4")
+    chunk = (f"\n/* {entry['func']} — {entry['words']} words. MATCH 100% "
+             f"(shape: {entry['shape']}). */\n{body}\n")
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        m = re.match(r"^[A-Za-z_][\w \*]*?\bfunc_([0-9A-F]+)\s*\([^;]*$", line)
+        if m and int(m.group(1), 16) > addr:
+            back = i
+            while back > 0 and (lines[back - 1].strip().startswith(("/*", "*", "*/"))
+                                or not lines[back - 1].strip()):
+                back -= 1
+            return "\n".join(lines[:back]) + chunk + "\n".join(lines[back:])
+    return text.rstrip("\n") + "\n" + chunk
+
+
+def harvest_objects(module):
+    """Trial objects in build/auto/<module>/ that MATCH but were never recorded.
+
+    auto_decomp only records the first shape that matches, and agents leave
+    behind trials they verified by hand; one agent found 87 already-matching
+    functions in rel_duel_draw this way. Re-diff every object and recover them."""
+    d = os.path.join(ROOT, "build/auto", module)
+    found = []
+    if not os.path.isdir(d):
+        return found
+
+    def check(fn):
+        """Re-diff one trial object. Returns an entry, or None."""
+        csrc = os.path.join(d, fn + ".c")
+        if not os.path.exists(csrc):
+            return None
+        r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
+                            os.path.join(ROOT, "asm", module, "text.s"),
+                            os.path.join(d, fn + ".o"), fn],
+                           capture_output=True, text=True, cwd=ROOT)
+        if not re.match(rf"^{fn}: MATCH", r.stdout.strip()):
+            return None
+        text = open(csrc).read()
+        m = re.search(rf"^[A-Za-z_][\w \*]*?\b{fn}\s*\(", text, re.M)
+        return {"func": fn, "words": 0, "shape": "harvested",
+                "src": text[m.start():].strip()} if m else None
+
+    names = sorted(o[:-2] for o in os.listdir(d)
+                   if o.endswith(".o") and re.match(r"^func_[0-9A-F]+\.o$", o))
+    # One mwcc_diff subprocess per object, and a swept rel_duel_eng leaves
+    # thousands behind — serially that is hours of wall-clock before the merge
+    # can even start. The diffs are independent and read-only, so run them in
+    # parallel; each is subprocess-bound, which threads handle fine.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(16, (os.cpu_count() or 4))) as ex:
+        for e in ex.map(check, names):
+            if e:
+                found.append(e)
+    return found
+
+
+def main():
+    module = sys.argv[1]
+    path = os.path.join(ROOT, "src", module + ".c")
+    if not os.path.exists(path):
+        print(f"{module}: nothing to do")
+        return
+
+    # Read the SHARDED outputs too. `auto_decomp.py --shard i/n` writes
+    # build/auto/<module>.<i>of<n>.matched.json, and this script used to read
+    # only the unsharded name — so every sharded run's matches were simply lost
+    # unless somebody consolidated them by hand. They were not: one such sweep
+    # of rel_duel_eng had 65 verified functions sitting unmerged. Every entry is
+    # re-verified against the whole file below, so reading a stale shard file
+    # costs a rejected candidate at worst.
+    entries, seen = [], set()
+    sources = (sorted(glob.glob(os.path.join(ROOT, f"build/auto/{module}.matched.json")))
+               + sorted(glob.glob(os.path.join(ROOT, f"build/auto/{module}.*of*.matched.json"))))
+    for mj in sources:
+        try:
+            for e in json.load(open(mj)):
+                if e["func"] not in seen:
+                    seen.add(e["func"])
+                    entries.append(e)
+        except (json.JSONDecodeError, KeyError, TypeError):
+            print(f"  skipping unreadable {os.path.basename(mj)}")
+    if not entries:
+        print(f"{module}: nothing to do")
+        return
+    if "--scan-objects" in sys.argv:
+        known = {e["func"] for e in entries}
+        extra = [e for e in harvest_objects(module) if e["func"] not in known]
+        print(f"{module}: harvested {len(extra)} matching trial objects")
+        entries += extra
+    symtab = symbols(module)
+    have = defined_in(open(path).read())
+    todo = [e for e in entries if e["func"] not in have]
+    if not todo:
+        print(f"{module}: nothing new ({len(have)} already present)")
+        return
+
+    added, rejects = 0, []
+    for e in todo:
+        before = open(path).read()
+        names = defined_in(before) | {e["func"]}
+        flavours = DATA_FLAVOURS if needs_decls(e["src"]) else [None]
+        # Try the candidate as written, then with its return type reconciled to
+        # whatever the file already declares for it.
+        variants = [e]
+        alt = reconcile_return_type(before, e["src"], e["func"])
+        if alt:
+            variants.append({**e, "src": alt})
+        done, last = False, None
+        for cand in variants:
+            for flavour in flavours:
+                decls = block_decls(cand["src"], symtab, flavour, cand["func"]) if flavour else []
+                open(path, "w").write(insert(before, cand, decls))
+                bad = verify(module, names)
+                if bad is not None and not bad:
+                    added += 1
+                    done = True
+                    break
+                open(path, "w").write(before)  # roll back, try the next flavour
+                last = bad
+            if done:
+                break
+        if not done:
+            rejects.append((e["func"], last))
+    print(f"{module}: added {added} of {len(todo)} candidates "
+          f"({len(defined_in(open(path).read()))} now in file)")
+
+    # Name the rejects and say what happened. A candidate that verified ALONE in
+    # auto_decomp but fails once inserted is not noise: it means the file's
+    # context changed its codegen, which is a lever, not a dead end. Reporting
+    # only a count hides that entirely.
+    if rejects:
+        broke = [(f, b) for f, b in rejects if b]
+        nocomp = [f for f, b in rejects if b is None]
+        if nocomp:
+            print(f"  {len(nocomp)} did not compile in context: "
+                  + ", ".join(nocomp[:8]) + (" ..." if len(nocomp) > 8 else ""))
+        for f, b in broke[:8]:
+            others = [x for x in b if x != f]
+            print(f"  {f}: rolled back — "
+                  + (f"itself no longer matched" if not others
+                     else f"broke {len(others)} neighbour(s): {', '.join(others[:4])}"))
+        if len(broke) > 8:
+            print(f"  ... and {len(broke) - 8} more")
+
+
+if __name__ == "__main__":
+    main()
