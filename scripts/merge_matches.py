@@ -14,6 +14,7 @@ it is rolled back and the next one is tried.
 That makes it safe to run against files that agents or humans are curating: the
 worst case is that nothing is added.
 """
+import concurrent.futures
 import glob
 import json
 import os
@@ -179,25 +180,33 @@ def harvest_objects(module):
     found = []
     if not os.path.isdir(d):
         return found
-    for obj in sorted(os.listdir(d)):
-        if not obj.endswith(".o"):
-            continue
-        fn = obj[:-2]
-        if not re.match(r"^func_[0-9A-F]+$", fn):
-            continue
+
+    def check(fn):
+        """Re-diff one trial object. Returns an entry, or None."""
         csrc = os.path.join(d, fn + ".c")
         if not os.path.exists(csrc):
-            continue
+            return None
         r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts/mwcc_diff.py"),
                             os.path.join(ROOT, "asm", module, "text.s"),
-                            os.path.join(d, obj), fn], capture_output=True, text=True, cwd=ROOT)
+                            os.path.join(d, fn + ".o"), fn],
+                           capture_output=True, text=True, cwd=ROOT)
         if not re.match(rf"^{fn}: MATCH", r.stdout.strip()):
-            continue
+            return None
         text = open(csrc).read()
         m = re.search(rf"^[A-Za-z_][\w \*]*?\b{fn}\s*\(", text, re.M)
-        if m:
-            found.append({"func": fn, "words": 0, "shape": "harvested",
-                          "src": text[m.start():].strip()})
+        return {"func": fn, "words": 0, "shape": "harvested",
+                "src": text[m.start():].strip()} if m else None
+
+    names = sorted(o[:-2] for o in os.listdir(d)
+                   if o.endswith(".o") and re.match(r"^func_[0-9A-F]+\.o$", o))
+    # One mwcc_diff subprocess per object, and a swept rel_duel_eng leaves
+    # thousands behind — serially that is hours of wall-clock before the merge
+    # can even start. The diffs are independent and read-only, so run them in
+    # parallel; each is subprocess-bound, which threads handle fine.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(16, (os.cpu_count() or 4))) as ex:
+        for e in ex.map(check, names):
+            if e:
+                found.append(e)
     return found
 
 
