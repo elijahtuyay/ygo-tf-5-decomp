@@ -9,14 +9,20 @@
 #
 # Requirements: tools/wibo-bin/wibo + tools/mwccpsp_3.0.1_219/mwccpsp.exe
 # (both fetched by scripts/setup_tools.sh).
+#
+# Environment overrides (used by scripts/mwcc_bisect.sh):
+#   MWCCPSP_BUILD  compiler build number to use     (default: 219)
+#   MWCC_OUT_DIR   directory to write the .o into   (default: build/mwcc)
+# Without these the bisect harness silently compiles every build with 219 and
+# re-diffs whatever .o files are already lying in its output dirs.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WIBO="$ROOT/tools/wibo-bin/wibo"
-MWCC="$ROOT/tools/mwccpsp_3.0.1_219/mwccpsp.exe"
+MWCC="$ROOT/tools/mwccpsp_3.0.1_${MWCCPSP_BUILD:-219}/mwccpsp.exe"
 
 if [ ! -x "$WIBO" ] || [ ! -f "$MWCC" ]; then
-  echo "ERROR: wibo/mwccpsp not found. Run scripts/setup_tools.sh first." >&2
+  echo "ERROR: wibo/mwccpsp not found ($MWCC). Run scripts/setup_tools.sh first." >&2
   exit 1
 fi
 
@@ -28,7 +34,7 @@ if [ "${#FLAGS[@]}" -eq 0 ]; then
 fi
 
 BASENAME="$(basename "${SRC%.c}")"
-OUT_DIR="$ROOT/build/mwcc"
+OUT_DIR="${MWCC_OUT_DIR:-$ROOT/build/mwcc}"
 mkdir -p "$OUT_DIR"
 cp "$SRC" "$OUT_DIR/$BASENAME.c"
 

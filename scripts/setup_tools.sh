@@ -39,6 +39,12 @@ clone_or_pull https://github.com/simonlindholm/decomp-permuter  decomp-permuter
 # pspdecrypt: to decrypt the EBOOT from the CLI (requires libssl-dev to build)
 clone_or_pull https://github.com/John-K/pspdecrypt              pspdecrypt
 
+# psplibdoc: the pspdev community's Sony NID database (~6300 NID -> name pairs,
+# CSV: lib,fun|var,NID,name,status). scripts/eboot_signatures.py uses it to name
+# the engine's SDK imports — it resolves 314 of modehsys's 339 imports (93%),
+# where PPSSPP's HLE tables alone managed 39. Large clone (~226 MB), shallow.
+clone_or_pull https://github.com/pspdev/psplibdoc                psplibdoc
+
 # Python dependencies of the cloned tools
 pip install --quiet -r tools/asm-differ/requirements.txt 2>/dev/null || true
 pip install --quiet -r tools/m2c/requirements.txt        2>/dev/null || true
