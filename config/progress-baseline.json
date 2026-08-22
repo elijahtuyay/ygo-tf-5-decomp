@@ -1,6 +1,24 @@
 {
  "generated": "2026-08-22",
  "modules": {
+  "rel_cardalbum": [
+   "func_00000888",
+   "func_000008A8",
+   "func_00001708",
+   "func_00001C48",
+   "func_00001FB0",
+   "func_00002E24",
+   "func_00002E34",
+   "func_000043E8",
+   "func_000052C4",
+   "func_00005C90",
+   "func_00005EFC",
+   "func_000063E4",
+   "func_000063F4",
+   "func_00006480",
+   "func_00006800",
+   "func_00006A84"
+  ],
   "rel_movie_viewer": [
    "func_00000000",
    "func_00000034",
