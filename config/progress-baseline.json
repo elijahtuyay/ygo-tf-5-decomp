@@ -1,0 +1,18 @@
+{
+ "generated": "2026-08-22",
+ "modules": {
+  "rel_password": [
+   "func_00000A10",
+   "func_00000A24",
+   "func_00000A34",
+   "func_00000A3C",
+   "func_00000A58",
+   "func_00000D6C",
+   "func_000010C4",
+   "func_0000152C",
+   "func_0000159C",
+   "func_0000337C",
+   "func_000034D8"
+  ]
+ }
+}
